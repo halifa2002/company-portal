@@ -1,0 +1,6 @@
+# 本机是 Windows 普通用户（没开开发者模式），bun 默认的 isolated 链接方式要建
+# 符号链接，会报「需要管理员权限」。改用 hoisted 布局：依赖平铺在根 node_modules，
+# 工作区包用 junction（普通用户可以创建），Turbopack 通过 apps/*/next.config.ts
+# 里的 resolveAlias 指到源码。
+[install]
+linker = "hoisted"

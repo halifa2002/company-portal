@@ -94,6 +94,29 @@ export function getStatus() {
 }
 
 /**
+ * GET /api/reset_password?email= —— 发送重置邮件
+ *
+ * 官方行为（controller/misc.go）：
+ *   邮箱存在就发信、不存在也返回 success（防账号枚举），所以前端一律按"已发送"处理。
+ *   邮件里的链接形如 {ServerAddress}/user/reset?email=..&token=..，
+ *   控制台必须有 /user/reset 这个路径，否则用户点进去会 404。
+ *   发不出信（未配邮件服务）后端只记日志、仍回 success —— 所以页面要提示"没收到就联系管理员"。
+ */
+export function sendPasswordResetEmail(email: string) {
+  return http.get<null>('/api/reset_password', { email });
+}
+
+/**
+ * POST /api/user/reset —— 用邮件里的 token 重置密码
+ *
+ * 官方不是让用户自己填新密码，而是**生成一个随机密码直接返回**（data 字段）。
+ * 页面必须把它明确展示给用户，并让用户登录后立即修改。
+ */
+export function resetPassword(input: { email: string; token: string }) {
+  return http.post<string>('/api/user/reset', input);
+}
+
+/**
  * 确保有可用登录态：
  * 页面刷新后内存里的令牌没了，但 refresh cookie 还在，用它静默续期。
  */

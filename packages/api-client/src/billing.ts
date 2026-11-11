@@ -7,6 +7,28 @@
  */
 
 import { http } from './client';
+import type { PageResult } from '@portal/types';
+
+/**
+ * 一笔充值记录（官方 model/topup.go 的 TopUp）
+ * status：pending 待支付 / success 已完成 / expired 已过期（官方按字符串返回）
+ */
+export interface TopUpRecord {
+  id: number;
+  user_id: number;
+  /** 入账额度（平台内部额度单位） */
+  amount: number;
+  /** 实付金额（元） */
+  money: number;
+  trade_no: string;
+  /** 兑换码为 balance，其余为支付通道 */
+  payment_method: string;
+  payment_provider: string;
+  create_time: number;
+  /** 未完成时为 0 */
+  complete_time: number;
+  status: string;
+}
 
 export interface TopUpInfo {
   /** 是否开启充值 */
@@ -23,9 +45,9 @@ export function getTopUpInfo() {
   return http.get<TopUpInfo>('/api/user/topup/info');
 }
 
-/** GET /api/user/topup/self —— 我的充值记录 */
+/** GET /api/user/topup/self —— 我的充值记录（p / page_size 分页，data 是 PageInfo） */
 export function listMyTopUps(params: { page?: number; page_size?: number } = {}) {
-  return http.get<unknown>('/api/user/topup/self', {
+  return http.get<PageResult<TopUpRecord>>('/api/user/topup/self', {
     p: params.page ?? 1,
     page_size: params.page_size ?? 20,
   });

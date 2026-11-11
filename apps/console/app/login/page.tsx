@@ -87,12 +87,17 @@ export default function LoginPage() {
             {loading ? '登录中…' : '登录'}
           </button>
 
-          <p className="mt-4 text-center text-xs text-ink-muted">
-            还没有账号？
-            <Link href="/register" className="ml-1 text-brand">
-              立即注册
+          <div className="mt-4 flex items-center justify-between text-xs text-ink-muted">
+            <Link href="/forgot-password" className="text-brand">
+              忘记密码？
             </Link>
-          </p>
+            <span>
+              还没有账号？
+              <Link href="/register" className="ml-1 text-brand">
+                立即注册
+              </Link>
+            </span>
+          </div>
         </form>
 
         {/* 返回官网：放在表单下面，不抢主按钮视线 */}

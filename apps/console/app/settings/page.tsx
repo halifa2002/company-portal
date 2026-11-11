@@ -59,6 +59,10 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState('');
   const [newPassword2, setNewPassword2] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
+  /** 改密码默认收起：这是高风险操作，列表页只留一行入口，表单放进弹窗 */
+  const [pwdOpen, setPwdOpen] = useState(false);
+  /** 三个密码框各自的「显示/隐藏」开关，跟常见做法一致 */
+  const [showPwd, setShowPwd] = useState({ old: false, next: false, again: false });
   const [revoking, setRevoking] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -142,6 +146,7 @@ export default function SettingsPage() {
       setOldPassword('');
       setNewPassword('');
       setNewPassword2('');
+      setPwdOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : '修改密码失败');
     } finally {
@@ -318,52 +323,45 @@ export default function SettingsPage() {
                 </div>
               </section>
 
-              {/* 修改密码 */}
-              <form
-                onSubmit={handleChangePassword}
-                className="rounded-card border border-line bg-surface p-6"
-              >
-                <h2 className="text-sm font-medium text-ink">修改密码</h2>
-                <p className="mt-1 text-xs text-ink-muted">
-                  改完密码后，其他设备需要重新登录；密码至少 8 位。
-                </p>
-                <div className="mt-4 grid gap-3 sm:max-w-md">
-                  <input
-                    type="password"
-                    required
-                    autoComplete="current-password"
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
-                    placeholder="当前密码"
-                    className="rounded-md border border-line px-3 py-2 text-sm outline-none transition-colors focus:border-brand"
-                  />
-                  <input
-                    type="password"
-                    required
-                    autoComplete="new-password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="新密码（至少 8 位）"
-                    className="rounded-md border border-line px-3 py-2 text-sm outline-none transition-colors focus:border-brand"
-                  />
-                  <input
-                    type="password"
-                    required
-                    autoComplete="new-password"
-                    value={newPassword2}
-                    onChange={(e) => setNewPassword2(e.target.value)}
-                    placeholder="再输入一次新密码"
-                    className="rounded-md border border-line px-3 py-2 text-sm outline-none transition-colors focus:border-brand"
-                  />
+              {/* 登录与认证 —— 改密码不常驻表单，只留一行入口，点开走弹窗 */}
+              <section>
+                <h2 className="mb-3 text-sm font-medium text-ink">登录与认证</h2>
+                <div className="flex items-center justify-between gap-4 rounded-card border border-line bg-surface p-5">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-subtle text-ink-muted">
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M12 3l7 3v6c0 4.2-2.9 7.4-7 9-4.1-1.6-7-4.8-7-9V6l7-3Z" />
+                        <path d="M9.5 12.2l1.8 1.8 3.4-3.6" />
+                      </svg>
+                    </span>
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-ink">更改密码</div>
+                      <div className="mt-0.5 truncate text-xs text-ink-muted">
+                        更新您的密码以确保账户安全
+                      </div>
+                    </div>
+                  </div>
                   <button
-                    type="submit"
-                    disabled={changingPassword}
-                    className="w-fit rounded-md bg-brand px-5 py-2 text-sm text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+                    type="button"
+                    onClick={() => {
+                      setError('');
+                      setNotice('');
+                      setPwdOpen(true);
+                    }}
+                    className="shrink-0 rounded-md border border-line px-3 py-1.5 text-xs text-ink transition-colors hover:border-brand hover:text-brand"
                   >
-                    {changingPassword ? '提交中…' : '修改密码'}
+                    更改密码
                   </button>
                 </div>
-              </form>
+              </section>
             </div>
 
             {/* 右栏：登录设备 */}
@@ -434,6 +432,176 @@ export default function SettingsPage() {
           </div>
         </div>
       </main>
+
+      {/* 更改密码弹窗 —— 常见的「点按钮弹窗改密码」做法，页面上不留常驻表单 */}
+      {pwdOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8"
+          onClick={() => {
+            setPwdOpen(false);
+          }}
+        >
+          <div
+            className="w-full max-w-md overflow-hidden rounded-panel border border-line bg-surface shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-line px-6 py-4">
+              <div>
+                <h2 className="text-sm font-medium text-ink">更改密码</h2>
+                <p className="mt-1 text-xs text-ink-muted">
+                  更新账户密码：{user?.email || user?.username || '当前账号'}
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="关闭"
+                onClick={() => setPwdOpen(false)}
+                className="-mr-1 rounded p-1 text-ink-muted transition-colors hover:text-ink"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleChangePassword} className="px-6 py-5">
+              <div className="grid gap-4">
+                <label className="block">
+                  <span className="block text-xs font-medium text-ink">当前密码</span>
+                  <span className="relative mt-1.5 block">
+                    <input
+                      type={showPwd.old ? 'text' : 'password'}
+                      required
+                      autoComplete="current-password"
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      className="w-full rounded-md border border-line px-3 py-2 pr-10 text-sm outline-none transition-colors focus:border-brand"
+                    />
+                    <button
+                      type="button"
+                      aria-label={showPwd.old ? '隐藏密码' : '显示密码'}
+                      onClick={() => setShowPwd((s) => ({ ...s, old: !s.old }))}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-muted transition-colors hover:text-ink"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      >
+                        <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" />
+                        <circle cx="12" cy="12" r="2.6" />
+                      </svg>
+                    </button>
+                  </span>
+                </label>
+
+                <label className="block">
+                  <span className="block text-xs font-medium text-ink">新密码</span>
+                  <span className="relative mt-1.5 block">
+                    <input
+                      type={showPwd.next ? 'text' : 'password'}
+                      required
+                      autoComplete="new-password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full rounded-md border border-line px-3 py-2 pr-10 text-sm outline-none transition-colors focus:border-brand"
+                    />
+                    <button
+                      type="button"
+                      aria-label={showPwd.next ? '隐藏密码' : '显示密码'}
+                      onClick={() => setShowPwd((s) => ({ ...s, next: !s.next }))}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-muted transition-colors hover:text-ink"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      >
+                        <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" />
+                        <circle cx="12" cy="12" r="2.6" />
+                      </svg>
+                    </button>
+                  </span>
+                  <span className="mt-1 block text-[11px] text-ink-muted">
+                    使用 8 位以上字符；改完后其他设备需重新登录。
+                  </span>
+                </label>
+
+                <label className="block">
+                  <span className="block text-xs font-medium text-ink">确认新密码</span>
+                  <span className="relative mt-1.5 block">
+                    <input
+                      type={showPwd.again ? 'text' : 'password'}
+                      required
+                      autoComplete="new-password"
+                      value={newPassword2}
+                      onChange={(e) => setNewPassword2(e.target.value)}
+                      className="w-full rounded-md border border-line px-3 py-2 pr-10 text-sm outline-none transition-colors focus:border-brand"
+                    />
+                    <button
+                      type="button"
+                      aria-label={showPwd.again ? '隐藏密码' : '显示密码'}
+                      onClick={() => setShowPwd((s) => ({ ...s, again: !s.again }))}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-muted transition-colors hover:text-ink"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      >
+                        <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" />
+                        <circle cx="12" cy="12" r="2.6" />
+                      </svg>
+                    </button>
+                  </span>
+                </label>
+              </div>
+
+              {error && (
+                <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-xs text-danger">{error}</p>
+              )}
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPwdOpen(false);
+                    setOldPassword('');
+                    setNewPassword('');
+                    setNewPassword2('');
+                  }}
+                  className="rounded-md border border-line px-4 py-2 text-sm text-ink-muted transition-colors hover:text-ink"
+                >
+                  取消
+                </button>
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="rounded-md bg-brand px-4 py-2 text-sm text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+                >
+                  {changingPassword ? '提交中…' : '更改密码'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

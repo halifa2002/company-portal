@@ -14,4 +14,4 @@ export * as accountApi from './account';
 export * as systemApi from './system';
 
 export type { LoginSession } from './account';
-export type { TopUpInfo } from './billing';
+export type { TopUpInfo, TopUpRecord } from './billing';

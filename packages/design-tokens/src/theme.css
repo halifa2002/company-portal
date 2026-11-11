@@ -1,0 +1,72 @@
+/**
+ * 品牌 CSS 变量
+ *
+ * 由 apps 的 globals.css 引入。改这里换肤，页面不写死颜色。
+ * 值与 src/index.ts 保持一致。
+ *
+ * 配色依据 md 7.1：蓝色或靛蓝色为主，具体色值待设计确认。
+ */
+:root {
+  --brand-primary: #4f46e5;
+  --brand-primary-hover: #4338ca;
+  --brand-primary-soft: #eef2ff;
+  --brand-accent: #6366f1;
+  --brand-hero-from: #e0e7ff;
+  --brand-hero-to: #dbeafe;
+
+  --dark-surface: #1e1b4b;
+  --dark-text: #ffffff;
+  --dark-text-muted: rgba(255, 255, 255, 0.72);
+
+  --neutral-bg: #ffffff;
+  --neutral-bg-subtle: #f9fafb;
+  --neutral-border: #e5e7eb;
+  --neutral-text-muted: #6b7280;
+  --neutral-text: #111827;
+  /*
+   * 正文色阶补两档（2026-11-11）：首屏改版时发现只有「标题 / 次要」两档，
+   * 中间的副标题和正文只能靠透明度调（text-ink/60 这类），对比度不够、字发虚。
+   * 四档实色取代透明度：标题 #111827 → 强调句 #334155 → 正文 #475569 → 说明 #6B7280。
+   */
+  --neutral-text-soft: #334155;
+  --neutral-text-mid: #475569;
+  --neutral-text-inverse: #ffffff;
+
+  /* 浅色块与浅色底（靛蓝偏冷，比紫色更中性） */
+  --surface-tint: #f5f7ff;
+  --surface-tint-soft: #fafbff;
+  --surface-tint-muted: #f7f8ff;
+
+  /*
+   * 官网首屏渐变、品牌渐变、代码块深色底：值只在这里写一次，页面引用变量。
+   * md 7.1 第 420 行把强调色限定在「蓝色或靛蓝色」，所以两条渐变都收在同一色相里，
+   * 不再掺紫（原来 40%/70% 处是 #f0e8ff、#f5f0ff，品牌渐变尾段是 #a855f7，都跑出色相范围）。
+   */
+  --gradient-hero: linear-gradient(135deg, #eef1ff 0%, #e9edff 40%, #f0f3ff 70%, #fafbff 100%);
+  --gradient-brand: linear-gradient(135deg, #6366f1 0%, #4f46e5 52%, #312e81 100%);
+  --code-surface: #0f172a;
+
+  --semantic-success: #16a34a;
+  --semantic-warning: #d97706;
+  --semantic-danger: #dc2626;
+  --semantic-info: #2563eb;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+  --shadow-panel: 0 12px 40px rgba(49, 46, 129, 0.08);
+  --shadow-popover: 0 12px 32px rgba(16, 24, 40, 0.12);
+
+  /* 主按钮渐变（靛蓝 → 深靛蓝） */
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 55%, #3730a3 100%);
+
+  /*
+   * 深色功能卡（首页产品矩阵）的底色。
+   * 比 --dark-surface 更沉一档：卡片面积大，纯 #1e1b4b 会发紫发闷，
+   * 带一点渐变让它有纵深，右下角的线框装饰才立得起来。
+   */
+  --matrix-dark: linear-gradient(148deg, #201e4d 0%, #17163a 52%, #0e0d27 100%);
+}

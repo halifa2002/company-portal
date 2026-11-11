@@ -4,12 +4,6 @@ import { apiBase } from '@/lib/brand';
 
 export const metadata = { title: '协议选择' };
 
-const TOC = [
-  { id: 'four', label: '四种协议' },
-  { id: 'choose', label: '怎么选' },
-  { id: 'caveat', label: '用之前要确认' },
-];
-
 const PROTOCOLS = [
   {
     name: 'OpenAI 对话',
@@ -40,7 +34,7 @@ const PROTOCOLS = [
 /** 协议选择：同一个网关收四种格式，选一个能跑通的就行 */
 export default function ProtocolsPage() {
   return (
-    <DocsShell toc={TOC}>
+    <DocsShell>
       <h1 className="text-3xl font-bold tracking-tight text-ink">协议选择</h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
         同一个网关同时收四种接口格式，请求发到哪个路径，就走哪套协议。你的代码原来用什么，就继续用什么——只要那把上游通道支持这种格式。

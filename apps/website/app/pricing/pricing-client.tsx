@@ -26,29 +26,6 @@ function priceLines(price: ModelPrice, kind: PriceKind): PriceLine[] | null {
   return [{ label: '', value: kind === 'input' ? price.inputPerM : price.outputPerM }];
 }
 
-const FAQS = [
-  {
-    q: '本页价格和实际扣费一致吗？',
-    a: '一致。本页单价直接读取后台计费配置生成，不是单独维护的一份展示价；后台调整价格后重新发布本页即同步。',
-  },
-  {
-    q: '一次调用的费用怎么算？',
-    a: '输入 token 数 × 输入单价 + 输出 token 数 × 输出单价。如果请求命中了上下文缓存，命中部分按更低的缓存单价计算。',
-  },
-  {
-    q: '有最低消费或月费吗？',
-    a: '没有。按实际用量结算，用多少算多少，不产生调用就不扣费。',
-  },
-  {
-    q: '余额不足会怎样？',
-    a: '余额不足时请求会被直接拒绝并返回明确错误，不会继续提供服务。由于按实际 token 用量结算，个别情况下单次调用可能使余额略微为负，充值后即可恢复。',
-  },
-  {
-    q: '价格会变吗？',
-    a: '上游厂商调价时本平台会同步调整。价格变动后本页重新发布即生效，历史调用的扣费不受影响。',
-  },
-];
-
 export function PricingClient(props: { models: ModelView[]; pricingAvailable: boolean }) {
   const [keyword, setKeyword] = useState('');
 
@@ -252,7 +229,7 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
       </section>
 
       {/* ─── 计费规则 ─── */}
-      <section className="mx-auto max-w-7xl px-6 pb-4">
+      <section className="mx-auto max-w-7xl px-6 pb-20">
         <h2 className="text-xl font-bold text-ink">计费规则</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           {[
@@ -275,42 +252,11 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
             </div>
           ))}
         </div>
-      </section>
 
-      {/* ─── 价格说明 ─── */}
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        <h2 className="text-xl font-bold text-ink">价格说明</h2>
-        <ul className="mt-4 space-y-2.5 text-sm leading-relaxed text-ink/60">
-          {[
-            '表中单价均为人民币，计价单位为每百万 token；实际扣费按实际 token 数等比换算。',
-            '单价由后台计费配置生成，与下单时的扣费规则一致，不是单独维护的展示价。',
-            '模型上下架、价格调整都会同步反映到本页，页面更新前产生的调用按当时的规则结算。',
-            '不同模型的计费方式可能不同（如按 token 分时计价、按次计价等），具体以模型详情页为准。',
-          ].map((line) => (
-            <li key={line} className="flex gap-2.5">
-              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand/60" aria-hidden />
-              {line}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* ─── FAQ ─── */}
-      <section className="mx-auto max-w-4xl px-6 pb-20">
-        <h2 className="text-xl font-bold text-ink">常见问题</h2>
-        <div className="mt-4 space-y-3">
-          {FAQS.map((item) => (
-            <details
-              key={item.q}
-              className="group rounded-xl border border-black/5 bg-white px-6 py-4"
-            >
-              <summary className="cursor-pointer list-none text-sm font-medium text-ink marker:hidden">
-                {item.q}
-              </summary>
-              <p className="mt-3 text-sm leading-relaxed text-ink/60">{item.a}</p>
-            </details>
-          ))}
-        </div>
+        {/* 上面三张卡讲的是通则，剩下真正需要补一句的是「各家计费方式不一样」 */}
+        <p className="mt-4 text-xs leading-relaxed text-ink/45">
+          不同模型的计费方式可能不同（如按 token 分时计价、按次计价），具体以模型详情页为准。
+        </p>
       </section>
     </main>
   );

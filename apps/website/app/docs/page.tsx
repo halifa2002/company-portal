@@ -6,12 +6,6 @@ import { apiBase } from '@/lib/brand';
 
 export const metadata = { title: '开发者文档' };
 
-const TOC = [
-  { id: 'start', label: '从这里开始' },
-  { id: 'billing', label: '计费方式' },
-  { id: 'scope', label: '当前支持范围' },
-];
-
 const ENTRIES = [
   {
     href: '/docs/quickstart',
@@ -35,7 +29,7 @@ export default async function DocsPage() {
   const { models } = await loadModelList(MODEL_CATALOG);
 
   return (
-    <DocsShell toc={TOC}>
+    <DocsShell>
       <h1 className="text-3xl font-bold tracking-tight text-ink">开发者文档</h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
         {models.length} 个模型、一个接口地址、一把 API Key。接口与 OpenAI

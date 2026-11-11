@@ -7,13 +7,6 @@ import { loadModelList } from '@/lib/pricing';
 
 export const metadata = { title: '文本与对话' };
 
-const TOC = [
-  { id: 'endpoint', label: '接口' },
-  { id: 'params', label: '请求参数' },
-  { id: 'response', label: '响应结构' },
-  { id: 'stream', label: '流式输出' },
-];
-
 const PARAMS = [
   { name: 'model', type: 'string', required: '是', note: '模型 ID，取值见模型广场' },
   { name: 'messages', type: 'array', required: '是', note: '消息数组，role 支持 system / user / assistant' },
@@ -77,7 +70,7 @@ export default async function ChatPage() {
   ].join('\n');
 
   return (
-    <DocsShell toc={TOC}>
+    <DocsShell>
       <h1 className="text-3xl font-bold tracking-tight text-ink">文本与对话</h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
         当前平台的全部模型都通过这一个接口调用。请求体与 OpenAI 的对话接口一致，

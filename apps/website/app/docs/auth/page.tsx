@@ -4,16 +4,10 @@ import { DocsShell } from '@/components/docs-shell';
 
 export const metadata = { title: 'API Key 与认证' };
 
-const TOC = [
-  { id: 'header', label: '怎么带 Key' },
-  { id: 'manage', label: 'Key 的生命周期' },
-  { id: 'security', label: '安全建议' },
-];
-
 /** 认证：一个 Header、一把 Key，没有别的花样 */
 export default function AuthPage() {
   return (
-    <DocsShell toc={TOC}>
+    <DocsShell>
       <h1 className="text-3xl font-bold tracking-tight text-ink">API Key 与认证</h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
         所有请求都用一个 HTTP Header 鉴权，没有签名、没有时间戳、没有额外参数。

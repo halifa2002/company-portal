@@ -6,12 +6,6 @@
  */
 export type DocNavItem = { href: string; label: string };
 
-export const DOC_TABS: DocNavItem[] = [
-  { href: '/docs', label: '文档' },
-  { href: '/docs/api', label: '接口速查' },
-  { href: '/docs/changelog', label: '更新记录' },
-];
-
 export const DOC_GROUPS: { title: string; items: DocNavItem[] }[] = [
   {
     title: '开始使用',
@@ -34,6 +28,7 @@ export const DOC_GROUPS: { title: string; items: DocNavItem[] }[] = [
     title: '其他',
     items: [
       { href: '/docs/integrations', label: '第三方工具接入' },
+      { href: '/docs/faq', label: '常见问题' },
       { href: '/docs/changelog', label: '更新记录' },
     ],
   },

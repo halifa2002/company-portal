@@ -4,12 +4,6 @@ import { apiBase } from '@/lib/brand';
 
 export const metadata = { title: '接口速查' };
 
-const TOC = [
-  { id: 'routes', label: '全部路由' },
-  { id: 'status', label: '可用状态说明' },
-  { id: 'limits', label: '频率与超时' },
-];
-
 type Row = {
   method: string;
   path: string;
@@ -39,7 +33,7 @@ const STATUS_TEXT: Record<Row['status'], { label: string; cls: string }> = {
 /** 接口速查：一张表说清网关有哪些路由、哪些现在就能用 */
 export default function ApiPage() {
   return (
-    <DocsShell toc={TOC}>
+    <DocsShell>
       <h1 className="text-3xl font-bold tracking-tight text-ink">接口速查</h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
         网关开放的接口一览。所有路径都拼在 <span className="font-mono text-[13px] text-brand">{apiBase}</span> 后面，

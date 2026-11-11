@@ -4,12 +4,6 @@ import { DocsShell } from '@/components/docs-shell';
 
 export const metadata = { title: '错误码' };
 
-const TOC = [
-  { id: 'shape', label: '返回体结构' },
-  { id: 'codes', label: '状态码' },
-  { id: 'retry', label: '该怎么重试' },
-];
-
 const CODES = [
   {
     code: '401',
@@ -55,7 +49,7 @@ export default function ErrorsPage() {
   ].join('\n');
 
   return (
-    <DocsShell toc={TOC}>
+    <DocsShell>
       <h1 className="text-3xl font-bold tracking-tight text-ink">错误码</h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
         出错时返回的不是 HTML 页面，是下面这种 JSON。判断依据优先看 HTTP 状态码，

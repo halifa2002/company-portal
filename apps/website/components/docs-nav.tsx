@@ -2,35 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { DOC_GROUPS, DOC_TABS } from '@/lib/docs-nav';
+import { DOC_GROUPS } from '@/lib/docs-nav';
 
-/** 顶部三个一级入口：文档 / 接口速查 / 更新记录 */
-export function DocsTabs() {
-  const pathname = usePathname();
+const FLAT = DOC_GROUPS.flatMap((group) => group.items);
 
-  return (
-    <nav className="flex items-center gap-7 border-b border-black/5">
-      {DOC_TABS.map((tab) => {
-        const active = pathname === tab.href;
-        return (
-          <Link
-            key={tab.href}
-            href={tab.href}
-            className={`-mb-px border-b-2 py-3 text-sm transition-colors ${
-              active
-                ? 'border-brand font-medium text-brand'
-                : 'border-transparent text-ink/60 hover:text-ink'
-            }`}
-          >
-            {tab.label}
-          </Link>
-        );
-      })}
-    </nav>
-  );
-}
-
-/** 左侧分组导航 */
+/**
+ * 左侧分组导航。文档站的导航只有这一套：
+ * 顶部原来还有一条「文档 / 接口速查 / 更新记录」的一级 tab，
+ * 和这里的分组重复，2026-11-11 去掉了。
+ */
 export function DocsSidebar() {
   const pathname = usePathname();
 
@@ -64,6 +44,35 @@ export function DocsSidebar() {
           </div>
         ))}
       </div>
+    </nav>
+  );
+}
+
+/** 窄屏没有左侧栏，换成一行可横向滑动的目录 */
+export function DocsMobileNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="-mx-6 mb-6 overflow-x-auto px-6 lg:hidden">
+      <ul className="flex w-max items-center gap-1.5">
+        {FLAT.map((item) => {
+          const active = pathname === item.href;
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                className={`block whitespace-nowrap rounded-full border px-3 py-1.5 text-[13px] transition-colors ${
+                  active
+                    ? 'border-brand/20 bg-brand/8 font-medium text-brand'
+                    : 'border-black/5 text-ink-mid hover:text-ink'
+                }`}
+              >
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }

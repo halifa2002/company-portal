@@ -4,12 +4,6 @@ import { apiBase } from '@/lib/brand';
 
 export const metadata = { title: '第三方工具接入' };
 
-const TOC = [
-  { id: 'common', label: '通用三件事' },
-  { id: 'clients', label: '常见客户端' },
-  { id: 'pitfalls', label: '容易填错的三个地方' },
-];
-
 const CLIENTS = [
   {
     name: 'Cherry Studio',
@@ -42,7 +36,7 @@ const CLIENTS = [
 /** 第三方工具接入：其实就三个空要填 */
 export default function IntegrationsPage() {
   return (
-    <DocsShell toc={TOC}>
+    <DocsShell>
       <h1 className="text-3xl font-bold tracking-tight text-ink">第三方工具接入</h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
         所有 OpenAI 兼容的客户端、插件、IDE 都能接。要填的就是三个空：地址、Key、模型名。

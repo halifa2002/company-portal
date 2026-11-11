@@ -2,8 +2,6 @@ import { DocsShell } from '@/components/docs-shell';
 
 export const metadata = { title: '更新记录' };
 
-const TOC = [{ id: 'log', label: '变更记录' }];
-
 type Entry = { date: string; title: string; items: string[] };
 
 const ENTRIES: Entry[] = [
@@ -30,7 +28,7 @@ const ENTRIES: Entry[] = [
 /** 更新记录：客户会问「你们多久更新一次」，这里要能答上来 */
 export default function ChangelogPage() {
   return (
-    <DocsShell toc={TOC}>
+    <DocsShell>
       <h1 className="text-3xl font-bold tracking-tight text-ink">更新记录</h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
         接口兼容性变更、模型上下架、文档修订都记在这里。新到旧排列。

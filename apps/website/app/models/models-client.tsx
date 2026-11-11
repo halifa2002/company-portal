@@ -68,7 +68,16 @@ export function ModelsClient(props: {
             当前提供 {props.models.length} 个模型，统一 OpenAI 兼容接口，一个 Key 全部调用
           </p>
 
-          <div className="mx-auto mt-8 flex max-w-2xl items-center overflow-hidden rounded-full border border-black/10 bg-white shadow-sm">
+          <form
+            className="mx-auto mt-8 flex max-w-2xl items-center overflow-hidden rounded-full border border-black/10 bg-white shadow-sm"
+            onSubmit={(event) => {
+              // 筛选是边打边生效的，这里让按钮/回车有个明确反馈：滚到结果区
+              event.preventDefault();
+              document
+                .getElementById('model-results')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
             <input
               type="text"
               value={search}
@@ -77,8 +86,9 @@ export function ModelsClient(props: {
               aria-label="搜索模型"
               className="flex-1 border-0 bg-transparent px-6 py-3.5 text-sm text-ink outline-none placeholder:text-ink/35"
             />
-            <span
-              className="mr-1.5 flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium text-white"
+            <button
+              type="submit"
+              className="mr-1.5 flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
               style={{ background: 'var(--gradient-primary, var(--brand-primary))' }}
             >
               <svg
@@ -95,13 +105,13 @@ export function ModelsClient(props: {
                 <path d="M21 21l-4.35-4.35" />
               </svg>
               搜索
-            </span>
-          </div>
+            </button>
+          </form>
         </div>
       </section>
 
       {/* ─── 筛选 + 卡片 ─── */}
-      <section className="mx-auto max-w-7xl px-6 py-10">
+      <section id="model-results" className="mx-auto max-w-7xl px-6 py-10">
         {!props.pricingAvailable && (
           <p className="mb-6 rounded-xl border border-warn/30 bg-warn/5 px-5 py-4 text-xs leading-relaxed text-ink/70">
             价格信息暂时不可用（本次构建没有连上计费接口），页面不显示具体单价，请以控制台下单时的价格为准。

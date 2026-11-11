@@ -7,13 +7,6 @@ import { loadModelList } from '@/lib/pricing';
 
 export const metadata = { title: '快速开始' };
 
-const TOC = [
-  { id: 'steps', label: '四步走' },
-  { id: 'curl', label: 'curl 调用' },
-  { id: 'sdk', label: 'SDK 调用' },
-  { id: 'next', label: '下一步' },
-];
-
 /** 快速开始：拿到 Key 到跑通第一次调用，全程只要四步 */
 export default async function QuickstartPage() {
   const { models } = await loadModelList(MODEL_CATALOG);
@@ -70,7 +63,7 @@ export default async function QuickstartPage() {
   ];
 
   return (
-    <DocsShell toc={TOC}>
+    <DocsShell>
       <h1 className="text-3xl font-bold tracking-tight text-ink">快速开始</h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
         从零到跑通一次调用，四步。全程不需要装任何 SDK——能发 HTTP 请求就行。

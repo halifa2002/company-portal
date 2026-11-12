@@ -100,12 +100,44 @@ function buildUrl(path: string, query?: RequestOptions['query']): string {
  * 官方认证是「access token（放请求头）+ refresh cookie（HttpOnly）」双轨：
  * - 登录返回 access_token，之后每个请求带 Authorization: Bearer <token>
  * - access token 过期后，用 refresh cookie 换新 token，再重试原请求
+ *
+ * 令牌存在 sessionStorage，不是只放内存。
+ * 只放内存的后果：一刷新就没了，于是每个页面的第一个请求都 401、都去换一次令牌，
+ * 而换令牌是后端限流最紧的口子（和登录、注册共用一个计数），刷几次就把自己锁在外面。
+ * 放 sessionStorage：同一标签页刷新不用重换；关掉标签页即清；新标签页各存各的，
+ * 最多各换一次，不会互相顶掉，也不像 localStorage 那样关掉浏览器还留着。
  */
-let accessToken: string | null = null;
+const ACCESS_TOKEN_KEY = 'portal.access_token';
+
+function readStoredAccessToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.sessionStorage.getItem(ACCESS_TOKEN_KEY);
+  } catch {
+    // 隐私模式等禁用存储的场景按「未登录」处理，不能因为存不了就让页面崩掉
+    return null;
+  }
+}
+
+function persistAccessToken(token: string | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (token) {
+      window.sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
+    } else {
+      window.sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+    }
+  } catch {
+    // 存不进去只影响刷新后的体验，不该让当前这次登录失败
+  }
+}
+
+let accessToken: string | null = readStoredAccessToken();
 let refreshHandler: (() => Promise<string | null>) | null = null;
 
 export function setAccessToken(token: string | null): void {
   accessToken = token;
+  persistAccessToken(token);
 }
 
 export function getAccessToken(): string | null {

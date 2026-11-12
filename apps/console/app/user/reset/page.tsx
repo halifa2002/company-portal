@@ -4,7 +4,8 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { authApi, ApiError } from '@portal/api-client';
-import { brand, siteUrl } from '@/lib/brand';
+import { LogoMark } from '@portal/ui';
+import { BackToSite } from '@/components/auth-shell';
 
 /**
  * 重置密码落地页 —— 路径必须是 /user/reset
@@ -75,9 +76,7 @@ function ResetForm() {
     <div className="flex min-h-screen items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-brand text-sm font-semibold text-white">
-            {brand.initial}
-          </span>
+          <LogoMark size="sm" />
           <h1 className="mt-4 text-xl font-semibold text-ink">重置密码</h1>
           <p className="mt-1.5 text-xs text-ink-muted">
             {email ? `账号邮箱：${email}` : '请从邮件里的链接进入本页'}
@@ -139,13 +138,8 @@ function ResetForm() {
           )}
         </div>
 
-        <p className="mt-4 text-center">
-          <a
-            href={siteUrl}
-            className="inline-flex items-center gap-1 rounded-md border border-line bg-surface px-4 py-2 text-xs text-ink-muted transition-colors hover:border-brand hover:text-brand"
-          >
-            ← 返回官网
-          </a>
+        <p className="mt-7 text-center">
+          <BackToSite />
         </p>
       </div>
     </div>

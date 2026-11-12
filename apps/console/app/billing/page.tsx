@@ -4,7 +4,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usageApi, ApiError } from '@portal/api-client';
 import type { UsageLog } from '@portal/types';
+import {
+  Badge,
+  Button,
+  Card,
+  Segmented,
+  THead,
+  Th,
+  Tr,
+  Td,
+  TdSub,
+} from '@portal/ui';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import { PageContainer } from '@/components/page-shell';
 import {
   EmptyHint,
   ErrorBox,
@@ -57,7 +69,7 @@ export default function BillingPage() {
         router.replace('/login');
         return;
       }
-      setError(err instanceof Error ? err.message : '加载失败');
+      setError('数据加载失败，稍等片刻再试一次');
     } finally {
       setLoading(false);
     }
@@ -75,159 +87,161 @@ export default function BillingPage() {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const successCount = tab === 'success' ? total : otherTotal;
   const failedCount = tab === 'success' ? otherTotal : total;
+  /** 读不到数就别在页签上摆一个 0，那会被当成「一次都没成功」 */
+  const countsReady = !loading && !error;
 
   return (
     <div className="min-h-screen md:pl-56">
       <ConsoleSidebar />
       <ConsoleTopbar title="消费记录" />
 
-      <main className="px-6 py-6">
+      <PageContainer>
         {error && (
-          <div className="mb-5">
+          <div className="mb-4">
             <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
           </div>
         )}
 
-        <div className="overflow-hidden rounded-card border border-line bg-surface">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-medium text-ink">调用明细</h2>
-              <div className="flex gap-1 rounded-md border border-line p-0.5">
-                <button
-                  type="button"
-                  onClick={() => setTab('success')}
-                  className={`rounded px-2.5 py-0.5 text-xs ${
-                    tab === 'success' ? 'bg-brand text-white' : 'text-ink-muted'
-                  }`}
-                >
-                  {/* 读不到数就别在页签上摆一个 0，那会被当成「一次都没成功」 */}
-                  成功{!loading && !error && ` ${formatNumber(successCount)}`}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTab('failed')}
-                  className={`rounded px-2.5 py-0.5 text-xs ${
-                    tab === 'failed' ? 'bg-brand text-white' : 'text-ink-muted'
-                  }`}
-                >
-                  失败{!loading && !error && ` ${formatNumber(failedCount)}`}
-                </button>
-              </div>
+        <Card flush>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-card py-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="text-title font-semibold text-ink">调用明细</h2>
+              <Segmented
+                ariaLabel="切换成功与失败记录"
+                value={tab}
+                onChange={setTab}
+                options={[
+                  {
+                    value: 'success',
+                    label: '成功',
+                    count: countsReady ? formatNumber(successCount) : undefined,
+                  },
+                  {
+                    value: 'failed',
+                    label: '失败',
+                    count: countsReady ? formatNumber(failedCount) : undefined,
+                  },
+                ]}
+              />
             </div>
-            <span className="text-xs text-ink-muted">
-              {tab === 'success' ? '扣费记录' : '未扣费，悬停状态可看原因'} ·{' '}
-              {loading ? '正在统计…' : error ? '条数未知' : `共 ${formatNumber(total)} 条`}
+            <span className="text-meta text-ink-muted">
+              {loading
+                ? '正在统计…'
+                : error
+                  ? '条数未知'
+                  : `${tab === 'success' ? '每笔扣费都记一条' : '未扣费，悬停可看原因'} · 共 ${formatNumber(total)} 条`}
             </span>
           </div>
 
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-line text-left text-xs text-ink-muted">
-                <th className="px-5 py-2.5 font-normal">时间</th>
-                <th className="px-5 py-2.5 font-normal">状态</th>
-                <th className="px-5 py-2.5 font-normal">模型</th>
-                <th className="px-5 py-2.5 font-normal">密钥</th>
-                <th className="px-5 py-2.5 font-normal">输入 / 输出</th>
-                <th className="px-5 py-2.5 font-normal">费用</th>
-                <th className="px-5 py-2.5 font-normal">请求编号</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <TableLoading colSpan={7} rows={5} />
-              ) : error ? (
-                <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-xs text-ink-muted">
-                    明细没读出来，点页面上方「重试」再拉一次
-                    <br />
-                    这是这次请求没成功，不是没有记录
-                  </td>
-                </tr>
-              ) : logs.length === 0 ? (
-                <tr>
-                  <td colSpan={7}>
-                    <EmptyHint
-                      text={tab === 'success' ? '还没有消费记录' : '没有失败记录'}
-                      hint={
-                        tab === 'success'
-                          ? '发出第一条调用后，这里按时间列出每一次扣费'
-                          : '这段时间的调用都成功了，失败记录会单独列在这里'
-                      }
-                    />
-                  </td>
-                </tr>
-              ) : (
-                logs.map((log) => {
-                  const failed = tab === 'failed';
-                  return (
-                    <tr key={log.id} className="border-b border-line last:border-0">
-                      <td className="px-5 py-3 text-xs text-ink-muted">
-                        {formatTime(log.created_at)}
-                      </td>
-                      <td className="px-5 py-3">
-                        <span
-                          title={failed ? log.content : undefined}
-                          className={`rounded px-1.5 py-0.5 text-[11px] ${
-                            failed ? 'bg-red-50 text-danger' : 'bg-green-50 text-ok'
-                          }`}
-                        >
-                          {failed ? '失败' : '成功'}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-ink">{log.model_name || PLACEHOLDER_DASH}</td>
-                      <td className="px-5 py-3 text-xs text-ink-muted">
-                        {log.token_name || PLACEHOLDER_DASH}
-                      </td>
-                      <td className="px-5 py-3 tabular-nums text-xs text-ink-muted">
-                        {failed
-                          ? PLACEHOLDER_DASH
-                          : `${formatNumber(log.prompt_tokens)} / ${formatNumber(log.completion_tokens)}`}
-                      </td>
-                      <td className="px-5 py-3 tabular-nums text-ink">
-                        {/* 失败调用不扣费，这是事实而不是"没数据"，写出来比横杠有用 */}
-                        {failed ? (
-                          <span className="text-xs text-ok">未扣费</span>
-                        ) : (
-                          quotaToAmount(log.quota)
-                        )}
-                      </td>
-                      <td className="px-5 py-3 font-mono text-[11px] text-ink-muted">
-                        {log.request_id || PLACEHOLDER_DASH}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-full text-left">
+              <THead>
+                <Th>时间</Th>
+                <Th>状态</Th>
+                <Th>模型</Th>
+                <Th>密钥</Th>
+                <Th>输入 / 输出</Th>
+                <Th>费用</Th>
+                <Th>请求编号</Th>
+              </THead>
+              <tbody>
+                {loading ? (
+                  <TableLoading colSpan={7} rows={5} />
+                ) : error ? (
+                  <tr>
+                    <td colSpan={7}>
+                      <EmptyHint
+                        text="暂时读不到明细"
+                        hint="可能是网络波动，稍等片刻再试一次"
+                      />
+                    </td>
+                  </tr>
+                ) : logs.length === 0 ? (
+                  <tr>
+                    <td colSpan={7}>
+                      <EmptyHint
+                        text={tab === 'success' ? '还没有消费记录' : '没有失败记录'}
+                        hint={
+                          tab === 'success'
+                            ? '发起一次调用，这里会记下每一笔扣费'
+                            : '这段时间的调用都成功了'
+                        }
+                      />
+                    </td>
+                  </tr>
+                ) : (
+                  logs.map((log) => {
+                    const failed = tab === 'failed';
+                    return (
+                      <Tr key={log.id}>
+                        <Td className="whitespace-nowrap text-ink-muted">
+                          {formatTime(log.created_at)}
+                        </Td>
+                        <Td>
+                          {/* 失败原因挂在标签上，扫表时不占列宽 */}
+                          <span title={failed ? log.content : undefined}>
+                            <Badge tone={failed ? 'danger' : 'success'}>
+                              {failed ? '失败' : '成功'}
+                            </Badge>
+                          </span>
+                        </Td>
+                        <Td>{log.model_name || PLACEHOLDER_DASH}</Td>
+                        <Td className="text-ink-mid">{log.token_name || PLACEHOLDER_DASH}</Td>
+                        <Td className="whitespace-nowrap tabular-nums text-ink-mid">
+                          {failed
+                            ? PLACEHOLDER_DASH
+                            : `${formatNumber(log.prompt_tokens)} / ${formatNumber(log.completion_tokens)}`}
+                        </Td>
+                        <Td className="whitespace-nowrap tabular-nums">
+                          {/* 失败调用不扣费，这是事实而不是"没数据"，写出来比横杠有用 */}
+                          {failed ? (
+                            <span className="text-ink-muted">未扣费</span>
+                          ) : (
+                            quotaToAmount(log.quota)
+                          )}
+                        </Td>
+                        <Td>
+                          <TdSub>
+                            <span className="font-mono">
+                              {log.request_id || PLACEHOLDER_DASH}
+                            </span>
+                          </TdSub>
+                        </Td>
+                      </Tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-line px-5 py-3 text-xs text-ink-muted">
+            <div className="flex items-center justify-between border-t border-line px-card py-3 text-meta text-ink-muted">
               <span>
-                第 {page} / {totalPages} 页
+                第 {page} / {totalPages} 页，每页 {pageSize} 条
               </span>
               <div className="flex gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="sm"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="rounded border border-line px-3 py-1 disabled:opacity-40"
                 >
                   上一页
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  className="rounded border border-line px-3 py-1 disabled:opacity-40"
                 >
                   下一页
-                </button>
+                </Button>
               </div>
             </div>
           )}
-        </div>
-      </main>
+        </Card>
+      </PageContainer>
     </div>
   );
 }

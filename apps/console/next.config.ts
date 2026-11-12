@@ -2,6 +2,12 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  /**
+   * 不要在这里加 allowedDevOrigins。
+   * 2026-11-12 实测：写成 ['127.0.0.1','localhost']（与官网同款）后，控制台 dev
+   * 侧边每加载一页就整页重载一次、连成无限刷新；去掉这一项才恢复。
+   * 官网仍保留该项，两边配置因此在这一点上刻意不同——改之前先照这个结论验一遍。
+   */
   // 工作区包直接引用 TS 源码（main 指向 src/index.ts），需让 Next 一并转译。
   transpilePackages: [
     '@portal/api-client',

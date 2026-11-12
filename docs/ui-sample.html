@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>控制台改版样板 · API 密钥</title>
+<style>
+/* ============================================================
+   改版样板 —— 纯静态，不影响正在跑的控制台。
+   所有值都写成变量，确认后可直接搬到 theme.css。
+   ============================================================ */
+:root{
+  /* 品牌色：沿用现有靛蓝，只补两档浅底和一层环 */
+  --brand:#4f46e5;
+  --brand-hover:#4338ca;
+  --brand-press:#3730a3;
+  --brand-soft:#eef2ff;
+  --brand-soft-2:#f6f7ff;
+  --brand-ring:rgba(79,70,229,.28);
+
+  /* 文字四档实色，不用透明度 —— 中文小字叠透明度会发虚 */
+  --ink:#101828;      /* 标题 */
+  --ink-2:#344054;    /* 正文强调 */
+  --ink-3:#5c6675;    /* 正文 */
+  --ink-4:#8a93a2;    /* 辅助 / 表头 */
+
+  /* 边框只留一套 */
+  --line:#e7e9ef;
+  --line-2:#d8dce5;
+
+  --bg:#f6f7f9;
+  --surface:#ffffff;
+  --surface-2:#fafbfc;
+
+  --ok:#15803d;   --ok-bg:#f0faf4;
+  --danger:#c4321e; --danger-bg:#fdf2f0; --danger-line:#f5d4ce;
+  --warn:#a85b00; --warn-bg:#fdf6ea;
+
+  /* 间距阶梯：4 / 8 / 12 / 16 / 24 / 32 / 48 */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+
+  /* 圆角三档，不再出现 11/13/18/20/24 混着用 */
+  --r-ctrl:8px;    /* 按钮、输入框 */
+  --r-card:12px;   /* 卡片 */
+  --r-panel:16px;  /* 弹窗、大面板 */
+  --r-pill:999px;
+
+  --shadow-card:0 1px 2px rgba(16,24,40,.04);
+  --shadow-pop:0 24px 48px -16px rgba(16,24,40,.20), 0 2px 6px rgba(16,24,40,.06);
+
+  --font:ui-sans-serif,system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--font);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  font-size:14px;line-height:1.55;letter-spacing:.006em;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+
+/* ---------- 字号阶梯（6 档，没有半像素） ---------- */
+.t-h1{font-size:20px;line-height:28px;font-weight:600;letter-spacing:-.01em}
+.t-h2{font-size:16px;line-height:24px;font-weight:600;letter-spacing:-.005em}
+.t-body{font-size:14px;line-height:22px}
+.t-sm{font-size:13px;line-height:20px}
+.t-xs{font-size:12px;line-height:18px}
+.num{font-variant-numeric:tabular-nums}
+
+/* ============================ 文档外层 ============================ */
+.doc-head{
+  background:var(--surface);border-bottom:1px solid var(--line);
+  padding:var(--s5) var(--s6);
+}
+.doc-head .inner{max-width:1280px;margin:0 auto;display:flex;align-items:flex-start;gap:var(--s4);flex-wrap:wrap}
+.doc-head .logo{
+  width:34px;height:34px;border-radius:10px;background:var(--brand);color:#fff;
+  display:grid;place-items:center;font-size:14px;font-weight:600;flex:none;
+  box-shadow:0 2px 6px rgba(79,70,229,.28);
+}
+.doc-head h1{font-size:16px;font-weight:600;line-height:22px}
+.doc-head p{font-size:13px;color:var(--ink-3);margin-top:2px}
+.doc-head .tag{
+  margin-left:auto;font-size:12px;color:var(--ink-4);
+  border:1px solid var(--line);border-radius:var(--r-pill);padding:5px 12px;background:var(--surface-2);
+}
+
+.doc{max-width:1280px;margin:0 auto;padding:var(--s6) var(--s6) 72px}
+
+.block{margin-top:var(--s7)}
+.block:first-child{margin-top:0}
+.block-head{display:flex;align-items:baseline;gap:var(--s3);margin-bottom:var(--s4);flex-wrap:wrap}
+.block-head .no{
+  font-family:var(--mono);font-size:12px;color:var(--brand);
+  background:var(--brand-soft);border-radius:6px;padding:3px 7px;flex:none;
+}
+.block-head h2{font-size:16px;font-weight:600}
+.block-head .note{font-size:12px;color:var(--ink-4)}
+
+/* ============================ 规格区 ============================ */
+.spec-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4)}
+@media (max-width:1080px){.spec-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.spec-grid{grid-template-columns:1fr}}
+.spec{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);
+  padding:var(--s4) var(--s4) var(--s5);box-shadow:var(--shadow-card);
+}
+.spec h3{font-size:12px;font-weight:600;color:var(--ink-4);letter-spacing:.04em;margin-bottom:var(--s3)}
+
+/* 字号展示 */
+.type-row{display:flex;align-items:baseline;gap:var(--s3);padding:5px 0;border-bottom:1px dashed var(--line)}
+.type-row:last-child{border-bottom:0}
+.type-row .meta{font-size:11px;color:var(--ink-4);font-family:var(--mono);width:54px;flex:none;text-align:right}
+
+/* 色板：5 列 × 2 行，刚好十色 */
+.swatches{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px 8px}
+.sw{text-align:center}
+.sw i{display:block;height:34px;border-radius:8px;border:1px solid rgba(16,24,40,.07)}
+.sw span{display:block;font-size:11px;line-height:14px;color:var(--ink-4);margin-top:5px;white-space:nowrap}
+
+/* 圆角：方块在上、标签在下，绝不重叠 */
+.radii{display:flex;gap:18px;align-items:flex-start}
+.radii>div{display:flex;flex-direction:column;align-items:center;font-size:11px;line-height:14px;color:var(--ink-4);white-space:nowrap}
+.radii span{display:block;margin-top:9px}
+.radii i{display:block;width:48px;height:48px;background:var(--brand-soft);border:1px solid #dcd9fb}
+
+/* ============================ 按钮 ============================ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:36px;padding:0 14px;border-radius:var(--r-ctrl);
+  font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;
+  border:1px solid transparent;background:none;
+  transition:background-color .15s ease,border-color .15s ease,color .15s ease,
+             box-shadow .15s ease,transform .06s ease;
+}
+.btn:focus-visible{outline:2px solid var(--brand-ring);outline-offset:2px}
+.btn-primary{background:var(--brand);color:#fff;box-shadow:0 1px 2px rgba(16,24,40,.10),inset 0 1px 0 rgba(255,255,255,.10)}
+.btn-primary:hover{background:var(--brand-hover)}
+.btn-primary:active{background:var(--brand-press);transform:translateY(1px)}
+.btn-ghost{background:var(--surface);border-color:var(--line-2);color:var(--ink-2)}
+.btn-ghost:hover{background:var(--surface-2);border-color:#c7ccd8;color:var(--ink)}
+.btn-ghost:active{transform:translateY(1px);background:#f2f4f8}
+.btn-quiet{color:var(--ink-3);padding:0 8px}
+.btn-quiet:hover{background:var(--surface-2);color:var(--ink)}
+.btn-sm{height:30px;padding:0 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ============================ 输入 ============================ */
+.field{
+  height:36px;width:100%;border:1px solid var(--line-2);border-radius:var(--r-ctrl);
+  background:var(--surface);padding:0 11px;font-size:13px;color:var(--ink);
+  transition:border-color .15s ease,box-shadow .15s ease;
+}
+.field::placeholder{color:#a6adba}
+.field:hover{border-color:#c7ccd8}
+.field:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+textarea.field{height:auto;padding:9px 11px;line-height:1.5;resize:vertical}
+
+.search{position:relative;width:240px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#a6adba;pointer-events:none}
+.search .field{padding-left:32px}
+
+/* 分段筛选 */
+.seg{display:inline-flex;background:#f0f2f6;border-radius:var(--r-ctrl);padding:3px;gap:2px}
+.seg button{
+  height:28px;padding:0 11px;border:0;background:none;border-radius:6px;
+  font-size:12px;color:var(--ink-3);cursor:pointer;transition:all .15s ease;
+}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:500;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.seg button:focus-visible{outline:2px solid var(--brand-ring);outline-offset:1px}
+
+/* 状态标签 */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;
+  border-radius:6px;font-size:12px;font-weight:500;white-space:nowrap;
+}
+.badge i{width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
+.badge-ok{color:var(--ok);background:var(--ok-bg)}
+.badge-off{color:var(--ink-4);background:#f0f2f6}
+.badge-warn{color:var(--warn);background:var(--warn-bg)}
+.badge-danger{color:var(--danger);background:var(--danger-bg)}
+
+/* 代码 */
+code.key{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-4);
+  background:#f5f6f9;border:1px solid #eef0f4;border-radius:5px;padding:1px 6px;
+}
+
+/* ============================ 改前 ============================ */
+.frame{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);
+  overflow:hidden;box-shadow:var(--shadow-card);
+}
+.frame-bar{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);
+  background:var(--surface-2);font-size:12px;color:var(--ink-4);
+}
+.frame-bar b{font-weight:500;color:var(--ink-3)}
+.frame-bar .dots{display:flex;gap:5px;margin-right:4px}
+.frame-bar .dots i{width:8px;height:8px;border-radius:50%;background:#e0e3ea}
+.frame-body{position:relative}
+
+/* 改前：忠实复刻旧样式 */
+.before{padding:18px 20px 22px;font-size:14px}
+.before .b-pagehead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+.before .b-pagehead p{font-size:13px;color:#6b7280;max-width:560px;line-height:1.6}
+.before .b-btn{background:var(--brand);color:#fff;border:0;border-radius:6px;padding:10px 20px;font-size:13.5px;font-weight:500}
+.before .b-filters{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.before .b-input{width:224px;border:1px solid #e5e7eb;border-radius:6px;padding:6px 11px;font-size:12px;color:#6b7280}
+.before .b-select{border:1px solid #e5e7eb;border-radius:6px;padding:6px 10px;font-size:12px;color:#111827;background:#fff}
+.before .b-count{margin-left:auto;font-size:12px;color:#6b7280}
+.before table{width:100%;border-collapse:collapse;font-size:13px}
+.before thead th{
+  text-align:left;font-weight:400;font-size:12px;color:#6b7280;
+  padding:9px 14px;border-bottom:1px solid #e5e7eb;white-space:nowrap;
+}
+.before tbody td{padding:11px 14px;border-bottom:1px solid #e5e7eb;font-size:12px;color:#6b7280;white-space:nowrap}
+.before tbody td:first-child{color:#111827;font-size:13px}
+.before tbody tr:hover td{background:#f9fafb}
+.before .b-tag{background:#f3f4f6;border-radius:4px;padding:2px 6px;font-size:11px;color:#6b7280}
+.before .b-tag.on{background:#f0fdf4;color:#16a34a}
+.before .b-link{color:var(--brand);font-size:12px}
+.before .b-del{color:#dc2626;font-size:12px}
+
+/* 行内标号 */
+.mark{
+  display:inline-grid;place-items:center;width:15px;height:15px;
+  border-radius:50%;background:var(--danger);color:#fff;
+  font-size:9.5px;font-weight:700;line-height:1;flex:none;
+  vertical-align:1px;margin-left:2px;
+}
+.anno-mark{
+  display:inline-grid;place-items:center;width:15px;height:15px;
+  border-radius:50%;background:var(--danger);color:#fff;
+  font-size:9.5px;font-weight:700;line-height:1;flex:none;margin-top:2px;
+}
+thead.marked th{border-top:1.5px dashed rgba(196,50,30,.4)}
+
+.issues{margin-top:var(--s4);display:grid;gap:8px}
+.issue{
+  display:flex;gap:10px;background:var(--surface);border:1px solid var(--line);
+  border-left:3px solid #e8a598;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--ink-2);
+}
+.issue b{color:var(--danger);font-weight:600;flex:none}
+
+/* ============================ 改后：应用外壳 ============================ */
+.app{
+  display:grid;grid-template-columns:224px 1fr;min-height:640px;
+  background:var(--surface);border-radius:var(--r-panel);overflow:hidden;
+  border:1px solid var(--line);box-shadow:var(--shadow-card);
+}
+.side{border-right:1px solid var(--line);background:var(--surface);padding:10px 10px 16px}
+.side .brand{display:flex;align-items:center;gap:9px;padding:6px 8px 14px}
+.side .brand i{
+  width:28px;height:28px;border-radius:8px;background:var(--brand);color:#fff;
+  display:grid;place-items:center;font-size:12px;font-weight:600;font-style:normal;
+}
+.side .brand span{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.side a{
+  display:flex;align-items:center;gap:9px;height:34px;padding:0 9px;border-radius:7px;
+  font-size:13px;color:var(--ink-3);transition:background-color .15s,color .15s;
+}
+.side a:hover{background:var(--surface-2);color:var(--ink)}
+.side a[aria-current]{background:var(--brand-soft);color:var(--brand);font-weight:500}
+.side a[aria-current] svg{color:var(--brand)}
+.side a svg{color:#9aa3b2;flex:none}
+.side .grp{font-size:11px;color:#a6adba;padding:14px 9px 5px;letter-spacing:.04em}
+
+.main{display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+.top{
+  height:52px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 var(--s5);background:var(--surface);border-bottom:1px solid var(--line);
+}
+.crumb{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-4)}
+.crumb b{color:var(--ink);font-weight:500}
+.top .right{display:flex;align-items:center;gap:12px}
+.balance{display:flex;align-items:baseline;gap:6px;font-size:13px;color:var(--ink-4)}
+.balance b{color:var(--ink);font-weight:600;font-size:14px}
+.avatar{
+  width:28px;height:28px;border-radius:50%;background:var(--brand-soft);color:var(--brand);
+  font-size:12px;font-weight:600;display:grid;place-items:center;border:1px solid #e0e2fb;
+}
+
+.content{padding:var(--s5) var(--s5) var(--s6);max-width:1240px;width:100%}
+
+/* 页头 */
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s4);margin-bottom:var(--s4)}
+.page-head h1{font-size:20px;line-height:28px;font-weight:600;letter-spacing:-.01em}
+.page-head p{font-size:13px;color:var(--ink-3);margin-top:3px;max-width:620px}
+
+/* 工具条 */
+.toolbar{display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3);flex-wrap:wrap}
+.toolbar .count{margin-left:auto;font-size:12px;color:var(--ink-4)}
+
+/* 数据卡 + 表格 */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-card)}
+table.grid{width:100%;border-collapse:collapse}
+table.grid thead th{
+  text-align:left;font-size:12px;font-weight:500;color:var(--ink-4);
+  padding:10px var(--s4);background:var(--surface-2);border-bottom:1px solid var(--line);
+  white-space:nowrap;letter-spacing:.02em;
+}
+table.grid thead th.r{text-align:right}
+table.grid tbody td{padding:11px var(--s4);border-bottom:1px solid #f0f1f5;font-size:13px;color:var(--ink-3);vertical-align:middle}
+table.grid tbody tr:last-child td{border-bottom:0}
+table.grid tbody tr{transition:background-color .12s ease}
+table.grid tbody tr:hover{background:#fbfcfe}
+.cell-name{font-size:13px;color:var(--ink);font-weight:500;line-height:18px}
+.cell-sub{margin-top:3px;display:flex;align-items:center;gap:8px}
+.cell-time{font-size:12px;line-height:18px;color:var(--ink-3)}
+.cell-time span{color:var(--ink-4)}
+.ops{display:flex;justify-content:flex-end;gap:2px}
+.amount{font-size:13px;color:var(--ink-2);font-weight:500}
+.amount.muted{color:var(--ink-4);font-weight:400}
+
+.pager{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px var(--s4);border-top:1px solid var(--line);background:var(--surface-2);
+  font-size:12px;color:var(--ink-4);
+}
+.pager .btns{display:flex;gap:6px}
+
+/* 提示条 */
+.callout{
+  display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r-card);
+  background:var(--brand-soft-2);border:1px solid #e4e4fb;margin-bottom:var(--s4);
+  font-size:13px;color:var(--ink-2);
+}
+.callout .ico{width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none;margin-top:1px}
+.callout b{font-weight:600;color:var(--ink)}
+
+/* 弹窗 */
+.overlay{
+  position:fixed;inset:0;z-index:50;background:rgba(16,24,40,.38);
+  backdrop-filter:blur(2px);display:none;align-items:flex-start;justify-content:center;
+  padding:56px 20px;overflow:auto;
+}
+.overlay.open{display:flex}
+.modal{
+  width:100%;max-width:520px;background:var(--surface);border-radius:var(--r-panel);
+  box-shadow:var(--shadow-pop);overflow:hidden;animation:pop .18s ease-out;
+}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+.modal header{padding:var(--s5) var(--s5) 0}
+.modal header h3{font-size:16px;font-weight:600}
+.modal header p{font-size:13px;color:var(--ink-3);margin-top:3px}
+.modal .body{padding:var(--s4) var(--s5) var(--s5)}
+.modal footer{
+  display:flex;justify-content:flex-end;gap:var(--s2);
+  padding:14px var(--s5);background:var(--surface-2);border-top:1px solid var(--line);
+}
+.label{display:block;font-size:12px;font-weight:500;color:var(--ink-2);margin-bottom:6px}
+.hint{font-size:12px;color:var(--ink-4);margin-top:6px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+.radio-line{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);padding:5px 0}
+.radio-line input{accent-color:var(--brand);width:15px;height:15px}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,12px);
+  background:#101828;color:#fff;font-size:13px;padding:9px 16px;border-radius:8px;
+  box-shadow:0 12px 28px rgba(16,24,40,.28);opacity:0;pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease;z-index:80;
+  display:flex;align-items:center;gap:8px;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast i{width:14px;height:14px;border-radius:50%;background:#22c55e;display:grid;place-items:center;font-size:9px;font-style:normal;flex:none}
+
+/* 页脚说明 */
+.foot-note{
+  margin-top:var(--s4);font-size:12px;color:var(--ink-4);line-height:1.7;
+  border-top:1px dashed var(--line);padding-top:var(--s3);
+}
+
+@media (max-width:1120px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .content{padding:var(--s4)}
+}
+@media (max-width:640px){
+  .doc{padding:var(--s4) var(--s3) 48px}
+  .page-head{flex-direction:column}
+  .search{width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="doc-head">
+  <div class="inner">
+    <div class="logo">虫</div>
+    <div>
+      <h1>控制台改版样板 · API 密钥页</h1>
+      <p>对应领导方案 4.2 C（密钥管理）+ 7.1 / 7.2 / 7.3（设计规范）</p>
+    </div>
+    <div class="tag">静态样板 · 不影响线上</div>
+  </div>
+</div>
+
+<main class="doc">
+
+  <!-- ================= 01 规格 ================= -->
+  <section class="block" id="spec">
+    <div class="block-head">
+      <span class="no">01</span>
+      <h2>先定零件，再改页面</h2>
+      <span class="note">这些值就是将来 theme.css 里的全部内容</span>
+    </div>
+
+    <div class="spec-grid">
+
+      <div class="spec">
+        <h3>字号 · 6 档</h3>
+        <div class="type-row"><span class="meta">20 / 600</span><span class="t-h1">页面标题</span></div>
+        <div class="type-row"><span class="meta">16 / 600</span><span class="t-h2">卡片标题</span></div>
+        <div class="type-row"><span class="meta">14 / 400</span><span class="t-body">正文内容，日常阅读</span></div>
+        <div class="type-row"><span class="meta">13 / 400</span><span class="t-sm">表格内容、说明文字</span></div>
+        <div class="type-row"><span class="meta">12 / 400</span><span class="t-xs">表头、辅助信息</span></div>
+        <p class="hint" style="margin-top:8px">等宽字体只给密钥和数字用，正文一律不用。</p>
+      </div>
+
+      <div class="spec">
+        <h3>颜色</h3>
+        <div class="swatches">
+          <div class="sw"><i style="background:#4f46e5"></i><span>主色</span></div>
+          <div class="sw"><i style="background:#eef2ff"></i><span>主色浅</span></div>
+          <div class="sw"><i style="background:#101828"></i><span>标题</span></div>
+          <div class="sw"><i style="background:#344054"></i><span>正文</span></div>
+          <div class="sw"><i style="background:#5c6675"></i><span>次要</span></div>
+          <div class="sw"><i style="background:#8a93a2"></i><span>辅助</span></div>
+          <div class="sw"><i style="background:#e7e9ef"></i><span>边框</span></div>
+          <div class="sw"><i style="background:#15803d"></i><span>正常</span></div>
+          <div class="sw"><i style="background:#a85b00"></i><span>警告</span></div>
+          <div class="sw"><i style="background:#c4321e"></i><span>危险</span></div>
+        </div>
+        <p class="hint">文字用四档实色，不用透明度 —— 中文小字叠透明度会发灰发虚。</p>
+      </div>
+
+      <div class="spec">
+        <h3>圆角 · 3 档</h3>
+        <div class="radii">
+          <div><i style="border-radius:8px"></i><span>8 控件</span></div>
+          <div><i style="border-radius:12px"></i><span>12 卡片</span></div>
+          <div><i style="border-radius:16px"></i><span>16 弹窗</span></div>
+        </div>
+        <p class="hint">现在全站有 7 种圆角写法（11 / 12 / 18 / 20 / 24px 混着），收敛成这三档。</p>
+      </div>
+
+      <div class="spec">
+        <h3>按钮 · 一屏一个实心</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn btn-primary">新建密钥</button>
+          <button class="btn btn-ghost">导出</button>
+          <button class="btn btn-quiet">取消</button>
+        </div>
+        <p class="hint">主按钮只留给「这一屏最想让人做的那件事」。其余一律描边或纯文字，蓝色不再到处都是。</p>
+      </div>
+
+      <div class="spec">
+        <h3>状态标签</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="badge badge-ok"><i></i>启用</span>
+          <span class="badge badge-off"><i></i>禁用</span>
+          <span class="badge badge-warn"><i></i>已过期</span>
+          <span class="badge badge-danger"><i></i>额度耗尽</span>
+        </div>
+        <p class="hint">加一个圆点。原来只有浅底和字色，色弱用户几乎分不出四种。</p>
+      </div>
+
+      <div class="spec">
+        <h3>焦点与按下</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn btn-primary" style="outline:2px solid var(--brand-ring);outline-offset:2px">键盘焦点</button>
+          <button class="btn btn-ghost" style="transform:translateY(1px);background:#f2f4f8">按下瞬间</button>
+        </div>
+        <p class="hint">现在全站 focus-visible 是 0 处、按下态 1 处。键盘用户看不到自己在哪，鼠标用户点了没回弹。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 02 改前 ================= -->
+  <section class="block" id="before">
+    <div class="block-head">
+      <span class="no">02</span>
+      <h2>改前</h2>
+      <span class="note">按现有代码 1:1 复刻，标注是实际问题</span>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><span class="dots"><i></i><i></i><i></i></span><b>控制台 / API 密钥</b><span style="margin-left:auto">1280 宽</span></div>
+      <div class="frame-body">
+        <div class="before">
+
+          <div class="b-pagehead">
+            <p>应用通过密钥调用本平台。可以给每个密钥单独限额、限制可用模型，因此给不同应用各建一个，出问题好定位。<span class="mark">1</span></p>
+            <button class="b-btn">新建密钥</button>
+          </div>
+
+          <div class="b-filters">
+            <input class="b-input" placeholder="按名称或密钥搜索">
+            <select class="b-select"><option>全部状态</option></select>
+            <span class="b-count">共 12 个</span>
+          </div>
+
+          <table>
+            <thead class="marked">
+              <tr>
+                <th>名称</th><th>状态</th><th>密钥</th><th>额度</th><th>过期</th><th style="text-align:right">操作<span class="mark">2</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>生产环境</td>
+                <td><span class="b-tag on">启用</span></td>
+                <td><code style="background:#f9fafb;border-radius:3px;padding:1px 5px;font-size:11px">sk-a1b2••••c3d4</code> <span class="b-link">查看</span></td>
+                <td>不限额<span class="mark">3</span></td>
+                <td>永不过期</td>
+                <td style="text-align:right"><span class="b-link">编辑</span> &nbsp; <span class="b-del">删除</span><span class="mark">4</span></td>
+              </tr>
+              <tr>
+                <td>测试脚本</td>
+                <td><span class="b-tag on">启用</span></td>
+                <td><code style="background:#f9fafb;border-radius:3px;padding:1px 5px;font-size:11px">sk-e5f6••••g7h8</code> <span class="b-link">查看</span></td>
+                <td>48.00</td>
+                <td>2026-12-01</td>
+                <td style="text-align:right"><span class="b-link">编辑</span> &nbsp; <span class="b-del">删除</span></td>
+              </tr>
+              <tr>
+                <td>外包临时</td>
+                <td><span class="b-tag">已过期</span></td>
+                <td><code style="background:#f9fafb;border-radius:3px;padding:1px 5px;font-size:11px">sk-i9j0••••k1l2</code> <span class="b-link">查看</span></td>
+                <td>10.00</td>
+                <td>2026-10-30</td>
+                <td style="text-align:right"><span class="b-link">编辑</span> &nbsp; <span class="b-del">删除</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="issues">
+      <div class="issue"><span class="anno-mark">1</span><span><b>布局：</b>标题区没有主次，一段说明和「新建密钥」并排挤在一行，读者得先读完 40 个字才知道能点哪儿。</span></div>
+      <div class="issue"><span class="anno-mark">2</span><span><b>信息：</b>实际是 10 列。「分组 / 模型 / 创建时间 / 最后使用」四列在 1280 宽以下被隐藏，而 4.2 C 明确要求「创建时间」和「最后使用时间」可见 —— 最常见的笔记本上，文档要求的两项直接消失。</span></div>
+      <div class="issue"><span class="anno-mark">3</span><span><b>字号：</b>表格内容 12px、表头 12px、辅助信息 11px，跟正文 13–14px 几乎没差。字小加上行高紧，扫一行要停顿。</span></div>
+      <div class="issue"><span class="anno-mark">4</span><span><b>颜色：</b>「查看 / 编辑」和右上主按钮同一种蓝、同一个浓度。一屏五个同等重量的蓝，等于没有重点。</span></div>
+    </div>
+  </section>
+
+  <!-- ================= 03 改后 ================= -->
+  <section class="block" id="after">
+    <div class="block-head">
+      <span class="no">03</span>
+      <h2>改后</h2>
+      <span class="note">可点：新建密钥会打开新弹窗，搜索框可以直接聚焦试焦点环</span>
+    </div>
+
+    <div class="app">
+      <!-- 侧栏 -->
+      <aside class="side">
+        <div class="brand"><i>虫</i><span>虫洞 AI</span></div>
+
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2.5-7 3.5 12 2.5-5H21"/></svg>
+          概览
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg>
+          可用模型
+        </a>
+        <a href="#" aria-current="page">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="12" r="4"/><path d="M12 12h9m-3 0v3m-3-3v2" stroke-linecap="round"/></svg>
+          API 密钥
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 20V10m5 10V5m5 15v-7m5 7V8"/></svg>
+          用量统计
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2z" stroke-linejoin="round"/><path d="M9 8h6M9 12h6" stroke-linecap="round"/></svg>
+          消费记录
+        </a>
+
+        <div class="grp">账户</div>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="6" width="17" height="12" rx="2.5"/><path d="M3.5 10h17"/></svg>
+          充值
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.4 3.8-5 7-5s5.8 1.6 7 5"/></svg>
+          账户设置
+        </a>
+      </aside>
+
+      <!-- 主区 -->
+      <div class="main">
+        <div class="top">
+          <div class="crumb">账户 <span>/</span> <b>API 密钥</b></div>
+          <div class="right">
+            <div class="balance">余额 <b class="num">¥ 36.50</b></div>
+            <div class="avatar">小</div>
+          </div>
+        </div>
+
+        <div class="content">
+          <!-- 页头：标题 + 一句话说明 + 唯一的实心按钮 -->
+          <div class="page-head">
+            <div>
+              <h1>API 密钥</h1>
+              <p>应用靠密钥调用平台。给每个应用单独建一把，出问题好定位，也方便单独限额。</p>
+            </div>
+            <button class="btn btn-primary" onclick="openModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              新建密钥
+            </button>
+          </div>
+
+          <div class="callout">
+            <span class="ico">i</span>
+            <span><b>密钥只在创建时完整显示一次。</b>之后随时可以在列表里点「查看」再复制 —— 不会丢。</span>
+          </div>
+
+          <!-- 工具条 -->
+          <div class="toolbar">
+            <div class="search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4" stroke-linecap="round"/></svg>
+              <input class="field" placeholder="搜索名称或密钥前缀" oninput="filterRows(this.value)">
+            </div>
+            <div class="seg" role="group" aria-label="按状态筛选">
+              <button aria-pressed="true" onclick="pick(this)">全部 12</button>
+              <button aria-pressed="false" onclick="pick(this)">启用 9</button>
+              <button aria-pressed="false" onclick="pick(this)">已过期 2</button>
+              <button aria-pressed="false" onclick="pick(this)">耗尽 1</button>
+            </div>
+            <span class="count">第 1–5 / 共 12 个</span>
+          </div>
+
+          <!-- 表格：6 列，时间折成两行 -->
+          <div class="card">
+            <table class="grid">
+              <thead>
+                <tr>
+                  <th style="width:26%">名称 / 密钥</th>
+                  <th style="width:12%">状态</th>
+                  <th style="width:12%">额度</th>
+                  <th style="width:16%">范围</th>
+                  <th style="width:20%">时间</th>
+                  <th style="width:14%;text-align:right">操作</th>
+                </tr>
+              </thead>
+              <tbody id="rows">
+                <tr>
+                  <td>
+                    <div class="cell-name">生产环境</div>
+                    <div class="cell-sub"><code class="key">sk-a1b2••••c3d4</code></div>
+                  </td>
+                  <td><span class="badge badge-ok"><i></i>启用</span></td>
+                  <td><span class="amount muted">不限额</span></td>
+                  <td><span class="t-xs" style="color:var(--ink-3)">全部模型</span></td>
+                  <td>
+                    <div class="cell-time"><span>创建</span> 11-02 14:20</div>
+                    <div class="cell-time"><span>最后</span> 11-11 09:31</div>
+                  </td>
+                  <td>
+                    <div class="ops">
+                      <button class="btn btn-sm btn-quiet" onclick="toast('已复制到剪贴板')">查看</button>
+                      <button class="btn btn-sm btn-quiet">编辑</button>
+                      <button class="btn btn-sm btn-quiet" style="color:var(--danger)" onclick="confirmDel('生产环境')">删除</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-name">测试脚本</div>
+                    <div class="cell-sub"><code class="key">sk-e5f6••••g7h8</code></div>
+                  </td>
+                  <td><span class="badge badge-ok"><i></i>启用</span></td>
+                  <td><span class="amount num">¥ 48.00</span></td>
+                  <td><span class="t-xs" style="color:var(--ink-3)">限定 3 个模型</span></td>
+                  <td>
+                    <div class="cell-time"><span>创建</span> 10-18 10:05</div>
+                    <div class="cell-time"><span>最后</span> 11-12 08:44</div>
+                  </td>
+                  <td>
+                    <div class="ops">
+                      <button class="btn btn-sm btn-quiet" onclick="toast('已复制到剪贴板')">查看</button>
+                      <button class="btn btn-sm btn-quiet">编辑</button>
+                      <button class="btn btn-sm btn-quiet" style="color:var(--danger)" onclick="confirmDel('测试脚本')">删除</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-name">外包临时</div>
+                    <div class="cell-sub"><code class="key">sk-i9j0••••k1l2</code></div>
+                  </td>
+                  <td><span class="badge badge-warn"><i></i>已过期</span></td>
+                  <td><span class="amount num">¥ 10.00</span></td>
+                  <td><span class="t-xs" style="color:var(--ink-3)">限定 1 个模型</span></td>
+                  <td>
+                    <div class="cell-time"><span>创建</span> 09-02 16:40</div>
+                    <div class="cell-time"><span>最后</span> 10-30 11:02</div>
+                  </td>
+                  <td>
+                    <div class="ops">
+                      <button class="btn btn-sm btn-quiet" onclick="toast('已复制到剪贴板')">查看</button>
+                      <button class="btn btn-sm btn-quiet">编辑</button>
+                      <button class="btn btn-sm btn-quiet" style="color:var(--danger)" onclick="confirmDel('外包临时')">删除</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-name">数据分析</div>
+                    <div class="cell-sub"><code class="key">sk-m3n4••••o5p6</code></div>
+                  </td>
+                  <td><span class="badge badge-off"><i></i>禁用</span></td>
+                  <td><span class="amount num">¥ 20.00</span></td>
+                  <td><span class="t-xs" style="color:var(--ink-3)">全部模型</span></td>
+                  <td>
+                    <div class="cell-time"><span>创建</span> 08-21 09:12</div>
+                    <div class="cell-time"><span>最后</span> 从未使用</div>
+                  </td>
+                  <td>
+                    <div class="ops">
+                      <button class="btn btn-sm btn-quiet" onclick="toast('已复制到剪贴板')">查看</button>
+                      <button class="btn btn-sm btn-quiet">编辑</button>
+                      <button class="btn btn-sm btn-quiet" style="color:var(--danger)" onclick="confirmDel('数据分析')">删除</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="cell-name">客服机器人</div>
+                    <div class="cell-sub"><code class="key">sk-q7r8••••s9t0</code></div>
+                  </td>
+                  <td><span class="badge badge-danger"><i></i>额度耗尽</span></td>
+                  <td><span class="amount num">¥ 0.00</span></td>
+                  <td><span class="t-xs" style="color:var(--ink-3)">限定 2 个模型</span></td>
+                  <td>
+                    <div class="cell-time"><span>创建</span> 07-11 13:28</div>
+                    <div class="cell-time"><span>最后</span> 11-05 17:50</div>
+                  </td>
+                  <td>
+                    <div class="ops">
+                      <button class="btn btn-sm btn-quiet" onclick="toast('已复制到剪贴板')">查看</button>
+                      <button class="btn btn-sm btn-quiet">编辑</button>
+                      <button class="btn btn-sm btn-quiet" style="color:var(--danger)" onclick="confirmDel('客服机器人')">删除</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="pager">
+              <span>每页 10 条 · 共 12 个密钥</span>
+              <div class="btns">
+                <button class="btn btn-sm btn-ghost" disabled>上一页</button>
+                <button class="btn btn-sm btn-ghost">下一页</button>
+              </div>
+            </div>
+          </div>
+
+          <p class="foot-note">
+            本页改动共 5 处：① 标题和说明拆开，主按钮独立成块 ② 10 列压到 6 列，创建/最后使用折成两行不隐藏
+            ③ 字号从 11px 提到 12–13px ④ 蓝色只保留主按钮，行内操作降为纯文字 ⑤ 补焦点环、按下态、自绘弹窗。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= 新建密钥弹窗 ================= -->
+<div class="overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt">
+    <header>
+      <h3 id="mt">新建密钥</h3>
+      <p>创建后会立刻显示完整密钥，请当场复制。</p>
+    </header>
+    <div class="body">
+      <div>
+        <label class="label" for="kname">名称</label>
+        <input class="field" id="kname" placeholder="例如：生产环境" autofocus>
+        <p class="hint">用「应用名 + 环境」命名，以后看调用记录一眼就知道是谁在用。</p>
+      </div>
+
+      <div style="margin-top:16px">
+        <span class="label">额度上限</span>
+        <label class="radio-line"><input type="radio" name="q" checked>不限额度，受账户余额约束</label>
+        <label class="radio-line"><input type="radio" name="q">限制总额度
+          <input class="field num" style="width:110px;height:30px;margin-left:4px" placeholder="0.00">
+          <span class="t-xs" style="color:var(--ink-4)">元</span>
+        </label>
+      </div>
+
+      <div class="row2" style="margin-top:16px">
+        <div>
+          <label class="label" for="kexp">有效期</label>
+          <select class="field" id="kexp">
+            <option>永不过期</option>
+            <option>7 天后失效</option>
+            <option>30 天后失效</option>
+            <option>90 天后失效</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="kmodel">可用模型</label>
+          <select class="field" id="kmodel">
+            <option>全部模型</option>
+            <option>仅指定模型…</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="closeModal();toast('密钥已创建，完整密钥已显示')">创建密钥</button>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i>✓</i><span id="toast-text">已复制</span></div>
+
+<script>
+function openModal(){
+  document.getElementById('modal').classList.add('open');
+  setTimeout(()=>document.getElementById('kname').focus(),40);
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+let tid;
+function toast(msg){
+  const el=document.getElementById('toast');
+  document.getElementById('toast-text').textContent=msg;
+  el.classList.add('show');
+  clearTimeout(tid);
+  tid=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+function pick(btn){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed','false'));
+  btn.setAttribute('aria-pressed','true');
+}
+
+function filterRows(q){
+  const key=q.trim().toLowerCase();
+  document.querySelectorAll('#rows tr').forEach(tr=>{
+    tr.style.display = tr.textContent.toLowerCase().includes(key) ? '' : 'none';
+  });
+}
+
+function confirmDel(name){
+  toast('「'+name+'」删除需要再次确认 —— 这版会换成自绘确认框');
+}
+</script>
+</body>
+</html>

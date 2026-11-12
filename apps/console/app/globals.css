@@ -1,14 +1,39 @@
 @import 'tailwindcss';
 @import '@portal/design-tokens/theme.css';
 
+/*
+ * 让 Tailwind 也扫 packages/ui 里的类名。
+ * 组件放在 app 目录之外，自动探测默认只扫当前应用目录，
+ * 不显式声明的话 @portal/ui 里的按钮出来是没有样式的裸 HTML。
+ */
+@source '../../../packages/ui/src';
+
+/*
+ * Tailwind 主题映射
+ *
+ * 原则（md 7.2「禁止每个页面自行定义一套颜色和间距」）：
+ * 这里声明的是**唯一允许使用的那一套**。页面里出现的值如果不是来自这里，
+ * 就是错的——包括 text-[11.5px] 这类临时字号、border-black/5 这类临时边框。
+ *
+ * 命名说明：--font-size-* / --space-* 是数值真源（在 theme.css），
+ * 这里只做语义别名，所以文字用 text-body / text-meta 而不是 text-[14px]。
+ * 之所以不覆盖 Tailwind 自带的 text-sm/text-base：那会一次性改动八个还没审计的
+ * 页面，等于把风险集中爆掉。改成新增别名，一页一页换，换完再把旧的清掉。
+ */
 @theme inline {
+  /* 品牌 */
   --color-brand: var(--brand-primary);
   --color-brand-hover: var(--brand-primary-hover);
   --color-brand-soft: var(--brand-primary-soft);
   --color-brand-accent: var(--brand-accent);
 
+  /* 文字四档（禁止再写 text-ink/60 这类透明度） */
   --color-ink: var(--neutral-text);
+  --color-ink-soft: var(--neutral-text-soft);
+  --color-ink-mid: var(--neutral-text-mid);
   --color-ink-muted: var(--neutral-text-muted);
+
+  /* 面与线 */
   --color-line: var(--neutral-border);
   --color-surface: var(--neutral-bg);
   --color-surface-subtle: var(--neutral-bg-subtle);
@@ -16,12 +41,49 @@
   --color-surface-tint-soft: var(--surface-tint-soft);
   --color-surface-tint-muted: var(--surface-tint-muted);
 
+  /* 语义色：实色 / 深字 / 浅底 三件套 */
   --color-ok: var(--semantic-success);
+  --color-ok-text: var(--semantic-success-text);
+  --color-ok-soft: var(--semantic-success-soft);
   --color-warn: var(--semantic-warning);
+  --color-warn-text: var(--semantic-warning-text);
+  --color-warn-soft: var(--semantic-warning-soft);
   --color-danger: var(--semantic-danger);
+  --color-danger-text: var(--semantic-danger-text);
+  --color-danger-soft: var(--semantic-danger-soft);
+  --color-info: var(--semantic-info);
+  --color-info-text: var(--semantic-info-text);
+  --color-info-soft: var(--semantic-info-soft);
 
+  /* 字号六档：text-meta 12 / text-note 13 / text-body 14 / text-title 16 / text-heading 20 / text-display 28 */
+  --text-meta: var(--font-size-xs);
+  --text-meta--line-height: 1.45;
+  --text-note: var(--font-size-sm);
+  --text-note--line-height: 1.5;
+  --text-body: var(--font-size-base);
+  --text-body--line-height: 1.55;
+  --text-title: var(--font-size-md);
+  --text-title--line-height: 1.4;
+  --text-heading: var(--font-size-lg);
+  --text-heading--line-height: 1.3;
+  --text-display: var(--font-size-xl);
+  --text-display--line-height: 1.15;
+
+  /* 圆角三档：rounded-control 8 / rounded-card 12 / rounded-panel 16 */
+  --radius-control: var(--radius-sm);
   --radius-card: var(--radius-md);
   --radius-panel: var(--radius-lg);
+
+  /* 间距别名：p-card 24 / gap-block 32 / px-page 24 */
+  --spacing-card: var(--space-card);
+  --spacing-block: var(--space-block);
+  --spacing-page: var(--space-page);
+
+  /* 内容最大宽度：max-w-content */
+  --container-content: var(--width-content);
+
+  /* 焦点环：shadow-focus */
+  --shadow-focus: var(--focus-ring);
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
@@ -33,4 +95,36 @@ body {
   color: var(--neutral-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * 键盘焦点环
+ *
+ * 全站原来 focus-visible 是 0 处：鼠标用户有 hover 反馈，键盘用户按 Tab 走一遍
+ * 基本看不出光标停在哪——这不是美观问题，是能不能用的问题。
+ * 在这里兜一次底，任何页面新增按钮/链接/输入框都自动有环，不用逐处加 class。
+ * 用 :focus-visible 而不是 :focus，所以鼠标点击不会出现这个环。
+ */
+a:focus-visible,
+button:focus-visible,
+[role='button']:focus-visible,
+[role='menuitem']:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* 尊重系统的「减少动画」设置：骨架呼吸、弹窗淡入这类都停掉 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

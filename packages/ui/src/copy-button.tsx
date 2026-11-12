@@ -50,7 +50,7 @@ export function CopyButton({
       onClick={onCopy}
       aria-live="polite"
       className={
-        'rounded-md border border-line px-2 py-1 text-xs text-ink-muted transition-colors hover:bg-surface-tint ' +
+        'rounded-control border border-line px-2 py-1 text-meta text-ink-muted transition-colors hover:bg-surface-subtle hover:text-ink ' +
         className
       }
     >

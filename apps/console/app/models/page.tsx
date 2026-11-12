@@ -12,7 +12,12 @@ import {
   type PricingRow,
 } from '@portal/pricing';
 import { CATEGORY_ORDER, findCatalogEntry } from '@portal/types';
+import { Card, Input, Segmented } from '@portal/ui';
+import type { SegmentedOption } from '@portal/ui';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import { PageContainer } from '@/components/page-shell';
+import { EmptyHint, ErrorBox, Skeleton } from '@/components/data-state';
+import { formatNumber } from '@/lib/format';
 
 /**
  * 模型广场（控制台内）—— md 4.2 B
@@ -65,7 +70,7 @@ export default function ConsoleModelsPage() {
         router.replace('/login');
         return;
       }
-      setError(err instanceof Error ? err.message : '加载失败');
+      setError('数据加载失败，稍等片刻再试一次');
     } finally {
       setLoading(false);
     }
@@ -91,6 +96,11 @@ export default function ConsoleModelsPage() {
     ];
   }, [rows]);
 
+  const categoryOptions: SegmentedOption<string>[] = categories.map((item) => ({
+    value: item,
+    label: item,
+  }));
+
   const filtered = useMemo(() => {
     const q = keyword.trim().toLowerCase();
     return rows.filter((row) => {
@@ -110,126 +120,136 @@ export default function ConsoleModelsPage() {
       <ConsoleSidebar />
       <ConsoleTopbar title="模型广场" />
 
-      <main className="px-6 py-6">
+      <PageContainer>
         {error && (
-          <div className="mb-5 rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
-            {error}
+          <div className="mb-4">
+            <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
           </div>
         )}
 
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          <input
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="搜索模型名称、厂商、能力"
-            className="w-72 rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand"
-          />
-          <span className="text-xs text-ink-muted">
-            可用模型 {loading ? '…' : filtered.length} 个
+        {/* 工具条：左边找模型，右边给条数 */}
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="搜索模型名称、厂商、能力"
+              aria-label="搜索模型"
+              className="w-72"
+            />
+            {/* 分类一多就折行，别把工具条顶宽 */}
+            {categories.length > 2 && (
+              <Segmented
+                ariaLabel="按分类筛选模型"
+                value={category}
+                onChange={setCategory}
+                options={categoryOptions}
+                wrap
+              />
+            )}
+          </div>
+          <span className="text-meta text-ink-muted">
+            {loading ? '正在统计…' : `共 ${formatNumber(filtered.length)} 个可用模型`}
           </span>
         </div>
 
-        {categories.length > 2 && (
-          <div className="mb-5 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-ink-muted">模型分类</span>
-            {categories.map((item) => (
-              <button
-                key={item}
-                type="button"
-                onClick={() => setCategory(item)}
-                className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                  category === item
-                    ? 'border-brand bg-brand text-white'
-                    : 'border-line text-ink-muted hover:text-ink'
-                }`}
-              >
-                {item}
-              </button>
+        {loading ? (
+          /* 骨架照真实卡片排：名称 / 模型 ID / 厂商 / 价格，加载完不会整块跳一下 */
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <Card key={index} className="flex h-full flex-col">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="mt-1.5 h-3 w-24" />
+                  </div>
+                  <Skeleton className="h-5 w-14 rounded-control" />
+                </div>
+                <Skeleton className="mt-3 h-3 w-36" />
+                <Skeleton className="mt-3 h-4 w-16 rounded-control" />
+                <Skeleton className="mt-auto h-5 w-24" />
+              </Card>
             ))}
           </div>
-        )}
-
-        {loading ? (
-          <div className="rounded-card border border-line bg-surface px-5 py-16 text-center text-xs text-ink-muted">
-            加载中…
-          </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-card border border-line bg-surface px-5 py-16 text-center text-xs text-ink-muted">
-            {models.length === 0
-              ? '当前分组下还没有可用模型，请联系管理员在后台配置渠道'
-              : '没有匹配的模型'}
-          </div>
+          <Card>
+            <EmptyHint
+              text={models.length === 0 ? '当前档位下还没有可用模型' : '没有匹配的模型'}
+              hint={
+                models.length === 0
+                  ? '联系管理员开通模型权限，开通后这里会显示可用清单'
+                  : '清掉搜索词或换个分类看看'
+              }
+            />
+          </Card>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((row) => {
               const price = summarizePrice(prices.get(row.name) ?? { mode: 'unknown' });
               return (
-              <Link
-                key={row.name}
-                href={`/models/${encodeURIComponent(row.name)}`}
-                className="group rounded-card border border-line bg-surface p-4 transition-colors hover:border-brand/40"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-ink">
-                      {row.entry?.displayName ?? row.name}
+                <Link
+                  key={row.name}
+                  href={`/models/${encodeURIComponent(row.name)}`}
+                  className="group flex h-full flex-col rounded-card border border-line bg-surface p-card transition-colors hover:border-brand/40"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="truncate text-body font-medium text-ink">
+                        {row.entry?.displayName ?? row.name}
+                      </div>
+                      <div className="mt-0.5 truncate font-mono text-meta text-ink-muted">
+                        {row.name}
+                      </div>
                     </div>
-                    <div className="mt-0.5 truncate font-mono text-[11px] text-ink-muted">
-                      {row.name}
-                    </div>
+                    <span className="whitespace-nowrap shrink-0 rounded-control bg-brand-soft px-2 py-0.5 text-meta text-brand">
+                      {row.entry?.category ?? '其他'}
+                    </span>
                   </div>
-                  <span className="shrink-0 rounded bg-brand-soft px-2 py-0.5 text-[11px] text-brand">
-                    {row.entry?.category ?? '其他'}
-                  </span>
-                </div>
 
-                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-ink-muted">
-                  <span>{row.entry?.vendorName ?? '未登记厂商'}</span>
-                  {row.entry?.contextWindow && (
-                    <>
-                      <span className="text-line">·</span>
-                      <span>上下文 {row.entry.contextWindow}</span>
-                    </>
-                  )}
-                </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-meta text-ink-muted">
+                    <span>{row.entry?.vendorName ?? '未登记厂商'}</span>
+                    {row.entry?.contextWindow && (
+                      <>
+                        <span aria-hidden className="text-line">
+                          |
+                        </span>
+                        <span>上下文 {row.entry.contextWindow}</span>
+                      </>
+                    )}
+                  </div>
 
-                <div className="mt-2 flex min-h-[22px] flex-wrap gap-1">
-                  {(row.entry?.capabilities ?? []).slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded border border-line px-1.5 py-0.5 text-[10px] text-ink-muted"
-                    >
-                      {tag}
+                  <div className="mt-2 flex min-h-[22px] flex-wrap gap-1">
+                    {(row.entry?.capabilities ?? []).slice(0, 3).map((tag) => (
+                      <span
+                        key={tag}
+                        className="whitespace-nowrap rounded border border-line px-1.5 py-0.5 text-meta text-ink-muted"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* 价格贴底：网格里每张卡内容多少不一，价格在同一水平线才好横向比 */}
+                  <div className="mt-auto flex items-baseline gap-1.5 pt-3">
+                    <span className="text-title font-semibold tabular-nums text-ink">
+                      {price.text}
                     </span>
-                  ))}
-                </div>
+                    {price.hint && (
+                      <span className="whitespace-nowrap rounded bg-surface-subtle px-1.5 py-0.5 text-meta text-ink-muted">
+                        {price.hint}
+                      </span>
+                    )}
+                  </div>
 
-                <div className="mt-3 flex items-baseline gap-1.5">
-                  <span className="text-sm font-semibold tabular-nums text-ink">
-                    {price.text}
-                  </span>
-                  {price.hint && (
-                    <span className="rounded bg-surface-subtle px-1.5 py-0.5 text-[10px] text-ink-muted">
-                      {price.hint}
-                    </span>
-                  )}
-                </div>
-
-                <div className="mt-2 text-[11px] text-brand opacity-0 transition-opacity group-hover:opacity-100">
-                  查看价格与调用示例 →
-                </div>
-              </Link>
+                  <div className="mt-2 text-meta text-ink-muted transition-colors group-hover:text-brand">
+                    查看价格与调用示例 →
+                  </div>
+                </Link>
               );
             })}
           </div>
         )}
-
-        <p className="mt-6 rounded-card border border-line bg-surface-subtle px-5 py-4 text-xs leading-relaxed text-ink-muted">
-          这里列出的是你所在分组实际可调用的模型（来自
-          <code className="mx-1 font-mono">/api/user/models</code>）。
-          价格与倍率需要在后台「模型」中配置，前端不写死。
-        </p>
-      </main>
+      </PageContainer>
     </div>
   );
 }

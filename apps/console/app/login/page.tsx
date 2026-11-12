@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authApi, ApiError } from '@portal/api-client';
-import { brand, siteUrl } from '@/lib/brand';
+import { Button, Field, Input } from '@portal/ui';
+import { AuthAlert, AuthShell } from '@/components/auth-shell';
 
 /** 登录页 —— md 第十章 Phase 2 第 1 步 */
 export default function LoginPage() {
@@ -54,97 +55,63 @@ export default function LoginPage() {
       : `${cooldown} 秒`;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
-      <div className="w-full max-w-sm">
-        {/* 头部：Logo + 标题 */}
-        <div className="mb-6 text-center">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-brand text-sm font-semibold text-white">
-            {brand.initial}
-          </span>
-          <h1 className="mt-4 text-xl font-semibold text-ink">登录控制台</h1>
-          <p className="mt-1.5 text-xs text-ink-muted">
-            使用平台账号登录，管理密钥与用量
-          </p>
-        </div>
+    <AuthShell title="登录控制台" description="使用平台账号登录，管理密钥与用量">
+      <form onSubmit={onSubmit} noValidate>
+        <Field label="用户名" htmlFor="username">
+          <Input
+            id="username"
+            type="text"
+            required
+            autoComplete="username"
+            autoFocus
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="请输入用户名"
+            className="w-full"
+          />
+        </Field>
 
-        {/* 登录表单 */}
-        <form
-          onSubmit={onSubmit}
-          className="rounded-panel border border-line bg-surface p-6 shadow-[var(--shadow-card)]"
+        <Field label="密码" htmlFor="password" className="mt-4">
+          <Input
+            id="password"
+            type="password"
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="请输入密码"
+            className="w-full"
+          />
+        </Field>
+
+        {cooldown > 0 ? (
+          <AuthAlert tone="warn">请求太频繁，请等 {cooldownLabel} 后重试</AuthAlert>
+        ) : (
+          error && <AuthAlert>{error}</AuthAlert>
+        )}
+
+        <Button
+          type="submit"
+          loading={loading}
+          loadingLabel="登录中…"
+          disabled={cooldown > 0}
+          className="mt-6 w-full"
         >
-          <label className="block text-xs font-medium text-ink">
-            用户名
-            <input
-              type="text"
-              required
-              autoComplete="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-line px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-brand"
-              placeholder="请输入用户名"
-            />
-          </label>
+          {cooldown > 0 ? `${cooldownLabel}后可再试` : '登录'}
+        </Button>
 
-          <label className="mt-4 block text-xs font-medium text-ink">
-            密码
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1.5 w-full rounded-md border border-line px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-brand"
-              placeholder="请输入密码"
-            />
-          </label>
-
-          {cooldown > 0 ? (
-            <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-xs text-danger">
-              请求太频繁，请等 {cooldownLabel} 后重试
-            </p>
-          ) : (
-            error && (
-              <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-xs text-danger">
-                {error}
-              </p>
-            )
-          )}
-
-          <button
-            type="submit"
-            disabled={loading || cooldown > 0}
-            className="mt-6 w-full rounded-md bg-brand py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-60"
-          >
-            {cooldown > 0
-              ? `${cooldownLabel}后可再试`
-              : loading
-                ? '登录中…'
-                : '登录'}
-          </button>
-
-          <div className="mt-4 flex items-center justify-between text-xs text-ink-muted">
-            <Link href="/forgot-password" className="text-brand">
-              忘记密码？
+        <div className="mt-4 flex items-center justify-between text-note text-ink-muted">
+          <Link href="/forgot-password" className="transition-colors hover:text-brand">
+            忘记密码？
+          </Link>
+          <span>
+            还没有账号？
+            <Link href="/register" className="ml-1 font-medium text-brand hover:underline">
+              立即注册
             </Link>
-            <span>
-              还没有账号？
-              <Link href="/register" className="ml-1 text-brand">
-                立即注册
-              </Link>
-            </span>
-          </div>
-        </form>
-
-        {/* 返回官网：放在表单下面，不抢主按钮视线 */}
-        <p className="mt-4 text-center">
-          <a
-            href={siteUrl}
-            className="inline-flex items-center gap-1 rounded-md border border-line bg-surface px-4 py-2 text-xs text-ink-muted transition-colors hover:border-brand hover:text-brand"
-          >
-            ← 返回官网
-          </a>
-        </p>
-      </div>
-    </div>
+          </span>
+        </div>
+      </form>
+    </AuthShell>
   );
 }

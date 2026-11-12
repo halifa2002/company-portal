@@ -4,7 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authApi, ApiError } from '@portal/api-client';
-import { brand, siteUrl } from '@/lib/brand';
+import { Button, Field, Input } from '@portal/ui';
+import { AuthAlert, AuthShell } from '@/components/auth-shell';
 
 /**
  * 注册页 —— md 第十章 Phase 2 第 1 步
@@ -56,115 +57,67 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 py-12">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-brand text-sm font-semibold text-white">
-            {brand.initial}
-          </span>
-          <h1 className="mt-4 text-xl font-semibold text-ink">创建账号</h1>
-          <p className="mt-1.5 text-xs text-ink-muted">
-            注册后即可创建 API 密钥、查看用量与账单
-          </p>
-          {/* 注册页同样要能回官网 */}
-          <a
-            href={siteUrl}
-            className="mt-4 inline-flex items-center gap-1 rounded-md border border-line bg-surface px-4 py-2 text-xs text-ink-muted transition-colors hover:border-brand hover:text-brand"
-          >
-            ← 返回官网
-          </a>
-        </div>
-
-        <form
-          onSubmit={onSubmit}
-          className="rounded-panel border border-line bg-surface p-6 shadow-[var(--shadow-card)]"
-        >
-          <Field
-            label="用户名"
+    <AuthShell title="创建账号" description="注册后即可创建 API 密钥、查看用量与账单">
+      <form onSubmit={onSubmit} noValidate>
+        <Field label="用户名" htmlFor="username" hint="用于登录，注册后不可修改">
+          <Input
+            id="username"
             type="text"
-            value={username}
-            onChange={setUsername}
-            placeholder="用于登录，注册后不可修改"
+            required
             autoComplete="username"
+            autoFocus
             maxLength={20}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="请输入用户名"
+            className="w-full"
           />
-          <Field
-            label="密码"
+        </Field>
+
+        <Field label="密码" htmlFor="password" hint="至少 8 位" className="mt-4">
+          <Input
+            id="password"
             type="password"
+            required
+            autoComplete="new-password"
             value={password}
-            onChange={setPassword}
-            placeholder="至少 8 位"
-            autoComplete="new-password"
-            className="mt-4"
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="请输入密码"
+            className="w-full"
           />
-          <Field
-            label="确认密码"
+        </Field>
+
+        <Field label="确认密码" htmlFor="password2" className="mt-4">
+          <Input
+            id="password2"
             type="password"
-            value={password2}
-            onChange={setPassword2}
-            placeholder="再输入一次"
+            required
             autoComplete="new-password"
-            className="mt-4"
+            value={password2}
+            onChange={(e) => setPassword2(e.target.value)}
+            placeholder="再输入一次"
+            className="w-full"
           />
+        </Field>
 
-          {error && (
-            <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-xs text-danger">
-              {error}
-            </p>
-          )}
+        {error && <AuthAlert>{error}</AuthAlert>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-6 w-full rounded-md bg-brand py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-60"
-          >
-            {loading ? '注册中…' : '注册并登录'}
-          </button>
+        <Button
+          type="submit"
+          loading={loading}
+          loadingLabel="注册中…"
+          className="mt-6 w-full"
+        >
+          注册并登录
+        </Button>
 
-          <p className="mt-4 text-center text-xs text-ink-muted">
-            已有账号？
-            <Link href="/login" className="ml-1 text-brand">
-              直接登录
-            </Link>
-          </p>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  type,
-  value,
-  onChange,
-  placeholder,
-  autoComplete,
-  maxLength,
-  className,
-}: {
-  label: string;
-  type: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  autoComplete?: string;
-  maxLength?: number;
-  className?: string;
-}) {
-  return (
-    <label className={`block text-xs font-medium text-ink ${className ?? ''}`}>
-      {label}
-      <input
-        type={type}
-        required
-        value={value}
-        autoComplete={autoComplete}
-        maxLength={maxLength}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="mt-1.5 w-full rounded-md border border-line px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-brand"
-      />
-    </label>
+        <p className="mt-4 text-center text-note text-ink-muted">
+          已有账号？
+          <Link href="/login" className="ml-1 font-medium text-brand hover:underline">
+            直接登录
+          </Link>
+        </p>
+      </form>
+    </AuthShell>
   );
 }

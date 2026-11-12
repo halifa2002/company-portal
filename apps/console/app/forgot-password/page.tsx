@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { authApi, ApiError } from '@portal/api-client';
-import { brand, siteUrl } from '@/lib/brand';
+import { LogoMark } from '@portal/ui';
+import { BackToSite } from '@/components/auth-shell';
 
 /**
  * 找回密码 —— 发重置邮件
@@ -45,9 +46,7 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-screen items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-brand text-sm font-semibold text-white">
-            {brand.initial}
-          </span>
+          <LogoMark size="sm" />
           <h1 className="mt-4 text-xl font-semibold text-ink">找回密码</h1>
           <p className="mt-1.5 text-xs text-ink-muted">
             填写注册时使用的邮箱，我们会发一条重置链接过去
@@ -120,13 +119,8 @@ export default function ForgotPasswordPage() {
           </form>
         )}
 
-        <p className="mt-4 text-center">
-          <a
-            href={siteUrl}
-            className="inline-flex items-center gap-1 rounded-md border border-line bg-surface px-4 py-2 text-xs text-ink-muted transition-colors hover:border-brand hover:text-brand"
-          >
-            ← 返回官网
-          </a>
+        <p className="mt-7 text-center">
+          <BackToSite />
         </p>
       </div>
     </div>

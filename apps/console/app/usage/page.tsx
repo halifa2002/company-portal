@@ -4,7 +4,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usageApi, ApiError } from '@portal/api-client';
 import type { UsageLog, UsageStat } from '@portal/types';
+import {
+  Button,
+  Card,
+  Segmented,
+  THead,
+  Th,
+  Tr,
+  Td,
+} from '@portal/ui';
+import type { SegmentedOption } from '@portal/ui';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import { PageContainer } from '@/components/page-shell';
 import {
   BlockLoading,
   EmptyHint,
@@ -30,6 +41,7 @@ const STAT_LIMIT = 500;
 
 type RangeKey = 'today' | '7d' | '30d' | 'all';
 type GroupKey = 'model' | 'token';
+type TrendKey = 'quota' | 'calls' | 'tokens';
 
 const RANGE_LABEL: Record<RangeKey, string> = {
   today: '今天',
@@ -37,6 +49,21 @@ const RANGE_LABEL: Record<RangeKey, string> = {
   '30d': '近 30 天',
   all: '全部',
 };
+
+const RANGE_OPTIONS: SegmentedOption<RangeKey>[] = (
+  ['today', '7d', '30d', 'all'] as RangeKey[]
+).map((key) => ({ value: key, label: RANGE_LABEL[key] }));
+
+const TREND_OPTIONS: SegmentedOption<TrendKey>[] = [
+  { value: 'quota', label: '消费' },
+  { value: 'calls', label: '调用次数' },
+  { value: 'tokens', label: 'Token' },
+];
+
+const GROUP_OPTIONS: SegmentedOption<GroupKey>[] = [
+  { value: 'model', label: '按模型' },
+  { value: 'token', label: '按密钥' },
+];
 
 /** 把范围算成秒级时间戳；all 不设边界 */
 function rangeToTimestamps(range: RangeKey): {
@@ -96,7 +123,7 @@ export default function UsagePage() {
    * 一次接口失败就会把成功率算成「100%」——比不显示更糟。
    */
   const [failedCalls, setFailedCalls] = useState<number | null>(null);
-  const [trendMetric, setTrendMetric] = useState<'quota' | 'calls' | 'tokens'>('quota');
+  const [trendMetric, setTrendMetric] = useState<TrendKey>('quota');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -158,7 +185,7 @@ export default function UsagePage() {
         router.replace('/login');
         return;
       }
-      setError(err instanceof Error ? err.message : '加载失败');
+      setError('数据加载失败，稍等片刻再试一次');
     } finally {
       setLoading(false);
     }
@@ -229,39 +256,29 @@ export default function UsagePage() {
       <ConsoleSidebar />
       <ConsoleTopbar title="用量统计" />
 
-      <main className="px-6 py-6">
+      <PageContainer>
         {error && (
-          <div className="mb-5">
+          <div className="mb-4">
             <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
           </div>
         )}
 
-        {/* 时间范围 */}
-        <div className="mb-5 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-ink-muted">时间范围</span>
-          <div className="flex gap-1 rounded-md border border-line bg-surface p-1">
-            {(Object.keys(RANGE_LABEL) as RangeKey[]).map((key) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setRange(key)}
-                className={`rounded px-3 py-1 text-xs transition-colors ${
-                  range === key
-                    ? 'bg-brand text-white'
-                    : 'text-ink-muted hover:text-ink'
-                }`}
-              >
-                {RANGE_LABEL[key]}
-              </button>
-            ))}
-          </div>
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <span className="text-meta text-ink-muted">时间范围</span>
+          <Segmented
+            ariaLabel="选择统计时间范围"
+            value={range}
+            onChange={setRange}
+            options={RANGE_OPTIONS}
+          />
         </div>
 
-        {/* 汇总 */}
+        {/* 汇总：与概览页同一套三层结构 */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Metric
             label="区间消费"
             value={stat ? quotaToAmount(stat.quota) : ''}
+            unit={moneyUnit()}
             loading={loading}
             failed={!loading && statFailed}
           />
@@ -270,6 +287,7 @@ export default function UsagePage() {
             value={
               statTruncated ? `${formatNumber(totalCalls)}+` : formatNumber(totalCalls)
             }
+            unit="次"
             loading={loading}
             failed={!loading && statFailed}
           />
@@ -278,6 +296,7 @@ export default function UsagePage() {
             value={
               statTruncated ? `${formatNumber(totalTokens)}+` : formatNumber(totalTokens)
             }
+            unit="Token"
             loading={loading}
             failed={!loading && statFailed}
           />
@@ -287,74 +306,65 @@ export default function UsagePage() {
               failedCalls === null
                 ? ''
                 : successRate === null
-                  ? '这段时间没有调用'
+                  ? '暂无调用'
                   : `${successRate.toFixed(1)}%`
             }
             loading={loading}
             failed={!loading && (statFailed || logsFailed || failedCalls === null)}
-            hint={
+            foot={
               failedCalls === null
-                ? undefined
+                ? '成功与失败次数暂未取到'
                 : `成功 ${formatNumber(total)} 次 · 失败 ${formatNumber(failedCalls)} 次`
             }
           />
         </div>
 
         {/* 每日趋势 —— 文档 4.2 D 要求「每日调用量 / 每日 Token / 每日消费」 */}
-        <div className="mt-6 rounded-card border border-line bg-surface">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
-            <div>
-              <h2 className="text-sm font-medium text-ink">每日趋势</h2>
-              <p className="mt-0.5 text-[11px] text-ink-muted">
-                {loading
-                  ? '正在汇总…'
-                  : statFailed
-                    ? '这段数据没读出来，下面的数不是真的'
-                    : `按天汇总，来自最近 ${formatNumber(statLogs.length)} 条调用记录${
-                        statTruncated ? '（超出部分未计入）' : ''
-                      }`}
-              </p>
-            </div>
-            <div className="flex gap-1 rounded-md border border-line p-0.5">
-              {(
-                [
-                  ['quota', '消费'],
-                  ['calls', '调用次数'],
-                  ['tokens', 'Token'],
-                ] as const
-              ).map(([key, label]) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setTrendMetric(key)}
-                  className={`rounded px-2.5 py-0.5 text-xs ${
-                    trendMetric === key ? 'bg-brand text-white' : 'text-ink-muted'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+        <Card flush className="mt-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-card py-3">
+            <h2 className="text-title font-semibold text-ink">每日趋势</h2>
+            <Segmented
+              ariaLabel="切换趋势指标"
+              value={trendMetric}
+              onChange={setTrendMetric}
+              options={TREND_OPTIONS}
+            />
           </div>
 
-          <div className="px-5 py-5">
+          <div className="px-card py-card">
             {loading ? (
-              <BlockLoading lines={4} />
+              /* 骨架照着柱状图排：几条长短不一的灰条看着像文字加载失败，柱子形状才对得上 */
+              <div
+                className="flex h-40 items-end justify-center gap-1.5"
+                aria-busy="true"
+                aria-label="加载中"
+              >
+                {[38, 62, 45, 80, 52, 30, 68].map((height, index) => (
+                  <div
+                    key={index}
+                    className="w-full max-w-[80px] flex-1"
+                    style={{ height: `${height}%` }}
+                  >
+                    <Skeleton className="h-full w-full rounded-t-control" />
+                  </div>
+                ))}
+              </div>
             ) : statFailed ? (
               <EmptyHint
-                text="趋势没读出来"
-                hint="点上方「重试」再拉一次——这是这次请求没成功，不是这段时间没有数据"
+                text="暂时读不到趋势"
+                hint="可能是网络波动，稍等片刻再试一次"
               />
             ) : daily.length === 0 ? (
               <EmptyHint
-                text="这段时间没有调用记录"
-                hint="换个时间范围看看，或先发一条请求，这里会按天显示"
+                text="这段时间还没有调用"
+                hint="换个时间范围，或发起一次调用试试"
               />
             ) : (
               <div className="flex h-40 items-stretch justify-center gap-1.5">
                 {daily.map((row) => {
                   const value = row[trendMetric];
-                  const height = dailyMax > 0 ? Math.max(value > 0 ? 4 : 0, (value / dailyMax) * 100) : 0;
+                  const height =
+                    dailyMax > 0 ? Math.max(value > 0 ? 4 : 0, (value / dailyMax) * 100) : 0;
                   const text =
                     trendMetric === 'quota'
                       ? `${quotaToAmount(row.quota)} ${moneyUnit()}`
@@ -365,90 +375,72 @@ export default function UsagePage() {
                     <div
                       key={row.ts}
                       /* 只有一天数据时别让柱子撑成整块色块：给个最大宽度 */
-                      className="flex w-full min-w-0 max-w-[80px] flex-1 flex-col items-center gap-2"
+                      className="group flex w-full min-w-0 max-w-[80px] flex-1 flex-col items-center gap-2"
                       title={`${row.label}：${text}`}
                     >
                       <div className="flex w-full flex-1 items-end">
                         <div
-                          className={`w-full rounded-t ${value > 0 ? 'bg-brand/85' : 'bg-line'}`}
+                          className={`w-full rounded-t-control transition-colors ${
+                            value > 0 ? 'bg-brand/85 group-hover:bg-brand' : 'bg-line'
+                          }`}
                           style={{ height: `${height}%` }}
                         />
                       </div>
-                      <span className="truncate text-[11px] text-ink-muted">{row.label}</span>
+                      <span className="truncate text-meta text-ink-muted">{row.label}</span>
                     </div>
                   );
                 })}
               </div>
             )}
           </div>
-        </div>
+        </Card>
 
         {/* 分组统计 */}
-        <div className="mt-6 overflow-hidden rounded-card border border-line bg-surface">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
-            <div className="flex items-center gap-3">
-              <h2 className="text-sm font-medium text-ink">分布统计</h2>
-              <div className="flex gap-1 rounded-md border border-line p-0.5">
-                <button
-                  type="button"
-                  onClick={() => setGroupBy('model')}
-                  className={`rounded px-2.5 py-0.5 text-xs ${
-                    groupBy === 'model' ? 'bg-brand text-white' : 'text-ink-muted'
-                  }`}
-                >
-                  按模型
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setGroupBy('token')}
-                  className={`rounded px-2.5 py-0.5 text-xs ${
-                    groupBy === 'token' ? 'bg-brand text-white' : 'text-ink-muted'
-                  }`}
-                >
-                  按密钥
-                </button>
-              </div>
+        <Card flush className="mt-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-card py-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="text-title font-semibold text-ink">分布统计</h2>
+              <Segmented
+                ariaLabel="切换统计维度"
+                value={groupBy}
+                onChange={setGroupBy}
+                options={GROUP_OPTIONS}
+              />
             </div>
-            <span className="text-[11px] text-ink-muted">
-              {loading
-                ? '正在汇总…'
-                : statFailed
-                  ? '这段数据没读出来'
-                  : `基于最近 ${formatNumber(statLogs.length)} 条记录汇总${
-                      statTruncated ? '（超出部分未计入）' : ''
-                    }`}
+            <span className="text-meta text-ink-muted">
+              {statTruncated ? `按最近 ${formatNumber(STAT_LIMIT)} 条估算` : '全部调用'}
             </span>
           </div>
 
           {loading ? (
-            <div className="px-5 py-5">
+            <div className="px-card py-card">
               <BlockLoading lines={3} />
             </div>
           ) : statFailed ? (
             <EmptyHint
-              text="分布没读出来"
-              hint="点上方「重试」再拉一次——这是这次请求没成功，不是没有数据"
+              text="暂时读不到分布"
+              hint="可能是网络波动，稍等片刻再试一次"
             />
           ) : agg.length === 0 ? (
             <EmptyHint
-              text="这段时间没有可归类的调用"
+              text="这段时间还没有调用"
               hint={
                 groupBy === 'model'
-                  ? '发出调用后，这里按模型显示各自花掉多少'
-                  : '同一批调用按密钥再分一次，方便看哪个 Key 在花钱'
+                  ? '发起调用后，这里会按模型显示各自的花费'
+                  : '按密钥分开看，能知道哪一把花得最多'
               }
             />
           ) : (
             <div className="divide-y divide-line">
               {agg.map((row) => (
-                <div key={row.name} className="px-5 py-3">
+                <div key={row.name} className="px-card py-3">
                   <div className="flex items-baseline justify-between gap-4">
-                    <span className="truncate text-sm text-ink">{row.name}</span>
-                    <span className="shrink-0 tabular-nums text-xs text-ink-muted">
+                    <span className="truncate text-body text-ink">{row.name}</span>
+                    <span className="shrink-0 tabular-nums text-meta text-ink-muted">
                       {row.count} 次 · {quotaToAmount(row.quota)}
                     </span>
                   </div>
-                  <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-line">
+                  <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-line">
                     <div
                       className="h-full rounded-full bg-brand"
                       style={{
@@ -456,7 +448,7 @@ export default function UsagePage() {
                       }}
                     />
                   </div>
-                  <div className="mt-1 text-[11px] text-ink-muted">
+                  <div className="mt-1.5 text-meta text-ink-muted">
                     输入 {formatNumber(row.promptTokens)} · 输出{' '}
                     {formatNumber(row.completionTokens)} Token
                   </div>
@@ -464,118 +456,101 @@ export default function UsagePage() {
               ))}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* 调用明细 */}
-        <div className="mt-6 overflow-hidden rounded-card border border-line bg-surface">
-          <div className="flex items-center justify-between border-b border-line px-5 py-3">
-            <h2 className="text-sm font-medium text-ink">调用明细</h2>
-            <span className="text-xs text-ink-muted">
-              {loading ? '正在统计…' : logsFailed ? '条数未知' : `共 ${total} 条`}
+        <Card flush className="mt-4">
+          <div className="flex items-center justify-between border-b border-line px-card py-3">
+            <h2 className="text-title font-semibold text-ink">调用明细</h2>
+            <span className="text-meta text-ink-muted">
+              {loading ? '正在统计…' : logsFailed ? '条数未知' : `共 ${formatNumber(total)} 条`}
             </span>
           </div>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-line text-left text-xs text-ink-muted">
-                <th className="px-5 py-2.5 font-normal">时间</th>
-                <th className="px-5 py-2.5 font-normal">模型</th>
-                <th className="px-5 py-2.5 font-normal">密钥</th>
-                <th className="px-5 py-2.5 font-normal">输入</th>
-                <th className="px-5 py-2.5 font-normal">输出</th>
-                <th className="px-5 py-2.5 font-normal">费用</th>
-                <th className="px-5 py-2.5 font-normal">耗时</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <TableLoading colSpan={7} rows={5} />
-              ) : logsFailed ? (
-                <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-xs text-ink-muted">
-                    明细没读出来，点页面上方「重试」再拉一次
-                    <br />
-                    这是这次请求没成功，不是没有调用记录
-                  </td>
-                </tr>
-              ) : logs.length === 0 ? (
-                <tr>
-                  <td colSpan={7}>
-                    <EmptyHint
-                      text="这段时间没有调用记录"
-                      hint="换个时间范围，或先去「API 密钥」页建一个 Key 发第一条请求"
-                    />
-                  </td>
-                </tr>
-              ) : (
-                logs.map((log) => (
-                  <tr key={log.id} className="border-b border-line last:border-0">
-                    <td className="px-5 py-3 text-xs text-ink-muted">
-                      {formatTime(log.created_at)}
-                    </td>
-                    <td className="px-5 py-3 text-ink">{log.model_name || PLACEHOLDER_DASH}</td>
-                    <td className="px-5 py-3 text-xs text-ink-muted">
-                      {log.token_name || PLACEHOLDER_DASH}
-                    </td>
-                    <td className="px-5 py-3 tabular-nums text-ink-muted">
-                      {formatNumber(log.prompt_tokens)}
-                    </td>
-                    <td className="px-5 py-3 tabular-nums text-ink-muted">
-                      {formatNumber(log.completion_tokens)}
-                    </td>
-                    <td className="px-5 py-3 tabular-nums text-ink-muted">
-                      {quotaToAmount(log.quota)}
-                    </td>
-                    <td className="px-5 py-3 tabular-nums text-ink-muted">
-                      {log.use_time ? `${log.use_time}s` : PLACEHOLDER_DASH}
+
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-full text-left">
+              <THead>
+                <Th>时间</Th>
+                <Th>模型</Th>
+                <Th>密钥</Th>
+                <Th>输入</Th>
+                <Th>输出</Th>
+                <Th>费用</Th>
+                <Th>耗时</Th>
+              </THead>
+              <tbody>
+                {loading ? (
+                  <TableLoading colSpan={7} rows={5} />
+                ) : logsFailed ? (
+                  <tr>
+                    <td colSpan={7}>
+                      <EmptyHint
+                        text="暂时读不到调用明细"
+                        hint="可能是网络波动，稍等片刻再试一次"
+                      />
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : logs.length === 0 ? (
+                  <tr>
+                    <td colSpan={7}>
+                      <EmptyHint
+                        text="这段时间还没有调用"
+                        hint="换个时间范围，或先去创建一把密钥"
+                      />
+                    </td>
+                  </tr>
+                ) : (
+                  logs.map((log) => (
+                    <Tr key={log.id}>
+                      <Td className="whitespace-nowrap text-ink-muted">
+                        {formatTime(log.created_at)}
+                      </Td>
+                      <Td>{log.model_name || PLACEHOLDER_DASH}</Td>
+                      <Td className="text-ink-mid">{log.token_name || PLACEHOLDER_DASH}</Td>
+                      <Td className="tabular-nums text-ink-mid">
+                        {formatNumber(log.prompt_tokens)}
+                      </Td>
+                      <Td className="tabular-nums text-ink-mid">
+                        {formatNumber(log.completion_tokens)}
+                      </Td>
+                      <Td className="tabular-nums">{quotaToAmount(log.quota)}</Td>
+                      <Td className="tabular-nums text-ink-mid">
+                        {log.use_time ? `${log.use_time}s` : PLACEHOLDER_DASH}
+                      </Td>
+                    </Tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-line px-5 py-3 text-xs text-ink-muted">
+            <div className="flex items-center justify-between border-t border-line px-card py-3 text-meta text-ink-muted">
               <span>
-                第 {page} / {totalPages} 页
+                第 {page} / {totalPages} 页，每页 {pageSize} 条
               </span>
               <div className="flex gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="sm"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="rounded border border-line px-3 py-1 disabled:opacity-40"
                 >
                   上一页
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  className="rounded border border-line px-3 py-1 disabled:opacity-40"
                 >
                   下一页
-                </button>
+                </Button>
               </div>
             </div>
           )}
-        </div>
-        {/* 统计口径 —— md 4.2 D 要求写清时间范围、时区、口径与分页规则 */}
-        <section className="mt-6 rounded-card border border-line bg-surface px-5 py-4 text-[11px] leading-relaxed text-ink-muted">
-          <h2 className="mb-2 text-xs font-medium text-ink">统计口径</h2>
-          <ul className="list-disc space-y-1 pl-4">
-            <li>
-              时间按本机时区切分：「今天」从本机 0 点起算；「近 7 / 30 天」是从现在往前推的滚动窗口，不是自然周 / 自然月。
-            </li>
-            <li>
-              金额 = quota ÷ 配额单位 × 汇率，两个参数取自 /api/status；后台改了换算参数这里跟着变，历史记录不回溯。
-            </li>
-            <li>成功率 = 成功调用 ÷（成功 + 失败）；失败调用记在错误日志里，不扣费。</li>
-            <li>明细每页 20 条；趋势与分布基于最近 500 条记录，超出部分未计入，趋势图只用来看形状。</li>
-          </ul>
-          <p className="mt-2">完整定义见仓库 docs/METRICS.md，改口径必须同步那份文件。</p>
-        </section>
-      </main>
+        </Card>
+      </PageContainer>
     </div>
   );
 }
@@ -583,34 +558,43 @@ export default function UsagePage() {
 function Metric({
   label,
   value,
-  hint,
+  unit,
+  foot,
   loading,
   failed,
 }: {
   label: string;
   value: string;
-  hint?: string;
+  unit?: string;
+  foot?: string;
   loading?: boolean;
   failed?: boolean;
 }) {
+  /* 加载中不摆脚注：原来这里会写「成功与失败次数暂未取到」，
+     数还没回来就先给用户报一个缺失，等于把加载中当成失败说。 */
+  const showFoot = !loading && !failed && foot;
   return (
-    <div className="rounded-card border border-line bg-surface p-5">
-      <div className="text-xs text-ink-muted">{label}</div>
-      <div className="mt-2 flex h-8 items-center">
+    <Card>
+      <div className="text-meta text-ink-muted">{label}</div>
+      <div className="mt-1 flex h-8 items-center">
         {loading ? (
-          <Skeleton className="h-5 w-20" />
+          <Skeleton className="h-6 w-24" />
         ) : failed ? (
-          <span
-            className="text-xs text-ink-muted"
-            title="这一项这次没取到，点页面上方「重试」再拉一次"
-          >
-            读取失败
+          <span className="text-meta text-ink-muted" title="暂时没读到，稍后重试一下">
+            暂时没读到
           </span>
         ) : (
-          <span className="text-2xl font-semibold tabular-nums text-ink">{value}</span>
+          <>
+            <span className="truncate text-display font-semibold tabular-nums text-ink">
+              {value}
+            </span>
+            {unit && <span className="ml-1 shrink-0 text-meta text-ink-muted">{unit}</span>}
+          </>
         )}
       </div>
-      {hint && <div className="mt-1 text-[11px] text-ink-muted">{hint}</div>}
-    </div>
+      <div className="mt-1 truncate text-meta text-ink-muted">
+        {showFoot ? foot : '\u00a0'}
+      </div>
+    </Card>
   );
 }

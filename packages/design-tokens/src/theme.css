@@ -20,16 +20,24 @@
 
   --neutral-bg: #ffffff;
   --neutral-bg-subtle: #f9fafb;
-  --neutral-border: #e5e7eb;
-  --neutral-text-muted: #6b7280;
-  --neutral-text: #111827;
   /*
-   * 正文色阶补两档（2026-11-11）：首屏改版时发现只有「标题 / 次要」两档，
-   * 中间的副标题和正文只能靠透明度调（text-ink/60 这类），对比度不够、字发虚。
-   * 四档实色取代透明度：标题 #111827 → 强调句 #334155 → 正文 #475569 → 说明 #6B7280。
+   * 边框只有这一档（2026-11-12）：
+   * 原来「浅边框」有两种写法——border-line 和手写的 border-black/5（60 处），
+   * 两者深浅还不一样，卡片挨着放会一深一浅。现在统一到 #e7e9ef，
+   * 页面里禁止再写 border-black/5、border-gray-200 这类。
    */
-  --neutral-text-soft: #334155;
-  --neutral-text-mid: #475569;
+  --neutral-border: #e7e9ef;
+  /*
+   * 正文四档（2026-11-12 定稿）：只用实色，禁止 text-ink/60 这种透明度写法。
+   * 透明度叠在不同底色上出来的深浅都不一样，同一页两处「说明文字」看着不是一档。
+   *   标题 #101828 → 强调句 #344054 → 正文 #5c6675 → 辅助 #667085
+   * 辅助色比初稿的浅灰深一档：12px 的字用更浅的颜色白底对比度只有 3:1，
+   * 看着就是「糊」，这是之前很多人说字不清楚的原因之一。
+   */
+  --neutral-text: #101828;
+  --neutral-text-soft: #344054;
+  --neutral-text-mid: #5c6675;
+  --neutral-text-muted: #667085;
   --neutral-text-inverse: #ffffff;
 
   /* 浅色块与浅色底（靛蓝偏冷，比紫色更中性） */
@@ -46,19 +54,58 @@
   --gradient-brand: linear-gradient(135deg, #6366f1 0%, #4f46e5 52%, #312e81 100%);
   --code-surface: #0f172a;
 
+  /*
+   * 语义色三件套：实色（图标/圆点）、深字（文字）、浅底（状态标签/提示条）。
+   * 以前只有实色，红底绿底只能手写 bg-red-50 / bg-green-50（21 处），
+   * 这些值不在变量里，换肤改不到，而且红绿深浅和品牌色不是一个温区。
+   */
   --semantic-success: #16a34a;
+  --semantic-success-text: #067647;
+  --semantic-success-soft: #ecfdf3;
   --semantic-warning: #d97706;
+  --semantic-warning-text: #b54708;
+  --semantic-warning-soft: #fffaeb;
   --semantic-danger: #dc2626;
+  --semantic-danger-text: #b42318;
+  --semantic-danger-soft: #fef3f2;
   --semantic-info: #2563eb;
+  --semantic-info-text: #175cd3;
+  --semantic-info-soft: #eff8ff;
 
+  /*
+   * 圆角只有三档（2026-11-12）：
+   * 原来 11 / 12 / 18 / 20 / 24 五种写法混着 rounded-md / rounded-xl 用，
+   * 「适度圆角」变成了「每块随便圆」。现在控件 8、卡片 12、弹窗 16。
+   */
+  --radius-control: 8px;
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 18px;
+  --radius-lg: 16px;
+  /* 仅官网营销页的大图/大色块用，控制台禁止使用 */
   --radius-xl: 24px;
+
+  /*
+   * 焦点环。全站原来 focus-visible 0 处：键盘用户按 Tab 走一遍，
+   * 根本看不出光标停在哪。所有可点元素统一用这个外环。
+   */
+  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px rgba(79, 70, 229, 0.45);
 
   --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
   --shadow-panel: 0 12px 40px rgba(49, 46, 129, 0.08);
   --shadow-popover: 0 12px 32px rgba(16, 24, 40, 0.12);
+
+  /*
+   * 品牌投影三档（2026-11-12）：
+   * 营销页的主按钮、logo 方块、深色卡原来各写各的，同样是「靛蓝往外发光」却出现
+   * 7 种偏移与透明度组合（0.22 / 0.28 / 0.30 / 0.34 / 0.45…），凑近看得出深浅不一。
+   * 现在按「静置 / 默认 / 强调」分三档，控制台不投影（工作台不需要光晕）。
+   *
+   * 前缀用 elevation- 而不是 shadow-：@theme 里要映射成 shadow-brand*，
+   * 同名会变成自己引用自己的死循环。
+   */
+  --elevation-brand-sm: 0 4px 12px rgba(79, 70, 229, 0.3);
+  --elevation-brand: 0 6px 18px rgba(79, 70, 229, 0.28);
+  --elevation-brand-lg: 0 10px 26px rgba(79, 70, 229, 0.34);
 
   /* 主按钮渐变（靛蓝 → 深靛蓝） */
   --gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 55%, #3730a3 100%);
@@ -69,4 +116,65 @@
    * 带一点渐变让它有纵深，右下角的线框装饰才立得起来。
    */
   --matrix-dark: linear-gradient(148deg, #201e4d 0%, #17163a 52%, #0e0d27 100%);
+
+  /*
+   * ============ 字号（2026-11-12）============
+   *
+   * 全站原来有 18 种字号，其中 11.5 / 12.5 / 13.5 / 14.5 / 10.5 这类半像素值
+   * 出现 34 处。半像素字号在普通屏上会被四舍五入取整渲染，边缘发虚；
+   * 更要命的是 18 种字号等于没有层级——用户看不出哪句是标题。
+   * 现在只留 6 档，一一对应用途，没有第七个。
+   */
+  --font-size-xs: 12px;   /* 表头、状态标签、辅助说明 */
+  --font-size-sm: 13px;   /* 表格单元格、次要正文 */
+  --font-size-base: 14px; /* 正文、按钮、输入框 */
+  --font-size-md: 16px;   /* 卡片标题、重点数字 */
+  --font-size-lg: 20px;   /* 页面标题、区块标题 */
+  --font-size-xl: 28px;   /* 概览页大数字，一屏最多两处 */
+
+  /*
+   * 展示档（2026-11-12）：只给官网营销页的大标题用，控制台一个都不许用——
+   * 工作台上 36/48 的字会把表格和操作挤出去。
+   *
+   * 官网原来用 Tailwind 自带的 2xl~5xl（24/30/36/48），等于另一套不受管的梯队：
+   * 改一个品牌字号要翻遍页面。收敛成「6 档界面 + 2 档展示」，一个来源。
+   */
+  --font-size-section: 36px; /* 首页区块大标题 */
+  --font-size-hero: 48px;    /* 首屏主标题，整站最多一处 */
+
+  /* 行高三档：紧凑用于标题，常规用于表格，宽松用于成段说明 */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /*
+   * ============ 间距（2026-11-12）============
+   *
+   * 间距值本来就是 4 的倍数，问题不在刻度而在「每处随手挑一个」：
+   * 同一页卡片内边距能同时出现 20 / 24 / 28 / 32。
+   * 下面只是把常用档位命名，页面写 p-card / gap-block，而不是 p-5 / p-6 / p-7 乱选。
+   */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* 语义间距：卡片内边距 24、区块之间 32、页面左右 24（宽屏 32） */
+  --space-card: 24px;
+  --space-block: 32px;
+  --space-page: 24px;
+  --space-page-wide: 32px;
+
+  /*
+   * 内容最大宽度（2026-11-12）：
+   * 8 个控制台页面原来全是 px-6 py-6、没有上限，1920/2560 屏上表格被拉成一米长，
+   * 一行字横跨七八十个汉字，眼睛来回甩——这是「看着不专业」最直接的原因。
+   */
+  --width-content: 1440px;
 }

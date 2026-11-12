@@ -5,21 +5,41 @@ import { useRouter } from 'next/navigation';
 import { authApi, billingApi, ApiError } from '@portal/api-client';
 import type { SelfUser } from '@portal/types';
 import type { TopUpRecord } from '@portal/api-client';
+import {
+  Badge,
+  Button,
+  Card,
+  CardHeader,
+  Input,
+  TableWrap,
+  THead,
+  Th,
+  Tr,
+  Td,
+  TdSub,
+} from '@portal/ui';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
-import { BlockLoading, EmptyHint, ErrorBox, PLACEHOLDER_DASH, Skeleton } from '@/components/data-state';
-import { ensureMoneySettings, formatTime, quotaToAmount } from '@/lib/format';
+import { PageContainer } from '@/components/page-shell';
+import {
+  EmptyHint,
+  ErrorBox,
+  PLACEHOLDER_DASH,
+  Skeleton,
+  TableLoading,
+} from '@/components/data-state';
+import { ensureMoneySettings, formatNumber, formatTime, moneyUnit, quotaToAmount } from '@/lib/format';
 
 /** 充值订单状态：官方按字符串返回，未知值原样显示，不假装懂 */
-function topUpStatusLabel(status: string): { text: string; className: string } {
+function TopUpBadge({ status }: { status: string }) {
   switch (status) {
     case 'success':
-      return { text: '已完成', className: 'text-ok' };
+      return <Badge tone="success">已完成</Badge>;
     case 'pending':
-      return { text: '待支付', className: 'text-ink-muted' };
+      return <Badge tone="warning">待支付</Badge>;
     case 'expired':
-      return { text: '已过期', className: 'text-danger' };
+      return <Badge tone="neutral">已过期</Badge>;
     default:
-      return { text: status || '未知', className: 'text-ink-muted' };
+      return <Badge tone="neutral">{status || '未知'}</Badge>;
   }
 }
 
@@ -74,7 +94,7 @@ export default function WalletPage() {
         return;
       }
       setLoadFailed(true);
-      setError(err instanceof Error ? err.message : '加载失败');
+      setError('数据加载失败，稍等片刻再试一次');
     } finally {
       setLoading(false);
     }
@@ -96,184 +116,173 @@ export default function WalletPage() {
       setNotice('兑换成功，余额已更新');
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : '兑换失败');
+      setError(err instanceof Error ? err.message : '兑换失败，检查一下兑换码');
     } finally {
       setRedeeming(false);
     }
   }
+
+  /** 三张数字卡，与概览页同一套三层结构：标签 / 数字 / 口径 */
+  const cards = [
+    {
+      label: '当前余额',
+      value: user ? quotaToAmount(user.quota) : '',
+      unit: moneyUnit(),
+      foot: '充值后可用于调用',
+      failed: !user,
+    },
+    {
+      label: '累计已用',
+      value: user ? quotaToAmount(user.used_quota) : '',
+      unit: moneyUnit(),
+      foot: '开户至今累计',
+      failed: !user,
+    },
+    {
+      label: '累计请求',
+      value: user ? formatNumber(user.request_count) : '',
+      unit: '次',
+      foot: '开户至今累计',
+      failed: !user,
+    },
+  ];
 
   return (
     <div className="min-h-screen md:pl-56">
       <ConsoleSidebar />
       <ConsoleTopbar title="充值" balance={user ? quotaToAmount(user.quota) : undefined} />
 
-      <main className="px-6 py-6">
+      <PageContainer>
         {error && (
-          <div className="mb-5">
+          <div className="mb-4">
             {loadFailed ? (
               <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
             ) : (
-              <div className="rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
+              <p className="rounded-control border border-danger/25 bg-danger-soft px-3.5 py-2.5 text-note text-danger-text">
                 {error}
-              </div>
+              </p>
             )}
           </div>
         )}
         {notice && (
-          <div className="mb-5 rounded-card border border-green-200 bg-green-50 px-4 py-3 text-xs text-ok">
+          <p className="mb-4 rounded-control border border-ok/25 bg-ok-soft px-3.5 py-2.5 text-note text-ok-text">
             {notice}
-          </div>
+          </p>
         )}
 
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-card border border-line bg-surface p-5">
-            <div className="text-xs text-ink-muted">当前余额</div>
-            <div className="mt-2 flex h-9 items-center text-3xl font-semibold tabular-nums text-ink">
-              {loading ? (
-                <Skeleton className="h-7 w-28" />
-              ) : loadFailed ? (
-                <span className="text-xs font-normal text-ink-muted">读取失败</span>
-              ) : user ? (
-                quotaToAmount(user.quota)
-              ) : (
-                PLACEHOLDER_DASH
-              )}
-            </div>
-          </div>
-          <div className="rounded-card border border-line bg-surface p-5">
-            <div className="text-xs text-ink-muted">累计已用</div>
-            <div className="mt-2 flex h-9 items-center text-3xl font-semibold tabular-nums text-ink">
-              {loading ? (
-                <Skeleton className="h-7 w-24" />
-              ) : loadFailed ? (
-                <span className="text-xs font-normal text-ink-muted">读取失败</span>
-              ) : user ? (
-                quotaToAmount(user.used_quota)
-              ) : (
-                PLACEHOLDER_DASH
-              )}
-            </div>
-          </div>
-          <div className="rounded-card border border-line bg-surface p-5">
-            <div className="text-xs text-ink-muted">累计请求</div>
-            <div className="mt-2 flex h-9 items-center text-3xl font-semibold tabular-nums text-ink">
-              {loading ? (
-                <Skeleton className="h-7 w-16" />
-              ) : loadFailed ? (
-                <span className="text-xs font-normal text-ink-muted">读取失败</span>
-              ) : user ? (
-                user.request_count
-              ) : (
-                PLACEHOLDER_DASH
-              )}
-            </div>
-          </div>
+          {cards.map((item) => (
+            <Card key={item.label}>
+              <div className="text-meta text-ink-muted">{item.label}</div>
+              <div className="mt-1 flex h-8 items-center">
+                {loading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : item.failed ? (
+                  <span className="text-meta text-ink-muted" title="暂时没读到，稍后重试一下">
+                    暂时没读到
+                  </span>
+                ) : (
+                  <>
+                    <span className="truncate text-display font-semibold tabular-nums text-ink">
+                      {item.value}
+                    </span>
+                    <span className="ml-1 shrink-0 text-meta text-ink-muted">{item.unit}</span>
+                  </>
+                )}
+              </div>
+              <div className="mt-1 text-meta text-ink-muted">{item.foot}</div>
+            </Card>
+          ))}
         </div>
 
-        {/* 兑换码充值 */}
-        <div className="mt-6 rounded-card border border-line bg-surface p-6">
-          <h2 className="text-sm font-medium text-ink">使用兑换码充值</h2>
-          <p className="mt-1.5 text-xs text-ink-muted">
-            向管理员获取兑换码，输入后额度立即到账。
-          </p>
-          <form onSubmit={handleRedeem} className="mt-4 flex flex-wrap gap-3">
-            <input
+        <Card className="mt-4">
+          <CardHeader title="使用兑换码充值" />
+          <form onSubmit={handleRedeem} className="flex flex-wrap items-start gap-3">
+            <Input
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="输入兑换码"
-              className="w-72 rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand"
+              aria-label="兑换码"
+              className="w-72"
             />
-            <button
-              type="submit"
-              disabled={redeeming || !code.trim()}
-              className="rounded-md bg-brand px-5 py-2 text-sm text-white disabled:opacity-50"
-            >
+            <Button type="submit" loading={redeeming} disabled={!code.trim()}>
               {redeeming ? '兑换中…' : '立即兑换'}
-            </button>
+            </Button>
           </form>
-        </div>
+        </Card>
 
-        {/* 充值记录 —— 官方 /api/user/topup/self */}
-        <div className="mt-6 rounded-card border border-line bg-surface p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium text-ink">充值记录</h2>
-            {topupTotal > 0 && (
-              <span className="text-xs text-ink-muted">共 {topupTotal} 条</span>
-            )}
+        <div className="mt-4">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-title font-semibold text-ink">充值记录</h2>
+            <span className="text-meta text-ink-muted">
+              {loading
+                ? '正在统计…'
+                : recordsFailed
+                  ? '条数未知'
+                  : `共 ${formatNumber(topupTotal)} 条`}
+            </span>
           </div>
-          <p className="mt-1.5 text-xs text-ink-muted">
-            兑换码与在线支付都在这里留痕；未完成的订单不会入账。
-          </p>
 
-          {loading ? (
-            <div className="mt-4">
-              <BlockLoading lines={3} />
-            </div>
-          ) : recordsFailed ? (
-            <EmptyHint
-              text="充值记录没读出来"
-              hint="点页面上方「重试」再拉一次——这是这次请求没成功，不是没有记录"
-            />
-          ) : topups.length === 0 ? (
-            <EmptyHint
-              text="还没有充值记录"
-              hint="兑换码兑换成功后会在这里留一条；未完成的订单不会入账"
-            />
-          ) : (
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full min-w-[640px] text-left text-xs">
-                <thead className="text-ink-muted">
-                  <tr className="border-b border-line">
-                    <th className="py-2.5 pr-4 font-normal">时间</th>
-                    <th className="py-2.5 pr-4 font-normal">实付</th>
-                    <th className="py-2.5 pr-4 font-normal">到账额度</th>
-                    <th className="py-2.5 pr-4 font-normal">方式</th>
-                    <th className="py-2.5 pr-4 font-normal">状态</th>
-                    <th className="py-2.5 font-normal">订单号</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topups.map((record) => {
-                    const status = topUpStatusLabel(record.status);
-                    return (
-                      <tr key={record.id} className="border-b border-line/60 last:border-0">
-                        <td className="py-3 pr-4 whitespace-nowrap text-ink-muted">
-                          {formatTime(record.create_time)}
-                        </td>
-                        <td className="py-3 pr-4 whitespace-nowrap tabular-nums text-ink">
-                          ¥{record.money}
-                        </td>
-                        <td className="py-3 pr-4 whitespace-nowrap tabular-nums text-ink">
-                          {quotaToAmount(record.amount)}
-                        </td>
-                        <td className="py-3 pr-4 whitespace-nowrap text-ink-muted">
-                          {topUpMethodLabel(record)}
-                        </td>
-                        <td className={`py-3 pr-4 whitespace-nowrap ${status.className}`}>
-                          {status.text}
-                        </td>
-                        <td className="py-3 font-mono text-[11px] text-ink-muted">
+          <TableWrap>
+            <THead>
+              <Th>时间</Th>
+              <Th>实付</Th>
+              <Th>到账额度</Th>
+              <Th>方式</Th>
+              <Th>状态</Th>
+              <Th>订单号</Th>
+            </THead>
+            <tbody>
+              {loading ? (
+                <TableLoading colSpan={6} rows={4} />
+              ) : recordsFailed ? (
+                <tr>
+                  <td colSpan={6}>
+                    <EmptyHint
+                      text="暂时读不到充值记录"
+                      hint="可能是网络波动，稍等片刻再试一次"
+                    />
+                  </td>
+                </tr>
+              ) : topups.length === 0 ? (
+                <tr>
+                  <td colSpan={6}>
+                    <EmptyHint
+                      text="还没有充值记录"
+                      hint="兑换成功后，记录会出现在这里"
+                    />
+                  </td>
+                </tr>
+              ) : (
+                topups.map((record) => (
+                  <Tr key={record.id}>
+                    <Td className="whitespace-nowrap text-ink-muted">
+                      {formatTime(record.create_time)}
+                    </Td>
+                    <Td className="whitespace-nowrap tabular-nums">
+                      ¥{record.money}
+                    </Td>
+                    <Td className="whitespace-nowrap tabular-nums">
+                      {quotaToAmount(record.amount)}
+                    </Td>
+                    <Td className="whitespace-nowrap text-ink-mid">{topUpMethodLabel(record)}</Td>
+                    <Td>
+                      <TopUpBadge status={record.status} />
+                    </Td>
+                    <Td>
+                      <TdSub>
+                        <span className="font-mono">
                           {record.trade_no || PLACEHOLDER_DASH}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+                        </span>
+                      </TdSub>
+                    </Td>
+                  </Tr>
+                ))
+              )}
+            </tbody>
+          </TableWrap>
         </div>
-
-        {/* 在线支付说明 */}
-        <div className="mt-6 rounded-card border border-line bg-surface-subtle p-6">
-          <h2 className="text-sm font-medium text-ink">在线支付</h2>
-          <p className="mt-2 text-xs leading-relaxed text-ink-muted">
-            官方后端内置多种支付通道（Epay / Stripe / Creem / Waffo 等），
-            是否开启取决于管理员在后台的配置。开启后此页会出现对应支付入口；
-            未开启时请使用上面的兑换码方式。
-          </p>
-        </div>
-      </main>
+      </PageContainer>
     </div>
   );
 }

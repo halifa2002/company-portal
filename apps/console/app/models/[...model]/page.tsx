@@ -4,7 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { modelsApi, ApiError } from '@portal/api-client';
+import { Badge, Card, Notice, Segmented } from '@portal/ui';
+import type { SegmentedOption } from '@portal/ui';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import { PageContainer } from '@/components/page-shell';
 import { ErrorBox, Skeleton } from '@/components/data-state';
 import { ensureMoneySettings, moneyUnit, usdToDisplay } from '@/lib/format';
 import { pricingUrl } from '@/lib/brand';
@@ -36,6 +39,14 @@ interface PricingItem {
   billing_mode?: string;
   billing_expr?: string;
 }
+
+type LangKey = 'curl' | 'node' | 'python';
+
+const LANG_OPTIONS: SegmentedOption<LangKey>[] = [
+  { value: 'curl', label: 'cURL' },
+  { value: 'node', label: 'Node.js' },
+  { value: 'python', label: 'Python' },
+];
 
 /** 倍率 → 每百万 token 的价格（按后端配置的货币与汇率展示） */
 function ratioToPrice(ratio: number): string {
@@ -69,7 +80,7 @@ export default function ModelDetailPage() {
   const [pricingFailed, setPricingFailed] = useState(false);
   /** 可用模型列表没拉到，此时既不能说可用也不能说不可用 */
   const [modelsFailed, setModelsFailed] = useState(false);
-  const [tab, setTab] = useState<'curl' | 'node' | 'python'>('curl');
+  const [tab, setTab] = useState<LangKey>('curl');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -108,7 +119,7 @@ export default function ModelDetailPage() {
         router.replace('/login');
         return;
       }
-      setError(err instanceof Error ? err.message : '加载失败');
+      setError('数据加载失败，稍等片刻再试一次');
     } finally {
       setLoading(false);
     }
@@ -169,21 +180,24 @@ resp = client.chat.completions.create(
       <ConsoleSidebar />
       <ConsoleTopbar title="模型详情" />
 
-      <main className="px-6 py-6">
-        <Link href="/models" className="text-xs text-ink-muted hover:text-brand">
+      <PageContainer>
+        <Link
+          href="/models"
+          className="inline-block text-note text-ink-mid transition-colors hover:text-brand"
+        >
           ← 返回模型广场
         </Link>
 
         {error && (
-          <div className="mt-4">
+          <div className="mt-3">
             <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
           </div>
         )}
 
         {loading ? (
           /* 骨架照真实版面排：标题 + 说明 + 两块价格，加载完不会整页跳 */
-          <div className="mt-4 space-y-4" aria-busy="true" aria-label="加载中">
-            <div className="rounded-card border border-line bg-surface p-6">
+          <div className="mt-3 space-y-4" aria-busy="true" aria-label="加载中">
+            <Card>
               <Skeleton className="h-5 w-44" />
               <Skeleton className="mt-4 h-3.5 w-full max-w-xl" />
               <Skeleton className="mt-2 h-3.5 w-2/3" />
@@ -191,173 +205,148 @@ resp = client.chat.completions.create(
                 <Skeleton className="h-5 w-16 rounded-full" />
                 <Skeleton className="h-5 w-14 rounded-full" />
               </div>
-            </div>
-            <div className="rounded-card border border-line bg-surface p-6">
+            </Card>
+            <Card>
               <Skeleton className="h-3.5 w-16" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <Skeleton className="h-8 w-32" />
                 <Skeleton className="h-8 w-32" />
               </div>
-            </div>
+            </Card>
           </div>
         ) : pricingFailed ? (
           /* 价格表没拉到 ≠ 这个模型不存在。这里的说法必须区分开 */
-          <div className="mt-4">
+          <div className="mt-3">
             <ErrorBox
-              message="价格表这次没读出来——这不代表模型不存在，重试一次看看"
+              message="价格表暂时读不到，稍后重试一下"
               onRetry={() => void load()}
               retrying={loading}
             />
           </div>
         ) : !item ? (
-          <div className="mt-8 rounded-card border border-line bg-surface px-5 py-16 text-center">
-            <p className="text-sm text-ink">没有找到模型「{modelName}」</p>
-            <p className="mt-2 text-xs text-ink-muted">
-              可能是价格表里没有这个模型，或管理员尚未配置它的价格。
-            </p>
-          </div>
+          <Card className="mt-3">
+            <div className="py-8 text-center">
+              <p className="text-body text-ink">没有找到模型「{modelName}」</p>
+              <p className="mt-1.5 text-meta text-ink-muted">
+                这个模型可能还没有上架，或还没有配置价格
+              </p>
+            </div>
+          </Card>
         ) : (
           <>
-            {/* 头部 */}
-            <div className="mt-4 rounded-card border border-line bg-surface p-6">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <h1 className="font-mono text-lg font-semibold text-ink">
-                    {item.model_name}
-                  </h1>
-                  <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-muted">
-                    {item.description || '管理员未填写模型说明。'}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {modelsFailed ? (
-                      /* 模型列表没拉到，说「不可用」等于把失败讲成事实 */
-                      <Tag text="可用状态未知" />
-                    ) : (
-                      <Tag ok={available} text={available ? '当前可用' : '当前不可用'} />
-                    )}
-                    {item.owner_by && <Tag text={`来源 ${item.owner_by}`} />}
-                    {item.tags
-                      ?.split(/[,;]/)
-                      .map((tag) => tag.trim())
-                      .filter(Boolean)
-                      .map((tag) => <Tag key={tag} text={tag} />)}
-                  </div>
-                </div>
+            {/* 头部：模型名 / 介绍 / 标签 */}
+            <Card className="mt-3">
+              <h1 className="font-mono text-heading font-semibold text-ink">
+                {item.model_name}
+              </h1>
+              <p className="mt-2 max-w-2xl text-body leading-relaxed text-ink-mid">
+                {item.description || '这个模型还没有介绍'}
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {modelsFailed ? (
+                  /* 模型列表没拉到，说「不可用」等于把失败讲成事实 */
+                  <Badge tone="neutral">可用状态未知</Badge>
+                ) : (
+                  <Badge tone={available ? 'success' : 'neutral'}>
+                    {available ? '当前可用' : '当前不可用'}
+                  </Badge>
+                )}
+                {item.owner_by && <Tag text={`来源 ${item.owner_by}`} />}
+                {item.tags
+                  ?.split(/[,;]/)
+                  .map((tag) => tag.trim())
+                  .filter(Boolean)
+                  .map((tag) => <Tag key={tag} text={tag} />)}
               </div>
-            </div>
+            </Card>
 
             {/* 价格 */}
-            <div className="mt-6 rounded-card border border-line bg-surface p-6">
-              <h2 className="text-sm font-medium text-ink">计费方式</h2>
+            <Card className="mt-4">
+              <h2 className="text-title font-semibold text-ink">计费方式</h2>
               {isTiered ? (
-                <div className="mt-4 rounded-card border border-line bg-surface-subtle px-4 py-3 text-xs leading-relaxed text-ink-muted">
-                  该模型按
+                <Notice className="mt-3">
+                  这个模型按
                   <span className="mx-1 font-medium text-ink">分时动态计费</span>
-                  （高峰期与空闲时段单价不同），单价随时段变化，这里不摆固定数字，
-                  以免和实际扣费对不上。
+                  ，高峰期和空闲时段单价不同，所以这里不标固定价格，免得和实际扣费对不上。
                   <a href={pricingUrl} className="ml-1 text-brand hover:underline">
-                    查看价格页 →
+                    看价格页 →
                   </a>
-                </div>
+                </Notice>
               ) : isPerCall ? (
-                <div className="mt-4">
-                  <div className="text-xs text-ink-muted">按次计费</div>
-                  <div className="mt-1 text-2xl font-semibold tabular-nums text-ink">
-                    {currencySign()}
-                    {Number(usdToDisplay(item.model_price).toFixed(4))}
-                    <span className="ml-1 text-xs font-normal text-ink-muted">/ 次</span>
+                <div className="mt-3">
+                  <div className="text-meta text-ink-muted">按次计费</div>
+                  <div className="mt-1 flex items-baseline gap-1">
+                    <span className="text-display font-semibold tabular-nums text-ink">
+                      {currencySign()}
+                      {Number(usdToDisplay(item.model_price).toFixed(4))}
+                    </span>
+                    <span className="text-meta text-ink-muted">/ 次</span>
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <div className="text-xs text-ink-muted">输入价格</div>
-                    <div className="mt-1 flex h-8 items-center text-2xl font-semibold tabular-nums text-ink">
-                      {inputPrice === '—' ? (
-                        /* 倍率不是数字时别拼出「¥—/百万 Token」，直接说没配 */
-                        <span className="text-sm font-normal text-ink-muted">未配置单价</span>
-                      ) : (
-                        <>
-                          {currencySign()}
-                          {inputPrice}
-                          <span className="ml-1 text-xs font-normal text-ink-muted">
-                            / 百万 Token
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-ink-muted">输出价格</div>
-                    <div className="mt-1 flex h-8 items-center text-2xl font-semibold tabular-nums text-ink">
-                      {outputPrice === '—' ? (
-                        <span className="text-sm font-normal text-ink-muted">未配置单价</span>
-                      ) : (
-                        <>
-                          {currencySign()}
-                          {outputPrice}
-                          <span className="ml-1 text-xs font-normal text-ink-muted">
-                            / 百万 Token
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
+                <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                  <PriceBlock label="输入价格" value={inputPrice} />
+                  <PriceBlock label="输出价格" value={outputPrice} />
                 </div>
               )}
-              <p className="mt-4 text-[11px] leading-relaxed text-ink-muted">
-                价格由管理员在后台配置，可能与上游厂商标价不同；
-                实际扣费以调用后的用量记录为准。
+              <p className="mt-3 text-meta text-ink-muted">
+                价格可能与官方标价不同，实际扣费以用量记录为准
               </p>
-            </div>
+            </Card>
 
             {/* 调用示例 */}
-            <div className="mt-6 overflow-hidden rounded-card border border-line bg-surface">
-              <div className="flex items-center justify-between border-b border-line px-5 py-3">
-                <h2 className="text-sm font-medium text-ink">调用示例</h2>
-                <div className="flex gap-1 rounded border border-line p-0.5">
-                  {(
-                    [
-                      ['curl', 'cURL'],
-                      ['node', 'Node.js'],
-                      ['python', 'Python'],
-                    ] as const
-                  ).map(([key, label]) => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => setTab(key)}
-                      className={`rounded px-2.5 py-0.5 text-xs ${
-                        tab === key ? 'bg-brand text-white' : 'text-ink-muted'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
+            <Card flush className="mt-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-card py-3">
+                <h2 className="text-title font-semibold text-ink">调用示例</h2>
+                <Segmented
+                  ariaLabel="切换代码语言"
+                  value={tab}
+                  onChange={setTab}
+                  options={LANG_OPTIONS}
+                />
               </div>
-              <pre className="overflow-x-auto bg-[#0F172A] px-5 py-4 text-[12px] leading-relaxed text-[#E2E8F0]">
+              <pre className="overflow-x-auto bg-[#0F172A] px-card py-card text-note leading-relaxed text-[#E2E8F0]">
                 <code>{samples[tab]}</code>
               </pre>
-              <p className="border-t border-line px-5 py-2.5 text-[11px] text-ink-muted">
-                把 $API_KEY 换成你在「API 密钥」页创建的密钥。
+              <p className="border-t border-line px-card py-2.5 text-meta text-ink-muted">
+                把示例里的 $API_KEY 换成你在「API 密钥」页创建的那把密钥，就能直接跑
               </p>
-            </div>
+            </Card>
           </>
         )}
-      </main>
+      </PageContainer>
     </div>
   );
 }
 
-function Tag({ text, ok }: { text: string; ok?: boolean }) {
-  const cls =
-    ok === undefined
-      ? 'border-line bg-surface-subtle text-ink-muted'
-      : ok
-        ? 'border-green-200 bg-green-50 text-ok'
-        : 'border-line bg-surface-subtle text-ink-muted';
+/** 一档价格：标签 / 数字 / 单位 */
+function PriceBlock({ label, value }: { label: string; value: string }) {
   return (
-    <span className={`rounded border px-2 py-0.5 text-[11px] ${cls}`}>{text}</span>
+    <div>
+      <div className="text-meta text-ink-muted">{label}</div>
+      <div className="mt-1 flex h-8 items-baseline gap-1">
+        {value === '—' ? (
+          /* 倍率不是数字时别拼出「¥—/百万 Token」，直接说没配 */
+          <span className="text-note text-ink-muted">未配置单价</span>
+        ) : (
+          <>
+            <span className="text-display font-semibold tabular-nums text-ink">
+              {currencySign()}
+              {value}
+            </span>
+            <span className="text-meta text-ink-muted">/ 百万 Token</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** 能力标签：不是状态，不需要圆点，比 Badge 轻一档 */
+function Tag({ text }: { text: string }) {
+  return (
+    <span className="whitespace-nowrap rounded-control border border-line px-2 py-0.5 text-meta text-ink-muted">
+      {text}
+    </span>
   );
 }

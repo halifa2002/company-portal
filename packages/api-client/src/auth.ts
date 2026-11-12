@@ -62,10 +62,17 @@ export async function login(input: LoginInput): Promise<LoginResponse> {
   return data;
 }
 
-/** GET /api/user/logout */
+/**
+ * POST /api/user/auth/logout —— 作废当前会话，并清掉 refresh / 提示两个 cookie
+ *
+ * 必须是 POST 且路径带 /auth：refresh cookie 的 Path 就是 /api/user/auth，
+ * 只有请求落在这个前缀下，浏览器才会把它带上，后端的「清 cookie」分支才有机会执行。
+ * 旧写法 GET /api/user/logout 这条路由根本不存在，会落到别的处理上返回 403——
+ * 结果就是本地令牌清了、服务端会话还在，回到官网仍显示已登录。
+ */
 export async function logout(): Promise<null> {
   try {
-    return await http.get<null>('/api/user/logout');
+    return await http.post<null>('/api/user/auth/logout');
   } finally {
     setAccessToken(null);
   }

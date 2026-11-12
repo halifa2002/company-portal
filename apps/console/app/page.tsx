@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authApi, tokensApi, usageApi, ApiError } from '@portal/api-client';
 import type { SelfUser, UsageLog } from '@portal/types';
+import { Button, buttonClass, Card, TableWrap, Td, Th, THead, Tr } from '@portal/ui';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
-import { BlockLoading, EmptyHint, PLACEHOLDER_DASH, Skeleton } from '@/components/data-state';
+import { BlockLoading, EmptyHint, ErrorBox, PLACEHOLDER_DASH, Skeleton } from '@/components/data-state';
+import { PageContainer } from '@/components/page-shell';
 import {
   ensureMoneySettings,
   formatNumber,
@@ -134,7 +136,7 @@ export default function DashboardPage() {
         router.replace('/login');
         return;
       }
-      setError(err instanceof Error ? err.message : '加载失败');
+      setError('数据加载失败，稍等片刻再试一次');
     } finally {
       setLoading(false);
     }
@@ -165,7 +167,7 @@ export default function DashboardPage() {
   /**
    * 消费趋势：从近 7 天调用明细里自己按天求和，不再一天问后端一次。
    * 原来的写法 7 天要打 7 个请求，加上其他请求一共 12 个，连翻两页就被后端限流，
-   * 全页变成「读取失败」——用户以为账户空了。
+   * 全页变成「暂时没读到」——用户以为账户空了。
    * 明细有 500 条上限，真超了就由 logTruncated 在图下标出来，不假装精确。
    */
   const trend = useMemo(() => {
@@ -188,24 +190,21 @@ export default function DashboardPage() {
   const steps = [
     {
       title: '创建 API 密钥',
-      hint: '密钥是调用接口的唯一凭据，创建后只完整显示一次',
-      action: '去创建',
+      hint: '用密钥调用模型，创建后随时可以在密钥页查看',
       href: '/keys',
       done: (keyCount ?? 0) > 0,
       external: false,
     },
     {
       title: '添加额度',
-      hint: '充值后余额可用于调用，额度不足时请求会被拒绝',
-      action: '去充值',
+      hint: '充值后就能开始调用，余额不足时请求会失败',
       href: '/wallet',
       done: (user?.quota ?? 0) > 0 || (user?.used_quota ?? 0) > 0,
       external: false,
     },
     {
       title: '发送第一个请求',
-      hint: '按文档复制一条 chat/completions 示例，替换成自己的密钥',
-      action: '看示例',
+      hint: '照着文档里的示例，把密钥填进去就能跑通',
       href: docsUrl,
       done: (user?.request_count ?? 0) > 0,
       external: true,
@@ -217,7 +216,7 @@ export default function DashboardPage() {
   /**
    * 六张卡片各自记一笔「这项到底拿没拿到」。
    * 之前拿不到就塞一个「—」，和「余额就是 0」长得一样；现在把 failed 单独标出来，
-   * 由渲染层决定显示「读取失败」而不是横杠。
+   * 由渲染层决定显示「暂时没读到」而不是横杠。
    */
   const cards: {
     label: string;
@@ -258,7 +257,7 @@ export default function DashboardPage() {
       label: 'Token 使用量',
       value: logsFailed ? '' : formatNumber(aggregate.tokens),
       unit: 'Token',
-      foot: logTruncated ? `近 7 天，前 ${formatNumber(logs.length)} 条` : '近 7 天汇总',
+      foot: logTruncated ? '近 7 天，部分记录' : '近 7 天汇总',
       failed: logsFailed,
     },
     {
@@ -275,17 +274,10 @@ export default function DashboardPage() {
       <ConsoleSidebar />
       <ConsoleTopbar title="概览" balance={user ? quotaToAmount(user.quota) : undefined} />
 
-      <main className="px-6 py-6">
+      <PageContainer>
         {error && (
-          <div className="mb-5 flex items-center justify-between rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
-            <span>{error}</span>
-            <button
-              type="button"
-              onClick={() => void load()}
-              className="rounded border border-red-300 px-2 py-0.5"
-            >
-              重试
-            </button>
+          <div className="mb-4">
+            <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
           </div>
         )}
 
@@ -294,58 +286,62 @@ export default function DashboardPage() {
           <div aria-busy="true" aria-label="加载中">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="rounded-card border border-line bg-surface p-5">
+                <Card key={index}>
                   <Skeleton className="h-3 w-16" />
                   <Skeleton className="mt-3 h-6 w-24" />
                   <Skeleton className="mt-2 h-3 w-28" />
-                </div>
+                </Card>
               ))}
             </div>
-            <div className="mt-6 grid gap-4 lg:grid-cols-3">
-              <div className="rounded-card border border-line bg-surface p-5 lg:col-span-2">
-                <Skeleton className="h-3.5 w-20" />
-                <div className="mt-6 flex h-40 items-end gap-2">
+            <div className="mt-4 grid gap-4 lg:grid-cols-3">
+              <Card flush className="lg:col-span-2">
+                <div className="border-b border-line px-card py-3">
+                  <Skeleton className="h-4 w-20" />
+                </div>
+                <div className="flex h-40 items-end gap-3 px-card py-card">
                   {[38, 62, 45, 80, 52, 30, 68].map((height, index) => (
                     <div key={index} className="flex-1" style={{ height: `${height}%` }}>
-                      <Skeleton className="h-full w-full rounded-t" />
+                      <Skeleton className="h-full w-full rounded-t-control" />
                     </div>
                   ))}
                 </div>
-              </div>
-              <div className="rounded-card border border-line bg-surface p-5">
-                <Skeleton className="h-3.5 w-20" />
-                <BlockLoading lines={4} />
-              </div>
+              </Card>
+              <Card flush>
+                <div className="border-b border-line px-card py-3">
+                  <Skeleton className="h-4 w-20" />
+                </div>
+                <div className="px-card py-card">
+                  <BlockLoading lines={4} />
+                </div>
+              </Card>
             </div>
           </div>
         ) : (
           <>
+            {/* 引导卡：只在还没走完三步时出现，走完就自动消失，不再占一块地方 */}
             {showGuide && (
-              <section className="mb-4 rounded-panel border border-line bg-surface p-5">
+              <Card className="mb-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-sm font-medium text-ink">开始使用</h2>
-                    <p className="mt-1 text-xs text-ink-muted">
-                      三步把第一条请求发出去，已完成 {doneSteps}/{steps.length}
+                  <div className="min-w-0">
+                    <h2 className="text-title font-semibold text-ink">开始使用</h2>
+                    <p className="mt-1 text-meta leading-normal text-ink-muted">
+                      完成这三步，就能发出第一条请求（已完成 {doneSteps}/{steps.length}）
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href="/keys"
-                      className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-hover"
-                    >
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Link href="/keys" className={buttonClass('primary', 'sm')}>
                       创建 API 密钥
                     </Link>
-                    <button
-                      type="button"
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => {
                         window.localStorage.setItem(GUIDE_HIDDEN_KEY, '1');
                         setGuideHidden(true);
                       }}
-                      className="rounded-md border border-line px-3 py-1.5 text-xs text-ink-muted transition-colors hover:text-ink"
                     >
                       隐藏
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -354,34 +350,38 @@ export default function DashboardPage() {
                     const body = (
                       <>
                         <span
-                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] ${
-                            step.done
-                              ? 'bg-brand text-white'
-                              : 'border border-line text-ink-muted'
+                          aria-hidden
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-meta font-medium ${
+                            step.done ? 'bg-brand text-white' : 'border border-line text-ink-muted'
                           }`}
                         >
                           {step.done ? '✓' : index + 1}
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="flex items-center gap-2">
-                            <span
-                              className={`text-sm ${step.done ? 'text-ink-muted line-through' : 'text-ink'}`}
-                            >
-                              {step.title}
-                            </span>
-                            <span className="text-[11px] text-brand">
-                              {step.done ? '已完成' : step.action}
-                            </span>
+                          {/*
+                            标题独占一行、说明换行显示，都不截断。
+                            原来标题旁边还挂一个「去创建」小字，在 1024 笔记本上
+                            挤到下一行，跟说明缠在一起；而整张卡本来就是链接、
+                            右边有箭头、悬停还有边框变化，这个标签纯属添乱，去掉。
+                          */}
+                          <span
+                            className={`block text-body ${
+                              step.done ? 'text-ink-muted line-through' : 'text-ink'
+                            }`}
+                          >
+                            {step.title}
                           </span>
-                          <span className="mt-0.5 block truncate text-[11px] text-ink-muted">
+                          <span className="mt-0.5 block text-meta leading-normal text-ink-muted">
                             {step.hint}
                           </span>
                         </span>
-                        <span className="shrink-0 text-ink-muted">→</span>
+                        <span aria-hidden className="shrink-0 text-ink-muted">
+                          →
+                        </span>
                       </>
                     );
                     const className =
-                      'flex items-start gap-3 rounded-card border border-line bg-surface-subtle px-4 py-3 transition-colors hover:border-brand/40';
+                      'flex items-start gap-3 rounded-card border border-line bg-surface-subtle px-4 py-3 transition-colors hover:border-brand/40 hover:bg-surface';
 
                     return (
                       <li key={step.title}>
@@ -398,79 +398,92 @@ export default function DashboardPage() {
                     );
                   })}
                 </ol>
-              </section>
+              </Card>
             )}
 
+            {/* 六项核心数字：标签在上、数值最大、口径说明最小，三层一眼分开 */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {cards.map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-card border border-line bg-surface p-5"
-                >
-                  <div className="text-xs text-ink-muted">{item.label}</div>
+                <Card key={item.label}>
+                  <div className="text-meta text-ink-muted">{item.label}</div>
                   {item.failed ? (
-                    <div className="mt-2 flex h-8 items-center">
+                    <div className="mt-1.5 flex h-8 items-center">
                       <span
-                        className="text-xs text-ink-muted"
-                        title="这一项这次没取到，点页面上方「重试」再拉一次"
+                        className="text-meta text-ink-muted"
+                        title="暂时没读到，稍后重试一下"
                       >
-                        读取失败
+                        暂时没读到
                       </span>
                     </div>
                   ) : (
-                    <div className="mt-2 flex items-baseline gap-1">
-                      <span className="text-2xl font-semibold tabular-nums text-ink">
+                    <div className="mt-1 flex items-baseline gap-1">
+                      <span className="truncate text-display font-semibold tabular-nums text-ink">
                         {item.value}
                       </span>
                       {item.unit && (
-                        <span className="text-xs text-ink-muted">{item.unit}</span>
+                        <span className="shrink-0 text-meta text-ink-muted">{item.unit}</span>
                       )}
                     </div>
                   )}
-                  <div className="mt-1 text-[11px] text-ink-muted">{item.foot}</div>
-                </div>
+                  <div className="mt-1 text-meta text-ink-muted">{item.foot}</div>
+                </Card>
               ))}
             </div>
 
             {user && (
-              <div className="mt-3 text-[11px] text-ink-muted">
-                当前账号 <span className="text-ink">{user.username}</span>
-                {user.display_name && user.display_name !== user.username
-                  ? `（${user.display_name}）`
-                  : ''}
-                <span className="mx-3 text-line">|</span>
-                计费档位 <span className="text-ink">{groupLabel(user.group)}</span>
-                <span className="mx-3 text-line">|</span>
-                角色{' '}
-                <span className="text-ink">
-                  {user.role >= 100 ? '超级管理员' : user.role >= 10 ? '管理员' : '普通用户'}
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-meta text-ink-muted">
+                <span>
+                  当前账号{' '}
+                  <span className="font-medium text-ink">
+                    {user.username}
+                    {user.display_name && user.display_name !== user.username
+                      ? `（${user.display_name}）`
+                      : ''}
+                  </span>
+                </span>
+                <span aria-hidden className="text-line">
+                  |
+                </span>
+                <span>
+                  计费档位 <span className="font-medium text-ink">{groupLabel(user.group)}</span>
+                </span>
+                <span aria-hidden className="text-line">
+                  |
+                </span>
+                <span>
+                  角色{' '}
+                  <span className="font-medium text-ink">
+                    {user.role >= 100 ? '超级管理员' : user.role >= 10 ? '管理员' : '普通用户'}
+                  </span>
                 </span>
               </div>
             )}
 
-            <div className="mt-6 grid gap-4 lg:grid-cols-3">
-              <section className="rounded-card border border-line bg-surface lg:col-span-2">
-                <div className="flex items-center justify-between border-b border-line px-5 py-3">
-                  <div>
-                    <h2 className="text-sm font-medium text-ink">消费趋势</h2>
-                    <p className="mt-0.5 text-[11px] text-ink-muted">
-                      近 7 天合计 {quotaToAmount(weekTotal)} {moneyUnit()}，按调用明细逐日汇总
-                      {logTruncated ? `（仅前 ${formatNumber(logs.length)} 条）` : ''}
+            <div className="mt-4 grid gap-4 lg:grid-cols-3">
+              <Card flush className="lg:col-span-2">
+                <div className="flex items-start justify-between gap-3 border-b border-line px-card py-3">
+                  <div className="min-w-0">
+                    <h2 className="text-title font-semibold text-ink">消费趋势</h2>
+                    <p className="mt-0.5 text-meta leading-normal text-ink-muted">
+                      近 7 天合计 {quotaToAmount(weekTotal)} {moneyUnit()}
                     </p>
                   </div>
-                  <Link href="/billing" className="text-xs text-brand hover:underline">
+                  <Link
+                    href="/billing"
+                    className="shrink-0 text-note text-ink-mid transition-colors hover:text-brand"
+                  >
                     查看记录
                   </Link>
                 </div>
 
-                <div className="px-5 py-5">
+                <div className="px-card py-card">
                   {logsFailed ? (
                     /* 明细没拿到就等于趋势算不出来。这两种情况不能都说成「还没有消费」 */
                     <EmptyHint
-                      text="消费趋势没读出来"
+                      text="暂时读不到消费趋势"
                       hint={
                         <>
-                          这张图按近 7 天调用明细逐日汇总，明细没拿到就画不出柱子。
+                          可能是网络波动，稍等片刻再试一次。
                           <button
                             type="button"
                             onClick={() => void load()}
@@ -483,56 +496,63 @@ export default function DashboardPage() {
                     />
                   ) : trendMax === 0 ? (
                     <EmptyHint
-                      text="近 7 天还没有消费记录"
-                      hint="发出第一条请求后，这里会按天显示每天花掉多少"
+                      text="近 7 天还没有消费"
+                      hint="发起一次调用，这里就会显示每天的消费"
                     />
                   ) : (
-                    <div className="flex h-40 items-stretch justify-between gap-2">
+                    <div className="flex h-40 items-stretch justify-between gap-3">
                       {trend.map((point) => {
                         const height =
-                          point.quota > 0
-                            ? Math.max(4, (point.quota / trendMax) * 100)
-                            : 0;
+                          point.quota > 0 ? Math.max(4, (point.quota / trendMax) * 100) : 0;
                         return (
                           <div
                             key={point.label}
-                            className="flex w-full min-w-0 max-w-[80px] flex-1 flex-col items-center gap-2"
+                            className="group flex w-full min-w-0 max-w-[80px] flex-1 flex-col items-center gap-2"
                             title={`${point.label}：${quotaToAmount(point.quota)} ${moneyUnit()}`}
                           >
                             {/* 柱子的百分比高度以这块剩余空间为准，避免把日期标签挤出卡片 */}
                             <div className="flex w-full flex-1 items-end">
                               <div
-                                className={`w-full rounded-t ${point.quota > 0 ? 'bg-brand/85' : 'bg-line'}`}
+                                className={`w-full rounded-t-control transition-colors ${
+                                  point.quota > 0
+                                    ? 'bg-brand/85 group-hover:bg-brand'
+                                    : 'bg-line'
+                                }`}
                                 style={{ height: `${height}%` }}
                               />
                             </div>
-                            <span className="text-[11px] text-ink-muted">{point.label}</span>
+                            <span className="text-meta tabular-nums text-ink-muted">
+                              {point.label}
+                            </span>
                           </div>
                         );
                       })}
                     </div>
                   )}
                 </div>
-              </section>
+              </Card>
 
-              <section className="rounded-card border border-line bg-surface">
-                <div className="flex items-center justify-between border-b border-line px-5 py-3">
-                  <div>
-                    <h2 className="text-sm font-medium text-ink">常用模型</h2>
-                    <p className="mt-0.5 text-[11px] text-ink-muted">近 7 天调用次数</p>
+              <Card flush>
+                <div className="flex items-start justify-between gap-3 border-b border-line px-card py-3">
+                  <div className="min-w-0">
+                    <h2 className="text-title font-semibold text-ink">常用模型</h2>
+                    <p className="mt-0.5 text-meta text-ink-muted">近 7 天调用次数</p>
                   </div>
-                  <Link href="/usage" className="text-xs text-brand hover:underline">
+                  <Link
+                    href="/usage"
+                    className="shrink-0 text-note text-ink-mid transition-colors hover:text-brand"
+                  >
                     用量统计
                   </Link>
                 </div>
 
-                <div className="px-5 py-4">
+                <div className="px-card py-card">
                   {logsFailed ? (
                     <EmptyHint
-                      text="常用模型没读出来"
+                      text="暂时读不到常用模型"
                       hint={
                         <>
-                          这里按调用明细统计，明细没拿到就排不出名次。
+                          可能是网络波动，稍等片刻再试一次。
                           <button
                             type="button"
                             onClick={() => void load()}
@@ -544,22 +564,29 @@ export default function DashboardPage() {
                       }
                     />
                   ) : aggregate.models.length === 0 ? (
-                    <div className="py-10 text-center text-xs text-ink-muted">
-                      近 7 天还没有调用
-                    </div>
+                    <EmptyHint
+                      text="近 7 天还没有调用"
+                      hint="发起一次调用，这里就会显示你常用的模型"
+                    />
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-3.5">
                       {aggregate.models.map((model) => (
                         <div key={model.name}>
                           <div className="flex items-baseline justify-between gap-3">
-                            <span className="truncate text-sm text-ink">{model.name}</span>
-                            <span className="shrink-0 tabular-nums text-xs text-ink-muted">
-                              {formatNumber(model.calls)} 次 · {quotaToAmount(model.quota)} {moneyUnit()}
+                            <span
+                              className="truncate text-body text-ink"
+                              title={model.name}
+                            >
+                              {model.name}
+                            </span>
+                            <span className="shrink-0 tabular-nums text-meta text-ink-muted">
+                              {formatNumber(model.calls)} 次 · {quotaToAmount(model.quota)}{' '}
+                              {moneyUnit()}
                             </span>
                           </div>
-                          <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-line">
+                          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-line">
                             <div
-                              className="h-full rounded-full bg-brand"
+                              className="h-full rounded-full bg-brand transition-[width] duration-300"
                               style={{
                                 width: `${Math.max(2, (model.calls / modelMax) * 100)}%`,
                               }}
@@ -570,67 +597,66 @@ export default function DashboardPage() {
                     </div>
                   )}
                 </div>
-              </section>
+              </Card>
             </div>
 
-            <section className="mt-6 overflow-hidden rounded-card border border-line bg-surface">
-              <div className="flex items-center justify-between border-b border-line px-5 py-3">
-                <div>
-                  <h2 className="text-sm font-medium text-ink">最近调用记录</h2>
-                  <p className="mt-0.5 text-[11px] text-ink-muted">最新 5 条消费调用</p>
+            <section className="mt-4">
+              <div className="mb-2 flex items-end justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="text-title font-semibold text-ink">最近调用记录</h2>
+                  <p className="mt-0.5 text-meta text-ink-muted">最新 5 条消费调用</p>
                 </div>
-                <Link href="/usage" className="text-xs text-brand hover:underline">
+                <Link
+                  href="/usage"
+                  className="shrink-0 text-note text-ink-mid transition-colors hover:text-brand"
+                >
                   全部记录
                 </Link>
               </div>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-line text-left text-xs text-ink-muted">
-                    <th className="px-5 py-2.5 font-normal">时间</th>
-                    <th className="px-5 py-2.5 font-normal">模型</th>
-                    <th className="px-5 py-2.5 font-normal">密钥</th>
-                    <th className="px-5 py-2.5 font-normal">Token</th>
-                    <th className="px-5 py-2.5 font-normal">费用</th>
-                  </tr>
-                </thead>
+
+              <TableWrap>
+                <THead>
+                  <Th>时间</Th>
+                  <Th>模型</Th>
+                  <Th>密钥</Th>
+                  <Th align="right">Token</Th>
+                  <Th align="right">费用</Th>
+                </THead>
                 <tbody>
                   {logs.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-5 py-10 text-center text-xs text-ink-muted">
-                        还没有调用记录，按上方「开始使用」发一条试试
+                      <td colSpan={5}>
+                        <EmptyHint
+                          text="还没有调用记录"
+                          hint="按「开始使用」里的步骤发起第一条调用"
+                        />
                       </td>
                     </tr>
                   ) : (
                     logs.slice(0, 5).map((log) => (
-                      <tr key={log.id} className="border-b border-line last:border-0">
-                        <td className="px-5 py-3 text-ink-muted">{formatTime(log.created_at)}</td>
-                        <td className="px-5 py-3 text-ink">{log.model_name || PLACEHOLDER_DASH}</td>
-                        <td className="px-5 py-3 text-ink-muted">{log.token_name || PLACEHOLDER_DASH}</td>
-                        <td className="px-5 py-3 tabular-nums text-ink-muted">
+                      <Tr key={log.id}>
+                        <Td className="whitespace-nowrap text-ink-muted">
+                          {formatTime(log.created_at)}
+                        </Td>
+                        <Td>{log.model_name || PLACEHOLDER_DASH}</Td>
+                        <Td className="text-ink-muted">{log.token_name || PLACEHOLDER_DASH}</Td>
+                        <Td align="right" className="tabular-nums text-ink-muted">
                           {formatNumber(
                             Number(log.prompt_tokens ?? 0) + Number(log.completion_tokens ?? 0),
                           )}
-                        </td>
-                        <td className="px-5 py-3 tabular-nums text-ink-muted">
+                        </Td>
+                        <Td align="right" className="tabular-nums">
                           {quotaToAmount(Math.abs(Number(log.quota ?? 0)))}
-                        </td>
-                      </tr>
+                        </Td>
+                      </Tr>
                     ))
                   )}
                 </tbody>
-              </table>
+              </TableWrap>
             </section>
-
-            <p className="mt-4 text-[11px] leading-relaxed text-ink-muted">
-              数据口径：余额与调用次数取自账号信息；今日/本月消费由后端按时间区间求和
-              （金额按后端配置的 quota 系数与汇率换算）；消费趋势、Token
-              使用量与常用模型按近 7 天调用明细汇总
-              {logTruncated ? `（仅前 ${formatNumber(logs.length)} 条）` : ''}
-              ，官方暂未提供按天/按模型聚合的统计接口。
-            </p>
           </>
         )}
-      </main>
+      </PageContainer>
     </div>
   );
 }

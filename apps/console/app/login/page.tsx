@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authApi, ApiError } from '@portal/api-client';
@@ -13,20 +13,41 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  /**
+   * 被后端限流后还要等多少秒。
+   * 后端对登录接口的限流不是「十几秒」，被连点几次会锁十几分钟（retry-after 728 秒）。
+   * 倒计时期间锁住按钮：不然用户一直点，每次违规都把等待时间重新顶满，越点越出不去。
+   */
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = window.setTimeout(() => setCooldown((left) => left - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [cooldown]);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
+    if (cooldown > 0) return;
     setError('');
     setLoading(true);
     try {
       await authApi.login({ username, password });
       router.replace('/');
     } catch (err) {
+      if (err instanceof ApiError && err.status === 429 && err.retryAfter) {
+        setCooldown(err.retryAfter);
+      }
       setError(err instanceof ApiError ? err.message : '登录失败，请重试');
     } finally {
       setLoading(false);
     }
   }
+
+  const cooldownLabel =
+    cooldown >= 60
+      ? `${Math.floor(cooldown / 60)} 分 ${cooldown % 60} 秒`
+      : `${cooldown} 秒`;
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6">
@@ -81,10 +102,14 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || cooldown > 0}
             className="mt-6 w-full rounded-md bg-brand py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-60"
           >
-            {loading ? '登录中…' : '登录'}
+            {cooldown > 0
+              ? `${cooldownLabel}后可再试`
+              : loading
+                ? '登录中…'
+                : '登录'}
           </button>
 
           <div className="mt-4 flex items-center justify-between text-xs text-ink-muted">

@@ -21,6 +21,11 @@ export class ApiError extends Error {
     message: string,
     readonly status: number,
     readonly code?: string,
+    /**
+     * 429 时后端要求的等待秒数，来自 retry-after 响应头。
+     * 登录、续期这类敏感接口被限时可能是十几分钟，页面要能照着这个数说清楚。
+     */
+    readonly retryAfter?: number,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -42,6 +47,37 @@ export interface RequestOptions {
    * 那个 promise —— 于是永远 pending，页面卡在「加载中」不跳登录页。
    */
   skipAuthRefresh?: boolean;
+}
+
+/** 读 retry-after（秒）。后端可能给纯秒数，也可能给 HTTP 日期，认不出就返回 undefined */
+function readRetryAfter(response: Response): number | undefined {
+  const raw = response.headers.get('retry-after');
+  if (!raw) return undefined;
+
+  const seconds = Number(raw);
+  if (Number.isFinite(seconds) && seconds > 0) return Math.ceil(seconds);
+
+  const at = Date.parse(raw);
+  if (!Number.isNaN(at)) {
+    const diff = Math.ceil((at - Date.now()) / 1000);
+    if (diff > 0) return diff;
+  }
+  return undefined;
+}
+
+/**
+ * 429 的文案必须照着后端给的秒数说。
+ * 原来这里硬写「等十几秒」，但登录/续期被限时后端给的是十几分钟（retry-after 728 秒），
+ * 用户等十几秒再点还是失败，只会以为系统坏了，然后一直点，把限流拖得更长。
+ */
+function tooManyRequestsMessage(retryAfter: number | undefined): string {
+  if (!retryAfter) return '请求太频繁，请稍后再试';
+  if (retryAfter < 60) return `请求太频繁，请等 ${retryAfter} 秒后重试`;
+
+  // 用四舍五入而不是向上取整：728 秒 = 12 分 8 秒，说「约 13 分钟」会和页面上的
+  // 「还有 12 分 X 秒」对不上，用户会怀疑到底该等多久。
+  const minutes = Math.max(1, Math.round(retryAfter / 60));
+  return `请求太频繁，请等约 ${minutes} 分钟后重试`;
 }
 
 function buildUrl(path: string, query?: RequestOptions['query']): string {
@@ -131,9 +167,11 @@ async function send<T>(path: string, options: SendOptions): Promise<T> {
     throw new ApiError('登录已失效，请重新登录', 401);
   }
 
-  // 官方对接口有频率限制，429 时给一句人能看懂的话，而不是原始状态码
+  // 官方对接口有频率限制。429 时后端在 retry-after 里给出真实等待秒数，
+  // 照着它说，别自己编一个「十几秒」。
   if (response.status === 429) {
-    throw new ApiError('操作太频繁了，等十几秒再点一次', 429);
+    const retryAfter = readRetryAfter(response);
+    throw new ApiError(tooManyRequestsMessage(retryAfter), 429, undefined, retryAfter);
   }
 
   let payload: ApiEnvelope<T> | null = null;

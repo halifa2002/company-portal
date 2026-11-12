@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { SiteHeader, SiteFooter } from '@/components/site-chrome';
 import { CodePreview } from '@/components/code-preview';
 import { brand, loginUrl, registerUrl } from '@/lib/brand';
-import { MODEL_CATALOG } from '@/lib/model-catalog';
+import { MODEL_CATALOG, findCatalogEntry } from '@/lib/model-catalog';
 import { loadModelList, modelPriceText } from '@/lib/pricing';
 
 /**
@@ -78,10 +78,11 @@ const steps = [
 export default async function HomePage() {
   /**
    * 模型名与单价都以后端 /api/pricing 为准（md 4.1 第 4 条「核心模型展示」）。
-   * 拿不到价格时仍是真实模型名，单价显示「以控制台为准」，绝不编数字。
+   * 只摆目录里整理过的对外模型：价格表里还有一批模型带着占位倍率（都是 37.5），
+   * 算出来是同一个数，摆到首页等于给客户报了个假价。完整清单仍在模型广场。
    */
   const { models } = await loadModelList(MODEL_CATALOG);
-  const featured = models.slice(0, 4);
+  const featured = models.filter((model) => findCatalogEntry(model.id)).slice(0, 4);
 
   return (
     <>

@@ -5,6 +5,13 @@ import { useRouter } from 'next/navigation';
 import { tokensApi, modelsApi, ApiError } from '@portal/api-client';
 import type { Token } from '@portal/types';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import {
+  BlockLoading,
+  EmptyHint,
+  ErrorBox,
+  PLACEHOLDER_DASH,
+  TableLoading,
+} from '@/components/data-state';
 import { amountToQuota, ensureMoneySettings, formatTime, moneyUnit, quotaToAmount, quotaToAmountValue } from '@/lib/format';
 
 /**
@@ -67,6 +74,8 @@ export default function KeysPage() {
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  /** 列表拉取失败。和「新建密钥失败」这类操作错误分开：前者该带重试，后者不该 */
+  const [loadFailed, setLoadFailed] = useState(false);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -78,6 +87,7 @@ export default function KeysPage() {
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
+    setLoadFailed(false);
     try {
       await ensureMoneySettings();
       const [list, models] = await Promise.all([
@@ -91,6 +101,7 @@ export default function KeysPage() {
         router.replace('/login');
         return;
       }
+      setLoadFailed(true);
       setError(err instanceof Error ? err.message : '加载失败');
     } finally {
       setLoading(false);
@@ -230,8 +241,14 @@ export default function KeysPage() {
       <main className="px-6 py-6">
         <div className="w-full">
           {error && !draft && (
-            <div className="mb-5 rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
-              {error}
+            <div className="mb-5">
+              {loadFailed ? (
+                <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
+              ) : (
+                <div className="rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
+                  {error}
+                </div>
+              )}
             </div>
           )}
 
@@ -324,43 +341,55 @@ export default function KeysPage() {
             </div>
             <span className="text-xs text-ink-muted">
               {loading
-                ? '加载中…'
-                : filtered.length === tokens.length
-                  ? `共 ${tokens.length} 个`
-                  : `筛选出 ${filtered.length} 个 / 共 ${tokens.length} 个`}
+                ? '正在统计…'
+                : loadFailed
+                  ? '个数未知'
+                  : filtered.length === tokens.length
+                    ? `共 ${tokens.length} 个`
+                    : `筛选出 ${filtered.length} 个 / 共 ${tokens.length} 个`}
             </span>
           </div>
 
           <div className="mt-3 overflow-hidden rounded-card border border-line bg-surface">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[1040px] text-sm">
+            <div className="hidden overflow-x-auto lg:block">
+              <table className="w-full text-sm lg:min-w-[720px] xl:min-w-[1040px]">
                 <thead>
                   <tr className="border-b border-line text-left text-xs text-ink-muted">
                     <th className="px-4 py-2.5 font-normal">名称</th>
                     <th className="px-4 py-2.5 font-normal">状态</th>
                     <th className="px-4 py-2.5 font-normal">密钥</th>
                     <th className="px-4 py-2.5 font-normal">额度</th>
-                    <th className="px-4 py-2.5 font-normal">分组</th>
-                    <th className="px-4 py-2.5 font-normal">模型</th>
-                    <th className="px-4 py-2.5 font-normal">创建时间</th>
-                    <th className="px-4 py-2.5 font-normal">最后使用</th>
+                    <th className="hidden px-4 py-2.5 font-normal xl:table-cell">分组</th>
+                    <th className="hidden px-4 py-2.5 font-normal xl:table-cell">模型</th>
+                    <th className="hidden px-4 py-2.5 font-normal xl:table-cell">创建时间</th>
+                    <th className="hidden px-4 py-2.5 font-normal xl:table-cell">最后使用</th>
                     <th className="px-4 py-2.5 font-normal">过期</th>
                     <th className="px-4 py-2.5 text-right font-normal">操作</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
+                    <TableLoading colSpan={10} rows={4} />
+                  ) : loadFailed ? (
                     <tr>
-                      <td colSpan={10} className="px-4 py-12 text-center text-xs text-ink-muted">
-                        加载中…
+                      <td colSpan={10}>
+                        <EmptyHint
+                          text="密钥列表没读出来"
+                          hint="点页面上方「重试」再拉一次——这不是没有密钥"
+                        />
                       </td>
                     </tr>
                   ) : filtered.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="px-4 py-12 text-center text-xs text-ink-muted">
-                        {tokens.length === 0
-                          ? '还没有密钥，点右上角「新建密钥」开始'
-                          : '没有匹配的密钥'}
+                      <td colSpan={10}>
+                        <EmptyHint
+                          text={tokens.length === 0 ? '还没有密钥' : '没有匹配的密钥'}
+                          hint={
+                            tokens.length === 0
+                              ? '点右上角「新建密钥」，建完就能拿它调模型'
+                              : '把状态筛选或搜索词清掉再看'
+                          }
+                        />
                       </td>
                     </tr>
                   ) : (
@@ -392,16 +421,16 @@ export default function KeysPage() {
                           <td className="px-4 py-3 text-xs text-ink-muted">
                             {token.unlimited_quota ? '不限额' : quotaToAmount(token.remain_quota)}
                           </td>
-                          <td className="px-4 py-3 text-xs text-ink-muted">
+                          <td className="hidden px-4 py-3 text-xs text-ink-muted xl:table-cell">
                             {token.group || 'default'}
                           </td>
-                          <td className="px-4 py-3 text-xs text-ink-muted">
+                          <td className="hidden px-4 py-3 text-xs text-ink-muted xl:table-cell">
                             {token.model_limits_enabled ? `限定 ${limited} 个` : '全部'}
                           </td>
-                          <td className="px-4 py-3 text-xs text-ink-muted">
-                            {token.created_time ? formatTime(token.created_time) : '—'}
+                          <td className="hidden px-4 py-3 text-xs text-ink-muted xl:table-cell">
+                            {token.created_time ? formatTime(token.created_time) : PLACEHOLDER_DASH}
                           </td>
-                          <td className="px-4 py-3 text-xs text-ink-muted">
+                          <td className="hidden px-4 py-3 text-xs text-ink-muted xl:table-cell">
                             {token.accessed_time ? formatTime(token.accessed_time) : '从未使用'}
                           </td>
                           <td className="px-4 py-3 text-xs text-ink-muted">
@@ -431,6 +460,103 @@ export default function KeysPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            <div className="lg:hidden">
+              {loading ? (
+                <div className="px-4 py-5">
+                  <BlockLoading lines={3} />
+                </div>
+              ) : loadFailed ? (
+                <EmptyHint
+                  text="密钥列表没读出来"
+                  hint="点页面上方「重试」再拉一次——这不是没有密钥"
+                />
+              ) : filtered.length === 0 ? (
+                <EmptyHint
+                  text={tokens.length === 0 ? '还没有密钥' : '没有匹配的密钥'}
+                  hint={
+                    tokens.length === 0
+                      ? '点右上角「新建密钥」，建完就能拿它调模型'
+                      : '把状态筛选或搜索词清掉再看'
+                  }
+                />
+              ) : (
+                <div className="divide-y divide-line">
+                  {paged.map((token) => {
+                    const limited = token.model_limits.split(',').filter(Boolean).length;
+                    return (
+                      <div key={token.id} className="space-y-3 px-4 py-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-sm text-ink">{token.name}</div>
+                            <div className="mt-1.5 flex items-center gap-2">
+                              <code className="min-w-0 truncate rounded bg-surface-subtle px-1.5 py-0.5 font-mono text-[11px] text-ink-muted">
+                                {token.key}
+                              </code>
+                              <button
+                                type="button"
+                                onClick={() => void handleReveal(token)}
+                                className="shrink-0 text-xs text-brand transition-colors hover:text-brand-hover"
+                              >
+                                查看
+                              </button>
+                            </div>
+                          </div>
+                          <StatusBadge status={token.status} />
+                        </div>
+
+                        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                          <div className="flex justify-between gap-2">
+                            <dt className="text-ink-muted">额度</dt>
+                            <dd className="truncate text-ink">
+                              {token.unlimited_quota ? '不限额' : quotaToAmount(token.remain_quota)}
+                            </dd>
+                          </div>
+                          <div className="flex justify-between gap-2">
+                            <dt className="text-ink-muted">分组</dt>
+                            <dd className="truncate text-ink">{token.group || 'default'}</dd>
+                          </div>
+                          <div className="flex justify-between gap-2">
+                            <dt className="text-ink-muted">模型</dt>
+                            <dd className="truncate text-ink">
+                              {token.model_limits_enabled ? `限定 ${limited} 个` : '全部'}
+                            </dd>
+                          </div>
+                          <div className="flex justify-between gap-2">
+                            <dt className="text-ink-muted">过期</dt>
+                            <dd className="truncate text-ink">{expireText(token.expired_time)}</dd>
+                          </div>
+                        </dl>
+
+                        <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
+                          <span className="truncate text-[11px] text-ink-muted">
+                            {token.accessed_time
+                              ? `最后使用 ${formatTime(token.accessed_time)}`
+                              : '从未使用'}
+                          </span>
+                          <div className="flex shrink-0 gap-3">
+                            <button
+                              type="button"
+                              onClick={() => openEdit(token)}
+                              className="text-xs text-brand transition-colors hover:text-brand-hover"
+                            >
+                              编辑
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void handleDelete(token)}
+                              className="text-xs text-danger transition-opacity hover:opacity-70"
+                            >
+                              删除
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {totalPages > 1 && (

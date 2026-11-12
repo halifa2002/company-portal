@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { authApi, setAccessToken } from '@portal/api-client';
 import { brand, docsUrl, pricingUrl, siteUrl } from '@/lib/brand';
+import { ensureMoneySettings, moneyUnit, quotaToAmount } from '@/lib/format';
+import { Skeleton } from '@/components/data-state';
 
 /**
  * 控制台侧边导航
@@ -124,6 +126,25 @@ function sectionOf(entry: (typeof items)[number]): string | undefined {
   return 'section' in entry ? (entry as { section?: string }).section : undefined;
 }
 
+/**
+ * 顶栏余额的模块级缓存。
+ * 60 秒内翻页复用同一个值，不去碰接口；超时或退出登录后重新拉。
+ * 存 null 表示"上次取失败了"，也照样缓存，避免失败时每个页面都重试一轮。
+ */
+const BALANCE_TTL = 60_000;
+let balanceCache: { at: number; value: string | null } | null = null;
+
+function readBalanceCache(): string | null | undefined {
+  if (!balanceCache) return undefined;
+  if (Date.now() - balanceCache.at > BALANCE_TTL) return undefined;
+  return balanceCache.value;
+}
+
+function writeBalanceCache(value: string | null) {
+  balanceCache = { at: Date.now(), value };
+}
+
+
 export function ConsoleSidebar() {
   const pathname = usePathname();
 
@@ -181,11 +202,47 @@ export function ConsoleTopbar({
   balance,
 }: {
   title: string;
+  /** 页面自己已经拿到余额时直接传入，省一次请求；不传则顶栏自己取 */
   balance?: string;
 }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  /**
+   * 顶栏余额：以前只有概览页传了 balance，其余六个页面顶栏永远显示「余额 —」，
+   * 看上去像"余额读不出来"。现在页面不传时顶栏自己取一次，并用模块级缓存
+   * 60 秒内复用——翻页不会因此多打接口（后端有限流，多打会撞 429）。
+   * undefined = 还在取，null = 取失败。
+   */
+  const [ownBalance, setOwnBalance] = useState<string | null | undefined>(balance);
+
+  useEffect(() => {
+    if (balance !== undefined) {
+      setOwnBalance(balance);
+      return;
+    }
+    const cached = readBalanceCache();
+    if (cached !== undefined) {
+      setOwnBalance(cached);
+      return;
+    }
+    let alive = true;
+    void (async () => {
+      try {
+        await ensureMoneySettings();
+        const me = await authApi.getSelf();
+        const text = `${quotaToAmount(me.quota)} ${moneyUnit()}`;
+        writeBalanceCache(text);
+        if (alive) setOwnBalance(text);
+      } catch {
+        writeBalanceCache(null);
+        if (alive) setOwnBalance(null);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [balance]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -258,7 +315,21 @@ export function ConsoleTopbar({
           </nav>
 
           <div className="flex items-center gap-4 text-sm text-ink-muted">
-          <span className="hidden sm:inline">余额 {balance ?? '—'}</span>
+          <span className="hidden items-center gap-1.5 sm:flex">
+            <span className="text-ink-muted">余额</span>
+            {ownBalance === undefined ? (
+              <Skeleton className="h-3.5 w-14" />
+            ) : ownBalance === null ? (
+              <span
+                className="text-[11px] text-ink-muted"
+                title="余额这次没取到，下拉刷新或稍后重试"
+              >
+                读取失败
+              </span>
+            ) : (
+              <span className="tabular-nums text-ink">{ownBalance}</span>
+            )}
+          </span>
 
           <div className="relative">
             <button

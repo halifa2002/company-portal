@@ -5,6 +5,12 @@ import { useRouter } from 'next/navigation';
 import { usageApi, ApiError } from '@portal/api-client';
 import type { UsageLog } from '@portal/types';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import {
+  EmptyHint,
+  ErrorBox,
+  PLACEHOLDER_DASH,
+  TableLoading,
+} from '@/components/data-state';
 import { ensureMoneySettings, quotaToAmount, formatNumber, formatTime } from '@/lib/format';
 
 /**
@@ -77,8 +83,8 @@ export default function BillingPage() {
 
       <main className="px-6 py-6">
         {error && (
-          <div className="mb-5 rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
-            {error}
+          <div className="mb-5">
+            <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
           </div>
         )}
 
@@ -94,7 +100,8 @@ export default function BillingPage() {
                     tab === 'success' ? 'bg-brand text-white' : 'text-ink-muted'
                   }`}
                 >
-                  成功 {formatNumber(successCount)}
+                  {/* 读不到数就别在页签上摆一个 0，那会被当成「一次都没成功」 */}
+                  成功{!loading && !error && ` ${formatNumber(successCount)}`}
                 </button>
                 <button
                   type="button"
@@ -103,12 +110,13 @@ export default function BillingPage() {
                     tab === 'failed' ? 'bg-brand text-white' : 'text-ink-muted'
                   }`}
                 >
-                  失败 {formatNumber(failedCount)}
+                  失败{!loading && !error && ` ${formatNumber(failedCount)}`}
                 </button>
               </div>
             </div>
             <span className="text-xs text-ink-muted">
-              {tab === 'success' ? '扣费记录' : '未扣费，悬停状态可看原因'} · 共 {formatNumber(total)} 条
+              {tab === 'success' ? '扣费记录' : '未扣费，悬停状态可看原因'} ·{' '}
+              {loading ? '正在统计…' : error ? '条数未知' : `共 ${formatNumber(total)} 条`}
             </span>
           </div>
 
@@ -126,15 +134,26 @@ export default function BillingPage() {
             </thead>
             <tbody>
               {loading ? (
+                <TableLoading colSpan={7} rows={5} />
+              ) : error ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-xs text-ink-muted">
-                    加载中…
+                  <td colSpan={7} className="px-5 py-10 text-center text-xs text-ink-muted">
+                    明细没读出来，点页面上方「重试」再拉一次
+                    <br />
+                    这是这次请求没成功，不是没有记录
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-xs text-ink-muted">
-                    {tab === 'success' ? '还没有消费记录' : '没有失败记录，说明这段时间的调用都成功了'}
+                  <td colSpan={7}>
+                    <EmptyHint
+                      text={tab === 'success' ? '还没有消费记录' : '没有失败记录'}
+                      hint={
+                        tab === 'success'
+                          ? '发出第一条调用后，这里按时间列出每一次扣费'
+                          : '这段时间的调用都成功了，失败记录会单独列在这里'
+                      }
+                    />
                   </td>
                 </tr>
               ) : (
@@ -155,18 +174,25 @@ export default function BillingPage() {
                           {failed ? '失败' : '成功'}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-ink">{log.model_name || '—'}</td>
-                      <td className="px-5 py-3 text-xs text-ink-muted">{log.token_name || '—'}</td>
+                      <td className="px-5 py-3 text-ink">{log.model_name || PLACEHOLDER_DASH}</td>
+                      <td className="px-5 py-3 text-xs text-ink-muted">
+                        {log.token_name || PLACEHOLDER_DASH}
+                      </td>
                       <td className="px-5 py-3 tabular-nums text-xs text-ink-muted">
                         {failed
-                          ? '—'
+                          ? PLACEHOLDER_DASH
                           : `${formatNumber(log.prompt_tokens)} / ${formatNumber(log.completion_tokens)}`}
                       </td>
                       <td className="px-5 py-3 tabular-nums text-ink">
-                        {failed ? '—' : quotaToAmount(log.quota)}
+                        {/* 失败调用不扣费，这是事实而不是"没数据"，写出来比横杠有用 */}
+                        {failed ? (
+                          <span className="text-xs text-ok">未扣费</span>
+                        ) : (
+                          quotaToAmount(log.quota)
+                        )}
                       </td>
                       <td className="px-5 py-3 font-mono text-[11px] text-ink-muted">
-                        {log.request_id || '—'}
+                        {log.request_id || PLACEHOLDER_DASH}
                       </td>
                     </tr>
                   );

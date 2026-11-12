@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { modelsApi, ApiError } from '@portal/api-client';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import { ErrorBox, Skeleton } from '@/components/data-state';
 import { ensureMoneySettings, moneyUnit, usdToDisplay } from '@/lib/format';
 import { pricingUrl } from '@/lib/brand';
 
@@ -154,13 +155,31 @@ resp = client.chat.completions.create(
         </Link>
 
         {error && (
-          <div className="mt-4 rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
-            {error}
+          <div className="mt-4">
+            <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
           </div>
         )}
 
         {loading ? (
-          <div className="mt-8 text-center text-xs text-ink-muted">加载中…</div>
+          /* 骨架照真实版面排：标题 + 说明 + 两块价格，加载完不会整页跳 */
+          <div className="mt-4 space-y-4" aria-busy="true" aria-label="加载中">
+            <div className="rounded-card border border-line bg-surface p-6">
+              <Skeleton className="h-5 w-44" />
+              <Skeleton className="mt-4 h-3.5 w-full max-w-xl" />
+              <Skeleton className="mt-2 h-3.5 w-2/3" />
+              <div className="mt-4 flex gap-2">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-5 w-14 rounded-full" />
+              </div>
+            </div>
+            <div className="rounded-card border border-line bg-surface p-6">
+              <Skeleton className="h-3.5 w-16" />
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <Skeleton className="h-8 w-32" />
+                <Skeleton className="h-8 w-32" />
+              </div>
+            </div>
+          </div>
         ) : !item ? (
           <div className="mt-8 rounded-card border border-line bg-surface px-5 py-16 text-center">
             <p className="text-sm text-ink">没有找到模型「{modelName}」</p>
@@ -222,22 +241,35 @@ resp = client.chat.completions.create(
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <div>
                     <div className="text-xs text-ink-muted">输入价格</div>
-                    <div className="mt-1 text-2xl font-semibold tabular-nums text-ink">
-                      {currencySign()}
-                      {inputPrice}
-                      <span className="ml-1 text-xs font-normal text-ink-muted">
-                        / 百万 Token
-                      </span>
+                    <div className="mt-1 flex h-8 items-center text-2xl font-semibold tabular-nums text-ink">
+                      {inputPrice === '—' ? (
+                        /* 倍率不是数字时别拼出「¥—/百万 Token」，直接说没配 */
+                        <span className="text-sm font-normal text-ink-muted">未配置单价</span>
+                      ) : (
+                        <>
+                          {currencySign()}
+                          {inputPrice}
+                          <span className="ml-1 text-xs font-normal text-ink-muted">
+                            / 百万 Token
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-ink-muted">输出价格</div>
-                    <div className="mt-1 text-2xl font-semibold tabular-nums text-ink">
-                      {currencySign()}
-                      {outputPrice}
-                      <span className="ml-1 text-xs font-normal text-ink-muted">
-                        / 百万 Token
-                      </span>
+                    <div className="mt-1 flex h-8 items-center text-2xl font-semibold tabular-nums text-ink">
+                      {outputPrice === '—' ? (
+                        <span className="text-sm font-normal text-ink-muted">未配置单价</span>
+                      ) : (
+                        <>
+                          {currencySign()}
+                          {outputPrice}
+                          <span className="ml-1 text-xs font-normal text-ink-muted">
+                            / 百万 Token
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

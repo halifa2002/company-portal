@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation';
 import { usageApi, ApiError } from '@portal/api-client';
 import type { UsageLog, UsageStat } from '@portal/types';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import {
+  BlockLoading,
+  EmptyHint,
+  ErrorBox,
+  PLACEHOLDER_DASH,
+  Skeleton,
+  TableLoading,
+} from '@/components/data-state';
 import { ensureMoneySettings, formatNumber, formatTime, moneyUnit, quotaToAmount } from '@/lib/format';
 
 /**
@@ -88,26 +96,49 @@ export default function UsagePage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  /**
+   * 汇总和明细是两次独立请求，各自可能失败。
+   * 失败必须单独记一笔——否则失败后 stat 为 null、logs 为空，
+   * 页面会理直气壮地显示「这段时间没有调用记录」，把故障说成事实。
+   */
+  const [statFailed, setStatFailed] = useState(false);
+  const [logsFailed, setLogsFailed] = useState(false);
   const pageSize = 20;
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
+    setStatFailed(false);
+    setLogsFailed(false);
     const ts = rangeToTimestamps(range);
+    let statsMissing = false;
+    let logsMissing = false;
     try {
       await ensureMoneySettings();
       const [s, l, batch, failed] = await Promise.all([
-        usageApi.getUsageStat({ type: 2, ...ts }).catch(() => null),
-        usageApi.listUsageLogs({ page, page_size: pageSize, type: 2, ...ts }),
+        // 汇总 / 趋势 / 分布都算"统计类数据"，任一处没拿到就一起标失败
+        usageApi.getUsageStat({ type: 2, ...ts }).catch(() => {
+          statsMissing = true;
+          return null;
+        }),
+        usageApi.listUsageLogs({ page, page_size: pageSize, type: 2, ...ts }).catch(() => {
+          logsMissing = true;
+          return { items: [] as UsageLog[], total: 0 };
+        }),
         usageApi
           .listUsageLogs({ page: 1, page_size: STAT_LIMIT, type: 2, ...ts })
-          .catch(() => ({ items: [] as UsageLog[], total: 0 })),
+          .catch(() => {
+            statsMissing = true;
+            return { items: [] as UsageLog[], total: 0 };
+          }),
         // 失败调用记在 type=5 的日志里，只要总数，page_size 取 1 最省
         usageApi
           .listUsageLogs({ page: 1, page_size: 1, type: 5, ...ts })
           .catch(() => ({ total: 0 })),
       ]);
       setStat(s);
+      setStatFailed(statsMissing);
+      setLogsFailed(logsMissing);
       setLogs(l.items ?? []);
       setTotal(l.total ?? 0);
       setFailedCalls(failed.total ?? 0);
@@ -187,8 +218,8 @@ export default function UsagePage() {
 
       <main className="px-6 py-6">
         {error && (
-          <div className="mb-5 rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
-            {error}
+          <div className="mb-5">
+            <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
           </div>
         )}
 
@@ -215,12 +246,37 @@ export default function UsagePage() {
 
         {/* 汇总 */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="区间消费" value={stat ? quotaToAmount(stat.quota) : '—'} />
-          <Metric label="调用次数" value={statTruncated ? `${formatNumber(totalCalls)}+` : formatNumber(totalCalls)} />
-          <Metric label="Token 用量" value={statTruncated ? `${formatNumber(totalTokens)}+` : formatNumber(totalTokens)} />
+          <Metric
+            label="区间消费"
+            value={stat ? quotaToAmount(stat.quota) : ''}
+            loading={loading}
+            failed={!loading && statFailed}
+          />
+          <Metric
+            label="调用次数"
+            value={
+              statTruncated ? `${formatNumber(totalCalls)}+` : formatNumber(totalCalls)
+            }
+            loading={loading}
+            failed={!loading && statFailed}
+          />
+          <Metric
+            label="Token 用量"
+            value={
+              statTruncated ? `${formatNumber(totalTokens)}+` : formatNumber(totalTokens)
+            }
+            loading={loading}
+            failed={!loading && statFailed}
+          />
           <Metric
             label="请求成功率"
-            value={successRate === null ? '—' : `${successRate.toFixed(1)}%`}
+            value={
+              successRate === null
+                ? '这段时间没有调用'
+                : `${successRate.toFixed(1)}%`
+            }
+            loading={loading}
+            failed={!loading && (statFailed || logsFailed)}
             hint={`成功 ${formatNumber(total)} 次 · 失败 ${formatNumber(failedCalls)} 次`}
           />
         </div>
@@ -231,8 +287,13 @@ export default function UsagePage() {
             <div>
               <h2 className="text-sm font-medium text-ink">每日趋势</h2>
               <p className="mt-0.5 text-[11px] text-ink-muted">
-                按天汇总，来自最近 {formatNumber(statLogs.length)} 条调用记录
-                {statTruncated && '（超出部分未计入）'}
+                {loading
+                  ? '正在汇总…'
+                  : statFailed
+                    ? '这段数据没读出来，下面的数不是真的'
+                    : `按天汇总，来自最近 ${formatNumber(statLogs.length)} 条调用记录${
+                        statTruncated ? '（超出部分未计入）' : ''
+                      }`}
               </p>
             </div>
             <div className="flex gap-1 rounded-md border border-line p-0.5">
@@ -258,10 +319,20 @@ export default function UsagePage() {
           </div>
 
           <div className="px-5 py-5">
-            {daily.length === 0 ? (
-              <div className="py-10 text-center text-xs text-ink-muted">这段时间没有调用记录</div>
+            {loading ? (
+              <BlockLoading lines={4} />
+            ) : statFailed ? (
+              <EmptyHint
+                text="趋势没读出来"
+                hint="点上方「重试」再拉一次——这是这次请求没成功，不是这段时间没有数据"
+              />
+            ) : daily.length === 0 ? (
+              <EmptyHint
+                text="这段时间没有调用记录"
+                hint="换个时间范围看看，或先发一条请求，这里会按天显示"
+              />
             ) : (
-              <div className="flex h-40 items-stretch gap-1.5">
+              <div className="flex h-40 items-stretch justify-center gap-1.5">
                 {daily.map((row) => {
                   const value = row[trendMetric];
                   const height = dailyMax > 0 ? Math.max(value > 0 ? 4 : 0, (value / dailyMax) * 100) : 0;
@@ -274,7 +345,8 @@ export default function UsagePage() {
                   return (
                     <div
                       key={row.ts}
-                      className="flex min-w-0 flex-1 flex-col items-center gap-2"
+                      /* 只有一天数据时别让柱子撑成整块色块：给个最大宽度 */
+                      className="flex w-full min-w-0 max-w-[80px] flex-1 flex-col items-center gap-2"
                       title={`${row.label}：${text}`}
                     >
                       <div className="flex w-full flex-1 items-end">
@@ -319,17 +391,34 @@ export default function UsagePage() {
               </div>
             </div>
             <span className="text-[11px] text-ink-muted">
-              基于最近 {formatNumber(statLogs.length)} 条记录汇总
-              {statTruncated && '（超出部分未计入）'}
+              {loading
+                ? '正在汇总…'
+                : statFailed
+                  ? '这段数据没读出来'
+                  : `基于最近 ${formatNumber(statLogs.length)} 条记录汇总${
+                      statTruncated ? '（超出部分未计入）' : ''
+                    }`}
             </span>
           </div>
 
           {loading ? (
-            <div className="px-5 py-10 text-center text-xs text-ink-muted">加载中…</div>
-          ) : agg.length === 0 ? (
-            <div className="px-5 py-10 text-center text-xs text-ink-muted">
-              这段时间没有调用记录
+            <div className="px-5 py-5">
+              <BlockLoading lines={3} />
             </div>
+          ) : statFailed ? (
+            <EmptyHint
+              text="分布没读出来"
+              hint="点上方「重试」再拉一次——这是这次请求没成功，不是没有数据"
+            />
+          ) : agg.length === 0 ? (
+            <EmptyHint
+              text="这段时间没有可归类的调用"
+              hint={
+                groupBy === 'model'
+                  ? '发出调用后，这里按模型显示各自花掉多少'
+                  : '同一批调用按密钥再分一次，方便看哪个 Key 在花钱'
+              }
+            />
           ) : (
             <div className="divide-y divide-line">
               {agg.map((row) => (
@@ -362,7 +451,9 @@ export default function UsagePage() {
         <div className="mt-6 overflow-hidden rounded-card border border-line bg-surface">
           <div className="flex items-center justify-between border-b border-line px-5 py-3">
             <h2 className="text-sm font-medium text-ink">调用明细</h2>
-            <span className="text-xs text-ink-muted">共 {total} 条</span>
+            <span className="text-xs text-ink-muted">
+              {loading ? '正在统计…' : logsFailed ? '条数未知' : `共 ${total} 条`}
+            </span>
           </div>
           <table className="w-full text-sm">
             <thead>
@@ -378,15 +469,22 @@ export default function UsagePage() {
             </thead>
             <tbody>
               {loading ? (
+                <TableLoading colSpan={7} rows={5} />
+              ) : logsFailed ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-xs text-ink-muted">
-                    加载中…
+                  <td colSpan={7} className="px-5 py-10 text-center text-xs text-ink-muted">
+                    明细没读出来，点页面上方「重试」再拉一次
+                    <br />
+                    这是这次请求没成功，不是没有调用记录
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-xs text-ink-muted">
-                    这段时间没有调用记录
+                  <td colSpan={7}>
+                    <EmptyHint
+                      text="这段时间没有调用记录"
+                      hint="换个时间范围，或先去「API 密钥」页建一个 Key 发第一条请求"
+                    />
                   </td>
                 </tr>
               ) : (
@@ -395,9 +493,9 @@ export default function UsagePage() {
                     <td className="px-5 py-3 text-xs text-ink-muted">
                       {formatTime(log.created_at)}
                     </td>
-                    <td className="px-5 py-3 text-ink">{log.model_name || '—'}</td>
+                    <td className="px-5 py-3 text-ink">{log.model_name || PLACEHOLDER_DASH}</td>
                     <td className="px-5 py-3 text-xs text-ink-muted">
-                      {log.token_name || '—'}
+                      {log.token_name || PLACEHOLDER_DASH}
                     </td>
                     <td className="px-5 py-3 tabular-nums text-ink-muted">
                       {formatNumber(log.prompt_tokens)}
@@ -409,7 +507,7 @@ export default function UsagePage() {
                       {quotaToAmount(log.quota)}
                     </td>
                     <td className="px-5 py-3 tabular-nums text-ink-muted">
-                      {log.use_time ? `${log.use_time}s` : '—'}
+                      {log.use_time ? `${log.use_time}s` : PLACEHOLDER_DASH}
                     </td>
                   </tr>
                 ))
@@ -463,11 +561,36 @@ export default function UsagePage() {
   );
 }
 
-function Metric({ label, value, hint }: { label: string; value: string; hint?: string }) {
+function Metric({
+  label,
+  value,
+  hint,
+  loading,
+  failed,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  loading?: boolean;
+  failed?: boolean;
+}) {
   return (
     <div className="rounded-card border border-line bg-surface p-5">
       <div className="text-xs text-ink-muted">{label}</div>
-      <div className="mt-2 text-2xl font-semibold tabular-nums text-ink">{value}</div>
+      <div className="mt-2 flex h-8 items-center">
+        {loading ? (
+          <Skeleton className="h-5 w-20" />
+        ) : failed ? (
+          <span
+            className="text-xs text-ink-muted"
+            title="这一项这次没取到，点页面上方「重试」再拉一次"
+          >
+            读取失败
+          </span>
+        ) : (
+          <span className="text-2xl font-semibold tabular-nums text-ink">{value}</span>
+        )}
+      </div>
       {hint && <div className="mt-1 text-[11px] text-ink-muted">{hint}</div>}
     </div>
   );

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { authApi, tokensApi, usageApi, ApiError } from '@portal/api-client';
 import type { SelfUser, UsageLog } from '@portal/types';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import { BlockLoading, EmptyHint, PLACEHOLDER_DASH, Skeleton } from '@/components/data-state';
 import {
   ensureMoneySettings,
   formatNumber,
@@ -73,10 +74,13 @@ export default function DashboardPage() {
   const [user, setUser] = useState<SelfUser | null>(null);
   const [todayQuota, setTodayQuota] = useState<number | null>(null);
   const [monthQuota, setMonthQuota] = useState<number | null>(null);
-  const [trend, setTrend] = useState<{ label: string; quota: number }[]>([]);
   const [keyCount, setKeyCount] = useState<number | null>(null);
   const [logs, setLogs] = useState<UsageLog[]>([]);
   const [logTotal, setLogTotal] = useState(0);
+  /** 最近 7 天区间（含今天）。趋势图与明细查询共用同一份，避免两边各自算跨零点 */
+  const week = useMemo(() => buildWeek(), []);
+  /** 明细拉取失败时要和"真的没有调用"区分开，否则页面会理直气壮地说"还没有调用记录" */
+  const [logsFailed, setLogsFailed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [guideHidden, setGuideHidden] = useState(false);
@@ -89,7 +93,6 @@ export default function DashboardPage() {
     setLoading(true);
     setError('');
 
-    const week = buildWeek();
     const todayStart = week[WEEK_DAYS - 1].start;
     const nowTs = Math.floor(Date.now() / 1000);
 
@@ -97,7 +100,9 @@ export default function DashboardPage() {
       // 金额要靠后端汇率换算，先把这个参数拿到再渲染
       await ensureMoneySettings();
 
-      const [me, todayStat, monthStat, weekStats, keys, recent] = await Promise.all([
+      // 只问 5 次：账户、今日、本月、密钥数、近 7 天明细。
+      // 趋势图不再按天各问一次（7 天 = 多 7 次请求，连翻几页必撞限流）。
+      const [me, todayStat, monthStat, keys, recent] = await Promise.all([
         authApi.getSelf(),
         usageApi
           .getUsageStat({ start_timestamp: todayStart, end_timestamp: nowTs })
@@ -105,16 +110,6 @@ export default function DashboardPage() {
         usageApi
           .getUsageStat({ start_timestamp: monthStartTs(), end_timestamp: nowTs })
           .catch(() => null),
-        Promise.all(
-          week.map((day) =>
-            usageApi
-              .getUsageStat({
-                start_timestamp: day.start,
-                end_timestamp: Math.min(day.end, nowTs),
-              })
-              .catch(() => null),
-          ),
-        ),
         tokensApi.listTokens({ page: 1, page_size: 1 }).catch(() => null),
         usageApi
           .listUsageLogs({
@@ -130,13 +125,10 @@ export default function DashboardPage() {
       setUser(me);
       setTodayQuota(todayStat ? Number(todayStat.quota ?? 0) : null);
       setMonthQuota(monthStat ? Number(monthStat.quota ?? 0) : null);
-      setTrend(week.map((day, index) => ({
-        label: day.label,
-        quota: Number(weekStats[index]?.quota ?? 0),
-      })));
       setKeyCount(keys ? keys.total : null);
       setLogs(recent?.items ?? []);
       setLogTotal(recent?.total ?? 0);
+      setLogsFailed(recent === null);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         router.replace('/login');
@@ -146,7 +138,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, week]);
 
   useEffect(() => {
     void load();
@@ -169,6 +161,24 @@ export default function DashboardPage() {
     const models = [...byModel.values()].sort((a, b) => b.calls - a.calls).slice(0, 5);
     return { tokens, models };
   }, [logs]);
+
+  /**
+   * 消费趋势：从近 7 天调用明细里自己按天求和，不再一天问后端一次。
+   * 原来的写法 7 天要打 7 个请求，加上其他请求一共 12 个，连翻两页就被后端限流，
+   * 全页变成「读取失败」——用户以为账户空了。
+   * 明细有 500 条上限，真超了就由 logTruncated 在图下标出来，不假装精确。
+   */
+  const trend = useMemo(() => {
+    const buckets = new Map<number, number>();
+    for (const log of logs) {
+      const day = new Date(Number(log.created_at ?? 0) * 1000);
+      day.setHours(0, 0, 0, 0);
+      const key = Math.floor(day.getTime() / 1000);
+      // quota 为负表示消费，取绝对值才画得出柱子
+      buckets.set(key, (buckets.get(key) ?? 0) + Math.abs(Number(log.quota ?? 0)));
+    }
+    return week.map((day) => ({ label: day.label, quota: buckets.get(day.start) ?? 0 }));
+  }, [logs, week]);
 
   const weekTotal = trend.reduce((sum, item) => sum + item.quota, 0);
   const trendMax = trend.reduce((max, item) => Math.max(max, item.quota), 0);
@@ -204,42 +214,59 @@ export default function DashboardPage() {
   const doneSteps = steps.filter((step) => step.done).length;
   const showGuide = !guideHidden && doneSteps < steps.length;
 
-  const cards: { label: string; value: string; unit?: string; foot: string }[] = [
+  /**
+   * 六张卡片各自记一笔「这项到底拿没拿到」。
+   * 之前拿不到就塞一个「—」，和「余额就是 0」长得一样；现在把 failed 单独标出来，
+   * 由渲染层决定显示「读取失败」而不是横杠。
+   */
+  const cards: {
+    label: string;
+    value: string;
+    unit?: string;
+    foot: string;
+    failed?: boolean;
+  }[] = [
     {
       label: '账户余额',
       value: quotaToAmount(user?.quota),
       unit: moneyUnit(),
       foot: '充值后可用于调用',
+      failed: !user,
     },
     {
       label: '今日消费',
-      value: todayQuota === null ? '—' : quotaToAmount(todayQuota),
+      value: todayQuota === null ? '' : quotaToAmount(todayQuota),
       unit: moneyUnit(),
       foot: '今日 00:00 起',
+      failed: todayQuota === null,
     },
     {
       label: '本月消费',
-      value: monthQuota === null ? '—' : quotaToAmount(monthQuota),
+      value: monthQuota === null ? '' : quotaToAmount(monthQuota),
       unit: moneyUnit(),
       foot: '本月 1 日起',
+      failed: monthQuota === null,
     },
     {
       label: '总调用次数',
       value: formatNumber(user?.request_count),
       unit: '次',
       foot: '开户至今累计',
+      failed: !user,
     },
     {
       label: 'Token 使用量',
-      value: formatNumber(aggregate.tokens),
+      value: logsFailed ? '' : formatNumber(aggregate.tokens),
       unit: 'Token',
       foot: logTruncated ? `近 7 天，前 ${formatNumber(logs.length)} 条` : '近 7 天汇总',
+      failed: logsFailed,
     },
     {
       label: 'API 密钥',
-      value: keyCount === null ? '—' : formatNumber(keyCount),
+      value: keyCount === null ? '' : formatNumber(keyCount),
       unit: '个',
       foot: '当前账号下的密钥数',
+      failed: keyCount === null,
     },
   ];
 
@@ -263,8 +290,33 @@ export default function DashboardPage() {
         )}
 
         {loading ? (
-          <div className="rounded-card border border-line bg-surface px-4 py-16 text-center text-xs text-ink-muted">
-            加载中…
+          /* 骨架屏：形状照着真实页面排，加载完成时不会整页跳一下 */
+          <div aria-busy="true" aria-label="加载中">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="rounded-card border border-line bg-surface p-5">
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="mt-3 h-6 w-24" />
+                  <Skeleton className="mt-2 h-3 w-28" />
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 grid gap-4 lg:grid-cols-3">
+              <div className="rounded-card border border-line bg-surface p-5 lg:col-span-2">
+                <Skeleton className="h-3.5 w-20" />
+                <div className="mt-6 flex h-40 items-end gap-2">
+                  {[38, 62, 45, 80, 52, 30, 68].map((height, index) => (
+                    <div key={index} className="flex-1" style={{ height: `${height}%` }}>
+                      <Skeleton className="h-full w-full rounded-t" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-card border border-line bg-surface p-5">
+                <Skeleton className="h-3.5 w-20" />
+                <BlockLoading lines={4} />
+              </div>
+            </div>
           </div>
         ) : (
           <>
@@ -356,14 +408,25 @@ export default function DashboardPage() {
                   className="rounded-card border border-line bg-surface p-5"
                 >
                   <div className="text-xs text-ink-muted">{item.label}</div>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-2xl font-semibold tabular-nums text-ink">
-                      {item.value}
-                    </span>
-                    {item.unit && (
-                      <span className="text-xs text-ink-muted">{item.unit}</span>
-                    )}
-                  </div>
+                  {item.failed ? (
+                    <div className="mt-2 flex h-8 items-center">
+                      <span
+                        className="text-xs text-ink-muted"
+                        title="这一项这次没取到，点页面上方「重试」再拉一次"
+                      >
+                        读取失败
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="mt-2 flex items-baseline gap-1">
+                      <span className="text-2xl font-semibold tabular-nums text-ink">
+                        {item.value}
+                      </span>
+                      {item.unit && (
+                        <span className="text-xs text-ink-muted">{item.unit}</span>
+                      )}
+                    </div>
+                  )}
                   <div className="mt-1 text-[11px] text-ink-muted">{item.foot}</div>
                 </div>
               ))}
@@ -391,7 +454,8 @@ export default function DashboardPage() {
                   <div>
                     <h2 className="text-sm font-medium text-ink">消费趋势</h2>
                     <p className="mt-0.5 text-[11px] text-ink-muted">
-                      近 7 天合计 {quotaToAmount(weekTotal)} {moneyUnit()}，按天后端求和
+                      近 7 天合计 {quotaToAmount(weekTotal)} {moneyUnit()}，按调用明细逐日汇总
+                      {logTruncated ? `（仅前 ${formatNumber(logs.length)} 条）` : ''}
                     </p>
                   </div>
                   <Link href="/billing" className="text-xs text-brand hover:underline">
@@ -400,12 +464,30 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="px-5 py-5">
-                  {trendMax === 0 ? (
-                    <div className="py-10 text-center text-xs text-ink-muted">
-                      近 7 天还没有消费记录
-                    </div>
+                  {logsFailed ? (
+                    /* 明细没拿到就等于趋势算不出来。这两种情况不能都说成「还没有消费」 */
+                    <EmptyHint
+                      text="消费趋势没读出来"
+                      hint={
+                        <>
+                          这张图按近 7 天调用明细逐日汇总，明细没拿到就画不出柱子。
+                          <button
+                            type="button"
+                            onClick={() => void load()}
+                            className="ml-1 text-brand underline"
+                          >
+                            重试
+                          </button>
+                        </>
+                      }
+                    />
+                  ) : trendMax === 0 ? (
+                    <EmptyHint
+                      text="近 7 天还没有消费记录"
+                      hint="发出第一条请求后，这里会按天显示每天花掉多少"
+                    />
                   ) : (
-                    <div className="flex h-40 items-stretch gap-2">
+                    <div className="flex h-40 items-stretch justify-between gap-2">
                       {trend.map((point) => {
                         const height =
                           point.quota > 0
@@ -414,7 +496,7 @@ export default function DashboardPage() {
                         return (
                           <div
                             key={point.label}
-                            className="flex flex-1 flex-col items-center gap-2"
+                            className="flex w-full min-w-0 max-w-[80px] flex-1 flex-col items-center gap-2"
                             title={`${point.label}：${quotaToAmount(point.quota)} ${moneyUnit()}`}
                           >
                             {/* 柱子的百分比高度以这块剩余空间为准，避免把日期标签挤出卡片 */}
@@ -445,7 +527,23 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="px-5 py-4">
-                  {aggregate.models.length === 0 ? (
+                  {logsFailed ? (
+                    <EmptyHint
+                      text="常用模型没读出来"
+                      hint={
+                        <>
+                          这里按调用明细统计，明细没拿到就排不出名次。
+                          <button
+                            type="button"
+                            onClick={() => void load()}
+                            className="ml-1 text-brand underline"
+                          >
+                            重试
+                          </button>
+                        </>
+                      }
+                    />
+                  ) : aggregate.models.length === 0 ? (
                     <div className="py-10 text-center text-xs text-ink-muted">
                       近 7 天还没有调用
                     </div>
@@ -506,8 +604,8 @@ export default function DashboardPage() {
                     logs.slice(0, 5).map((log) => (
                       <tr key={log.id} className="border-b border-line last:border-0">
                         <td className="px-5 py-3 text-ink-muted">{formatTime(log.created_at)}</td>
-                        <td className="px-5 py-3 text-ink">{log.model_name || '—'}</td>
-                        <td className="px-5 py-3 text-ink-muted">{log.token_name || '—'}</td>
+                        <td className="px-5 py-3 text-ink">{log.model_name || PLACEHOLDER_DASH}</td>
+                        <td className="px-5 py-3 text-ink-muted">{log.token_name || PLACEHOLDER_DASH}</td>
                         <td className="px-5 py-3 tabular-nums text-ink-muted">
                           {formatNumber(
                             Number(log.prompt_tokens ?? 0) + Number(log.completion_tokens ?? 0),
@@ -524,10 +622,11 @@ export default function DashboardPage() {
             </section>
 
             <p className="mt-4 text-[11px] leading-relaxed text-ink-muted">
-              数据口径：余额与调用次数取自账号信息；今日/本月消费与消费趋势由后端按时间区间求和
-              （金额按后端配置的 quota 系数与汇率换算）；Token 使用量与常用模型按近 7
-              天调用明细汇总{logTruncated ? `（仅前 ${formatNumber(logs.length)} 条）` : ''}，
-              官方暂未提供按模型聚合的统计接口。
+              数据口径：余额与调用次数取自账号信息；今日/本月消费由后端按时间区间求和
+              （金额按后端配置的 quota 系数与汇率换算）；消费趋势、Token
+              使用量与常用模型按近 7 天调用明细汇总
+              {logTruncated ? `（仅前 ${formatNumber(logs.length)} 条）` : ''}
+              ，官方暂未提供按天/按模型聚合的统计接口。
             </p>
           </>
         )}

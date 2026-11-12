@@ -6,6 +6,7 @@ import { authApi, billingApi, ApiError } from '@portal/api-client';
 import type { SelfUser } from '@portal/types';
 import type { TopUpRecord } from '@portal/api-client';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import { BlockLoading, EmptyHint, ErrorBox, PLACEHOLDER_DASH, Skeleton } from '@/components/data-state';
 import { ensureMoneySettings, formatTime, quotaToAmount } from '@/lib/format';
 
 /** 充值订单状态：官方按字符串返回，未知值原样显示，不假装懂 */
@@ -26,7 +27,7 @@ function topUpStatusLabel(status: string): { text: string; className: string } {
 function topUpMethodLabel(record: TopUpRecord): string {
   const method = record.payment_provider || record.payment_method;
   if (method === 'balance') return '兑换码';
-  return method || '—';
+  return method || PLACEHOLDER_DASH;
 }
 
 /** 充值与余额 —— md 4.2 G（优先沿用官方充值能力） */
@@ -40,24 +41,39 @@ export default function WalletPage() {
   const [notice, setNotice] = useState('');
   const [code, setCode] = useState('');
   const [redeeming, setRedeeming] = useState(false);
+  /** 拉数据失败，和「兑换码填错」这类操作失败分开——前者该带重试，后者不该 */
+  const [loadFailed, setLoadFailed] = useState(false);
+  /** 充值记录单独失败，不影响上面的余额数字 */
+  const [recordsFailed, setRecordsFailed] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
+    setLoadFailed(false);
+    setRecordsFailed(false);
+    let recordsMissing = false;
     try {
       await ensureMoneySettings();
       const [me, records] = await Promise.all([
         authApi.getSelf(),
-        billingApi.listMyTopUps({ page: 1, page_size: 20 }).catch(() => null),
+        billingApi
+          .listMyTopUps({ page: 1, page_size: 20 })
+          .catch(() => {
+            // 记录拉不到不能连带把余额也判失败，单独记一笔
+            recordsMissing = true;
+            return null;
+          }),
       ]);
       setUser(me);
       setTopups(records?.items ?? []);
       setTopupTotal(records?.total ?? 0);
+      setRecordsFailed(recordsMissing);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         router.replace('/login');
         return;
       }
+      setLoadFailed(true);
       setError(err instanceof Error ? err.message : '加载失败');
     } finally {
       setLoading(false);
@@ -93,8 +109,14 @@ export default function WalletPage() {
 
       <main className="px-6 py-6">
         {error && (
-          <div className="mb-5 rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
-            {error}
+          <div className="mb-5">
+            {loadFailed ? (
+              <ErrorBox message={error} onRetry={() => void load()} retrying={loading} />
+            ) : (
+              <div className="rounded-card border border-red-200 bg-red-50 px-4 py-3 text-xs text-danger">
+                {error}
+              </div>
+            )}
           </div>
         )}
         {notice && (
@@ -106,20 +128,44 @@ export default function WalletPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-card border border-line bg-surface p-5">
             <div className="text-xs text-ink-muted">当前余额</div>
-            <div className="mt-2 text-3xl font-semibold tabular-nums text-ink">
-              {loading ? '…' : user ? quotaToAmount(user.quota) : '—'}
+            <div className="mt-2 flex h-9 items-center text-3xl font-semibold tabular-nums text-ink">
+              {loading ? (
+                <Skeleton className="h-7 w-28" />
+              ) : loadFailed ? (
+                <span className="text-xs font-normal text-ink-muted">读取失败</span>
+              ) : user ? (
+                quotaToAmount(user.quota)
+              ) : (
+                PLACEHOLDER_DASH
+              )}
             </div>
           </div>
           <div className="rounded-card border border-line bg-surface p-5">
             <div className="text-xs text-ink-muted">累计已用</div>
-            <div className="mt-2 text-3xl font-semibold tabular-nums text-ink">
-              {loading ? '…' : user ? quotaToAmount(user.used_quota) : '—'}
+            <div className="mt-2 flex h-9 items-center text-3xl font-semibold tabular-nums text-ink">
+              {loading ? (
+                <Skeleton className="h-7 w-24" />
+              ) : loadFailed ? (
+                <span className="text-xs font-normal text-ink-muted">读取失败</span>
+              ) : user ? (
+                quotaToAmount(user.used_quota)
+              ) : (
+                PLACEHOLDER_DASH
+              )}
             </div>
           </div>
           <div className="rounded-card border border-line bg-surface p-5">
             <div className="text-xs text-ink-muted">累计请求</div>
-            <div className="mt-2 text-3xl font-semibold tabular-nums text-ink">
-              {loading ? '…' : user ? user.request_count : '—'}
+            <div className="mt-2 flex h-9 items-center text-3xl font-semibold tabular-nums text-ink">
+              {loading ? (
+                <Skeleton className="h-7 w-16" />
+              ) : loadFailed ? (
+                <span className="text-xs font-normal text-ink-muted">读取失败</span>
+              ) : user ? (
+                user.request_count
+              ) : (
+                PLACEHOLDER_DASH
+              )}
             </div>
           </div>
         </div>
@@ -160,11 +206,19 @@ export default function WalletPage() {
           </p>
 
           {loading ? (
-            <div className="mt-4 py-8 text-center text-xs text-ink-muted">加载中…</div>
-          ) : topups.length === 0 ? (
-            <div className="mt-4 py-8 text-center text-xs text-ink-muted">
-              还没有充值记录
+            <div className="mt-4">
+              <BlockLoading lines={3} />
             </div>
+          ) : recordsFailed ? (
+            <EmptyHint
+              text="充值记录没读出来"
+              hint="点页面上方「重试」再拉一次——这是这次请求没成功，不是没有记录"
+            />
+          ) : topups.length === 0 ? (
+            <EmptyHint
+              text="还没有充值记录"
+              hint="兑换码兑换成功后会在这里留一条；未完成的订单不会入账"
+            />
           ) : (
             <div className="mt-4 overflow-x-auto">
               <table className="w-full min-w-[640px] text-left text-xs">
@@ -199,7 +253,7 @@ export default function WalletPage() {
                           {status.text}
                         </td>
                         <td className="py-3 font-mono text-[11px] text-ink-muted">
-                          {record.trade_no || '—'}
+                          {record.trade_no || PLACEHOLDER_DASH}
                         </td>
                       </tr>
                     );

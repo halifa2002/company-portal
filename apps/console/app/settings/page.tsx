@@ -6,6 +6,7 @@ import { authApi, accountApi, ApiError } from '@portal/api-client';
 import type { SelfUser } from '@portal/types';
 import type { LoginSession } from '@portal/api-client';
 import { ConsoleSidebar, ConsoleTopbar } from '@/components/console-chrome';
+import { BlockLoading, EmptyHint, PLACEHOLDER_DASH, Skeleton } from '@/components/data-state';
 import {
   ensureMoneySettings,
   formatNumber,
@@ -64,18 +65,32 @@ export default function SettingsPage() {
   /** 三个密码框各自的「显示/隐藏」开关，跟常见做法一致 */
   const [showPwd, setShowPwd] = useState({ old: false, next: false, again: false });
   const [revoking, setRevoking] = useState<string | null>(null);
+  /**
+   * 「加载失败」和「保存 / 改密码失败」分开记。
+   * 后者是操作反馈，不该带「重试拉数据」的按钮；前者才是页面没内容可看。
+   */
+  const [loadFailed, setLoadFailed] = useState(false);
+  /** 设备列表单独失败：它是另一个接口，挂了不该把整页判死，也不能谎报「0 台在用」 */
+  const [sessionsFailed, setSessionsFailed] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
+    setLoadFailed(false);
+    setSessionsFailed(false);
+    let sessionsMissing = false;
     try {
       await ensureMoneySettings();
       const [me, sess] = await Promise.all([
         authApi.getSelf(),
-        accountApi.listSessions().catch(() => [] as LoginSession[]),
+        accountApi.listSessions().catch(() => {
+          sessionsMissing = true;
+          return [] as LoginSession[];
+        }),
       ]);
       setUser(me);
       setDisplayName(me.display_name || '');
+      setSessionsFailed(sessionsMissing);
       const items = Array.isArray(sess) ? sess : [];
       // 当前设备排最前，其余按最近活跃时间倒序
       setSessions(
@@ -89,6 +104,7 @@ export default function SettingsPage() {
         router.replace('/login');
         return;
       }
+      setLoadFailed(true);
       setError(err instanceof Error ? err.message : '加载失败');
     } finally {
       setLoading(false);
@@ -100,13 +116,14 @@ export default function SettingsPage() {
   }, [load]);
 
   const roleLabel = useMemo(() => {
-    if (!user) return '—';
+    if (!user) return '';
     if (user.role >= 100) return '超级管理员';
     if (user.role >= 10) return '管理员';
     return '普通用户';
   }, [user]);
 
-  const initial = (user?.display_name || user?.username || '?').slice(0, 1).toUpperCase();
+  /** 没名字时留空，交给头像去画人形轮廓——之前拿「?」当首字母，看着像图片加载失败 */
+  const initial = (user?.display_name || user?.username || '').slice(0, 1).toUpperCase();
 
   async function handleSave(event: React.FormEvent) {
     event.preventDefault();
@@ -215,23 +232,49 @@ export default function SettingsPage() {
               {/* 账号卡 */}
               <section className="rounded-card border border-line bg-surface p-6">
                 <div className="flex flex-wrap items-start gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand text-xl font-semibold text-white">
-                    {initial}
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand text-xl font-semibold text-white">
+                    {loading ? (
+                      <Skeleton className="h-full w-full rounded-full" />
+                    ) : initial ? (
+                      initial
+                    ) : (
+                      /* 没设名字时画人形轮廓。以前用「?」当首字母，用户以为头像加载失败 */
+                      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6" aria-hidden>
+                        <circle cx="12" cy="8.5" r="3.4" stroke="currentColor" strokeWidth="1.6" />
+                        <path
+                          d="M4.8 19.6c1.3-3.4 4-5.2 7.2-5.2s5.9 1.8 7.2 5.2"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-lg font-semibold text-ink">
-                        {user?.display_name || user?.username || '—'}
+                        {loading ? (
+                          <Skeleton className="h-5 w-28" />
+                        ) : loadFailed ? (
+                          <span className="text-sm font-normal text-ink-muted">读取失败</span>
+                        ) : (
+                          user?.display_name || user?.username || PLACEHOLDER_DASH
+                        )}
                       </h2>
-                      <span className="rounded bg-brand-soft px-2 py-0.5 text-[11px] text-brand">
-                        {roleLabel}
-                      </span>
-                      <span
-                        title="不同档位的价格与可用模型不同，由管理员分配，用户不能自己改"
-                        className="rounded border border-line px-2 py-0.5 text-[11px] text-ink-muted"
-                      >
-                        计费档位 {groupLabel(user?.group)}
-                      </span>
+                      {roleLabel && (
+                        <span className="rounded bg-brand-soft px-2 py-0.5 text-[11px] text-brand">
+                          {roleLabel}
+                        </span>
+                      )}
+                      {/* 读不到账号信息时不能显示「标准档」——那是编的，groupLabel 会把空值默认成标准档 */}
+                      {user && (
+                        <span
+                          title="不同档位的价格与可用模型不同，由管理员分配，用户不能自己改"
+                          className="rounded border border-line px-2 py-0.5 text-[11px] text-ink-muted"
+                        >
+                          计费档位 {groupLabel(user.group)}
+                        </span>
+                      )}
                       {/* 文档 4.2 F 的「账户状态」：后端 1=启用 2=禁用 */}
                       {user && (
                         <span
@@ -246,12 +289,49 @@ export default function SettingsPage() {
                       )}
                     </div>
                     <div className="mt-1 text-sm text-ink-muted">
-                      @{user?.username ?? '—'}
+                      {loading ? (
+                        <Skeleton className="h-3.5 w-20" />
+                      ) : loadFailed ? (
+                        '读取失败'
+                      ) : user?.username ? (
+                        `@${user.username}`
+                      ) : (
+                        PLACEHOLDER_DASH
+                      )}
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-xs text-ink-muted">
-                      <span>邮箱 {user?.email || '未绑定'}</span>
-                      <span>用户 ID {user?.id ?? '—'}</span>
-                      <span>余额 {user ? `${quotaToAmount(user.quota)} ${moneyUnit()}` : '—'}</span>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-1 text-xs text-ink-muted">
+                      <span className="inline-flex items-center gap-1">
+                        邮箱
+                        {loading ? (
+                          <Skeleton className="h-3 w-16" />
+                        ) : loadFailed ? (
+                          '读取失败'
+                        ) : (
+                          user?.email || '未绑定'
+                        )}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        用户 ID
+                        {loading ? (
+                          <Skeleton className="h-3 w-10" />
+                        ) : loadFailed ? (
+                          '读取失败'
+                        ) : (
+                          (user?.id ?? PLACEHOLDER_DASH)
+                        )}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        余额
+                        {loading ? (
+                          <Skeleton className="h-3 w-16" />
+                        ) : loadFailed ? (
+                          '读取失败'
+                        ) : user ? (
+                          `${quotaToAmount(user.quota)} ${moneyUnit()}`
+                        ) : (
+                          PLACEHOLDER_DASH
+                        )}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -296,27 +376,27 @@ export default function SettingsPage() {
                   <div>
                     <div className="text-xs text-ink-muted">可用余额</div>
                     <div className="mt-1 flex items-baseline gap-1">
-                      <span className="text-2xl font-semibold tabular-nums text-ink">
-                        {user ? quotaToAmount(user.quota) : '—'}
-                      </span>
+                      <StatValue loading={loading} failed={loadFailed}>
+                        {user ? quotaToAmount(user.quota) : PLACEHOLDER_DASH}
+                      </StatValue>
                       <span className="text-xs text-ink-muted">{moneyUnit()}</span>
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-ink-muted">已用额度</div>
                     <div className="mt-1 flex items-baseline gap-1">
-                      <span className="text-2xl font-semibold tabular-nums text-ink">
-                        {user ? quotaToAmount(user.used_quota) : '—'}
-                      </span>
+                      <StatValue loading={loading} failed={loadFailed}>
+                        {user ? quotaToAmount(user.used_quota) : PLACEHOLDER_DASH}
+                      </StatValue>
                       <span className="text-xs text-ink-muted">{moneyUnit()}</span>
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-ink-muted">总调用次数</div>
                     <div className="mt-1 flex items-baseline gap-1">
-                      <span className="text-2xl font-semibold tabular-nums text-ink">
-                        {user ? formatNumber(user.request_count) : '—'}
-                      </span>
+                      <StatValue loading={loading} failed={loadFailed}>
+                        {user ? formatNumber(user.request_count) : PLACEHOLDER_DASH}
+                      </StatValue>
                       <span className="text-xs text-ink-muted">次</span>
                     </div>
                   </div>
@@ -378,15 +458,29 @@ export default function SettingsPage() {
                   </button>
                 </div>
                 <p className="mt-1 text-[11px] text-ink-muted">
-                  共 {sessions.length} 台在用，逐台可踢
+                  {loading
+                    ? '正在读取…'
+                    : loadFailed || sessionsFailed
+                      ? '设备数读不出来'
+                      : `共 ${sessions.length} 台在用，逐台可踢`}
                 </p>
               </div>
 
               <div className="divide-y divide-line">
                 {loading ? (
-                  <div className="px-5 py-10 text-center text-xs text-ink-muted">加载中…</div>
+                  <div className="px-5 py-5">
+                    <BlockLoading lines={2} />
+                  </div>
+                ) : loadFailed || sessionsFailed ? (
+                  <EmptyHint
+                    text="设备列表没读出来"
+                    hint="点页面上方「重试」再拉一次——这不是没有登录记录"
+                  />
                 ) : sessions.length === 0 ? (
-                  <div className="px-5 py-10 text-center text-xs text-ink-muted">暂无登录记录</div>
+                  <EmptyHint
+                    text="暂无其他登录记录"
+                    hint="在当前浏览器外的设备登录后，会在这里逐条列出来"
+                  />
                 ) : (
                   sessions.map((session) => (
                     <div key={session.sid} className="px-5 py-3">
@@ -603,5 +697,28 @@ export default function SettingsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+/** 额度数字位：加载中骨架、失败写明「读取失败」、成功才给数字。别再拿横杠一锅端。 */
+function StatValue({
+  loading,
+  failed,
+  children,
+}: {
+  loading: boolean;
+  failed: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <span className="text-2xl font-semibold tabular-nums text-ink">
+      {loading ? (
+        <Skeleton className="h-6 w-24" />
+      ) : failed ? (
+        <span className="text-xs font-normal text-ink-muted">读取失败</span>
+      ) : (
+        children
+      )}
+    </span>
   );
 }

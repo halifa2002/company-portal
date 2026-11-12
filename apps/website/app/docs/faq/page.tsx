@@ -6,9 +6,9 @@ export const metadata = { title: '常见问题' };
 /** 一条问答：问题加粗，正文可以直接塞链接与代码 */
 function Q(props: { q: string; children: React.ReactNode }) {
   return (
-    <div className="mt-3 rounded-xl border border-black/5 bg-white p-4">
-      <h3 className="text-[14.5px] font-semibold text-ink">{props.q}</h3>
-      <div className="mt-1.5 text-[13.5px] leading-relaxed text-ink-mid">{props.children}</div>
+    <div className="mt-3 rounded-card border border-line bg-white p-4">
+      <h3 className="text-body font-semibold text-ink">{props.q}</h3>
+      <div className="mt-1.5 text-body leading-relaxed text-ink-mid">{props.children}</div>
     </div>
   );
 }
@@ -17,8 +17,8 @@ function Q(props: { q: string; children: React.ReactNode }) {
 export default function FaqPage() {
   return (
     <DocsShell>
-      <h1 className="text-3xl font-bold tracking-tight text-ink">常见问题</h1>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
+      <h1 className="text-display font-bold tracking-tight text-ink">常见问题</h1>
+      <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
         接入前后最常被问到的十几件事。接口细节在
         <Link href="/docs/api" className="mx-1 text-brand hover:underline">
           接口速查
@@ -31,7 +31,7 @@ export default function FaqPage() {
       </p>
 
       <section id="account" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">账号与充值</h2>
+        <h2 className="text-heading font-bold text-ink">账号与充值</h2>
 
         <Q q="怎么注册账号？">
           在控制台点「注册」，填用户名和密码即可，注册完成后可自助登录。新账号余额为
@@ -50,7 +50,7 @@ export default function FaqPage() {
       </section>
 
       <section id="key" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">Key 与权限</h2>
+        <h2 className="text-heading font-bold text-ink">Key 与权限</h2>
 
         <Q q="怎么创建 API Key？">
           控制台「密钥」→ 新建，填名称；额度可以填具体数值，也可以勾「不限额度」；
@@ -74,11 +74,11 @@ export default function FaqPage() {
       </section>
 
       <section id="call" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">调用与报错</h2>
+        <h2 className="text-heading font-bold text-ink">调用与报错</h2>
 
         <Q q="已有的 OpenAI 代码要改哪里？">
           只改两处：base_url 换成文档首页显示的网关地址（带
-          <code className="mx-1 rounded bg-black/5 px-1 py-0.5 font-mono text-[12.5px]">/v1</code>），
+          <code className="mx-1 rounded bg-black/5 px-1 py-0.5 font-mono text-note">/v1</code>），
           api_key 换成平台 Key。其余参数、SDK、调用方式都不用动。完整示例见
           <Link href="/docs/quickstart" className="mx-1 text-brand hover:underline">
             快速开始
@@ -97,7 +97,7 @@ export default function FaqPage() {
         </Q>
 
         <Q q="请求很久不返回，或者客户端超时？">
-          长文本建议开流式输出（<code className="rounded bg-black/5 px-1 py-0.5 font-mono text-[12.5px]">stream: true</code>），
+          长文本建议开流式输出（<code className="rounded bg-black/5 px-1 py-0.5 font-mono text-note">stream: true</code>），
           首字节会明显更早到达；同时把客户端超时放宽到分钟级，别用默认的几十秒。
         </Q>
 
@@ -108,7 +108,7 @@ export default function FaqPage() {
       </section>
 
       <section id="bill" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">计费与账单</h2>
+        <h2 className="text-heading font-bold text-ink">计费与账单</h2>
 
         <Q q="按什么计费？">
           按 token 计费，输入和输出分开计价。部分模型分时段：工作日白天按高峰价，其余时间

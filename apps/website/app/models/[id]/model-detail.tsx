@@ -75,7 +75,7 @@ export function ModelDetail(props: { model: ModelView }) {
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
-      <Link href="/models" className="text-sm text-ink/50 transition-colors hover:text-brand">
+      <Link href="/models" className="text-body text-ink-mid transition-colors hover:text-brand">
         ← 返回模型广场
       </Link>
 
@@ -83,19 +83,19 @@ export function ModelDetail(props: { model: ModelView }) {
       <header className="mt-6">
         <div className="flex items-center gap-2">
           <VendorLogo vendor={model.vendorName} size={20} />
-          <span className="text-sm text-ink/55">{model.vendorName}</span>
-          <span className="rounded border border-brand/20 bg-brand/5 px-2 py-0.5 text-xs text-brand">
+          <span className="text-body text-ink-mid">{model.vendorName}</span>
+          <span className="whitespace-nowrap rounded border border-brand/20 bg-brand/5 px-2 py-0.5 text-meta text-brand">
             {model.category}
           </span>
         </div>
 
-        <h1 className="mt-3 text-3xl font-bold tracking-tight text-ink md:text-4xl">
+        <h1 className="mt-3 text-display font-bold tracking-tight text-ink md:text-section">
           {model.displayName}
         </h1>
-        <p className="mt-1 font-mono text-sm text-ink/45">{model.id}</p>
+        <p className="mt-1 font-mono text-body text-ink-muted">{model.id}</p>
 
         {model.description && (
-          <p className="mt-4 text-base leading-relaxed text-ink/70">{model.description}</p>
+          <p className="mt-4 text-title leading-relaxed text-ink-soft">{model.description}</p>
         )}
 
         {model.capabilities.length > 0 && (
@@ -103,7 +103,7 @@ export function ModelDetail(props: { model: ModelView }) {
             {model.capabilities.map((tag) => (
               <span
                 key={tag}
-                className="rounded border border-brand/15 bg-brand/5 px-2 py-0.5 text-xs text-brand/80"
+                className="whitespace-nowrap rounded border border-brand/15 bg-brand/5 px-2 py-0.5 text-meta text-brand/80"
               >
                 {tag}
               </span>
@@ -114,8 +114,8 @@ export function ModelDetail(props: { model: ModelView }) {
 
       {/* ─── 规格 ─── */}
       <section className="mt-10">
-        <h2 className="text-lg font-semibold text-ink">模型规格</h2>
-        <dl className="mt-3 divide-y divide-black/5 rounded-xl border border-black/5 bg-white text-sm">
+        <h2 className="text-title font-semibold text-ink">模型规格</h2>
+        <dl className="mt-3 divide-y divide-black/5 rounded-card border border-line bg-white text-body">
           {model.contextWindow && <SpecRow label="上下文长度" value={model.contextWindow} />}
           {model.maxOutput && <SpecRow label="最大输出" value={model.maxOutput} />}
           {model.useCase && <SpecRow label="模型用途" value={model.useCase} />}
@@ -129,15 +129,15 @@ export function ModelDetail(props: { model: ModelView }) {
 
       {/* ─── 价格 ─── */}
       <section className="mt-10">
-        <h2 className="text-lg font-semibold text-ink">价格</h2>
-        <p className="mt-1 text-xs text-ink/45">单位：人民币 / 百万 tokens</p>
+        <h2 className="text-title font-semibold text-ink">价格</h2>
+        <p className="mt-1 text-meta text-ink-muted">单位：人民币 / 百万 tokens</p>
 
         {tieredPrice && (
           <>
-            <div className="mt-3 overflow-hidden rounded-xl border border-black/5">
-              <table className="w-full text-sm">
+            <div className="mt-3 overflow-hidden rounded-card border border-line">
+              <table className="w-full text-body">
                 <thead>
-                  <tr className="bg-surface-tint text-left text-xs text-ink/60">
+                  <tr className="bg-surface-tint text-left text-meta text-ink-mid">
                     <th className="px-5 py-3 font-medium">时段</th>
                     <th className="px-5 py-3 font-medium">输入</th>
                     <th className="px-5 py-3 font-medium">输出</th>
@@ -146,8 +146,8 @@ export function ModelDetail(props: { model: ModelView }) {
                 </thead>
                 <tbody>
                   {tieredPrice.tiers.map((tier) => (
-                    <tr key={tier.key} className="border-t border-black/5">
-                      <td className="px-5 py-3 text-ink/70">{tier.label}</td>
+                    <tr key={tier.key} className="border-t border-line">
+                      <td className="px-5 py-3 text-ink-soft">{tier.label}</td>
                       <td className="px-5 py-3 font-medium text-ink">
                         {formatCnyPerMillion(tier.inputPerM)}
                       </td>
@@ -155,7 +155,7 @@ export function ModelDetail(props: { model: ModelView }) {
                         {formatCnyPerMillion(tier.outputPerM)}
                       </td>
                       {hasCachePrice && (
-                        <td className="px-5 py-3 text-ink/70">
+                        <td className="px-5 py-3 text-ink-soft">
                           {formatCnyPerMillion(tier.cacheReadPerM)}
                         </td>
                       )}
@@ -165,22 +165,22 @@ export function ModelDetail(props: { model: ModelView }) {
               </table>
             </div>
             {tieredPrice.schedule && (
-              <p className="mt-2 text-xs leading-relaxed text-ink/50">{tieredPrice.schedule}</p>
+              <p className="mt-2 text-meta leading-relaxed text-ink-mid">{tieredPrice.schedule}</p>
             )}
           </>
         )}
 
         {flatPrice && (
-          <div className="mt-3 overflow-hidden rounded-xl border border-black/5">
-            <table className="w-full text-sm">
+          <div className="mt-3 overflow-hidden rounded-card border border-line">
+            <table className="w-full text-body">
               <thead>
-                <tr className="bg-surface-tint text-left text-xs text-ink/60">
+                <tr className="bg-surface-tint text-left text-meta text-ink-mid">
                   <th className="px-5 py-3 font-medium">输入</th>
                   <th className="px-5 py-3 font-medium">输出</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-t border-black/5">
+                <tr className="border-t border-line">
                   <td className="px-5 py-3 font-medium text-ink">
                     {formatCnyPerMillion(flatPrice.inputPerM)}
                   </td>
@@ -194,20 +194,20 @@ export function ModelDetail(props: { model: ModelView }) {
         )}
 
         {price.mode === 'unknown' && (
-          <p className="mt-3 rounded-xl border border-black/5 bg-surface-tint-soft px-5 py-4 text-xs leading-relaxed text-ink/55">
+          <p className="mt-3 rounded-card border border-line bg-surface-tint-soft px-5 py-4 text-meta leading-relaxed text-ink-mid">
             价格信息暂时不可用，请以控制台下单时的价格为准。
           </p>
         )}
 
-        <p className="mt-2 text-xs leading-relaxed text-ink/45">
+        <p className="mt-2 text-meta leading-relaxed text-ink-muted">
           价格直接读取后台计费配置生成，与下单计费一致；后台调整价格后，重新构建即可同步。
         </p>
       </section>
 
       {/* ─── API 调用方式 ─── */}
       <section className="mt-10">
-        <h2 className="text-lg font-semibold text-ink">API 调用方式</h2>
-        <p className="mt-1 text-sm leading-relaxed text-ink/60">
+        <h2 className="text-title font-semibold text-ink">API 调用方式</h2>
+        <p className="mt-1 text-body leading-relaxed text-ink-mid">
           接口与 OpenAI 完全兼容。把 API 地址指向本平台、把模型名填成本页的模型 ID，就能直接复用现有的 OpenAI
           SDK 或客户端。
         </p>
@@ -215,11 +215,11 @@ export function ModelDetail(props: { model: ModelView }) {
           <CodeBlock label="请求地址与请求头" code={requestExample} />
         </div>
 
-        <h3 className="mt-6 text-sm font-semibold text-ink">主要请求参数</h3>
-        <div className="mt-2 overflow-hidden rounded-xl border border-black/5">
-          <table className="w-full text-sm">
+        <h3 className="mt-6 text-body font-semibold text-ink">主要请求参数</h3>
+        <div className="mt-2 overflow-hidden rounded-card border border-line">
+          <table className="w-full text-body">
             <thead>
-              <tr className="bg-surface-tint text-left text-xs text-ink/60">
+              <tr className="bg-surface-tint text-left text-meta text-ink-mid">
                 <th className="px-4 py-2.5 font-medium">参数</th>
                 <th className="px-4 py-2.5 font-medium">类型</th>
                 <th className="px-4 py-2.5 font-medium">必填</th>
@@ -228,11 +228,11 @@ export function ModelDetail(props: { model: ModelView }) {
             </thead>
             <tbody>
               {PARAM_ROWS.map((row) => (
-                <tr key={row.name} className="border-t border-black/5">
-                  <td className="px-4 py-2.5 font-mono text-xs text-ink">{row.name}</td>
-                  <td className="px-4 py-2.5 text-xs text-ink/55">{row.type}</td>
-                  <td className="px-4 py-2.5 text-xs text-ink/55">{row.required}</td>
-                  <td className="px-4 py-2.5 text-xs leading-relaxed text-ink/60">{row.note}</td>
+                <tr key={row.name} className="border-t border-line">
+                  <td className="px-4 py-2.5 font-mono text-meta text-ink">{row.name}</td>
+                  <td className="px-4 py-2.5 text-meta text-ink-mid">{row.type}</td>
+                  <td className="px-4 py-2.5 text-meta text-ink-mid">{row.required}</td>
+                  <td className="px-4 py-2.5 text-meta leading-relaxed text-ink-mid">{row.note}</td>
                 </tr>
               ))}
             </tbody>
@@ -242,16 +242,16 @@ export function ModelDetail(props: { model: ModelView }) {
 
       {/* ─── 代码示例 ─── */}
       <section className="mt-10">
-        <h2 className="text-lg font-semibold text-ink">代码示例</h2>
+        <h2 className="text-title font-semibold text-ink">代码示例</h2>
         <div className="mt-3 space-y-3">
           <CodeBlock label="cURL" code={curlExample} />
           <CodeBlock label="Python（OpenAI SDK）" code={pythonExample} />
           <CodeBlock label="Node.js（openai npm 包）" code={nodeExample} />
         </div>
 
-        <p className="mt-3 text-xs leading-relaxed text-ink/45">
+        <p className="mt-3 text-meta leading-relaxed text-ink-muted">
           API Key 在控制台的「API Key 管理」里创建。示例里的
-          <code className="mx-1 font-mono text-ink/65">{apiBase}</code>
+          <code className="mx-1 font-mono text-ink-soft">{apiBase}</code>
           是占位地址，正式域名确定后会替换。
         </p>
       </section>
@@ -262,8 +262,8 @@ export function ModelDetail(props: { model: ModelView }) {
 function SpecRow(props: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1 px-5 py-3 sm:flex-row sm:items-baseline sm:gap-6">
-      <dt className="w-28 shrink-0 text-ink/45">{props.label}</dt>
-      <dd className="text-ink/80">{props.value}</dd>
+      <dt className="w-28 shrink-0 text-ink-muted">{props.label}</dt>
+      <dd className="text-ink">{props.value}</dd>
     </div>
   );
 }

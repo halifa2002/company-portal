@@ -50,33 +50,33 @@ export default function ErrorsPage() {
 
   return (
     <DocsShell>
-      <h1 className="text-3xl font-bold tracking-tight text-ink">错误码</h1>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
+      <h1 className="text-display font-bold tracking-tight text-ink">错误码</h1>
+      <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
         出错时返回的不是 HTML 页面，是下面这种 JSON。判断依据优先看 HTTP 状态码，
-        <span className="font-mono text-[13px]"> type </span>字段用来区分同一状态码下的不同原因。
+        <span className="font-mono text-note"> type </span>字段用来区分同一状态码下的不同原因。
       </p>
 
       <section id="shape" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">返回体结构</h2>
+        <h2 className="text-heading font-bold text-ink">返回体结构</h2>
         <div className="mt-3">
           <CodeBlock label="错误响应" code={shape} />
         </div>
-        <ul className="mt-3 space-y-1.5 text-[13.5px] leading-relaxed text-ink-mid">
+        <ul className="mt-3 space-y-1.5 text-body leading-relaxed text-ink-mid">
           <li>
-            <span className="font-mono text-[12.5px] text-ink">message</span>：给人看的中文说明，可以直接展示给用户。
+            <span className="font-mono text-note text-ink">message</span>：给人看的中文说明，可以直接展示给用户。
           </li>
           <li>
-            <span className="font-mono text-[12.5px] text-ink">type</span>：给程序判断的英文标识，代码里按它分支比按 message 判断稳。
+            <span className="font-mono text-note text-ink">type</span>：给程序判断的英文标识，代码里按它分支比按 message 判断稳。
           </li>
         </ul>
       </section>
 
       <section id="codes" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">状态码</h2>
-        <div className="mt-3 overflow-x-auto rounded-xl border border-black/5">
-          <table className="w-full min-w-[680px] text-sm">
+        <h2 className="text-heading font-bold text-ink">状态码</h2>
+        <div className="mt-3 overflow-x-auto rounded-card border border-line">
+          <table className="w-full min-w-[680px] text-body">
             <thead>
-              <tr className="bg-surface-tint text-left text-xs text-ink-mid">
+              <tr className="bg-surface-tint text-left text-meta text-ink-mid">
                 <th className="px-4 py-2.5 font-medium">状态码</th>
                 <th className="px-4 py-2.5 font-medium">含义</th>
                 <th className="px-4 py-2.5 font-medium">常见原因</th>
@@ -85,11 +85,11 @@ export default function ErrorsPage() {
             </thead>
             <tbody>
               {CODES.map((row) => (
-                <tr key={row.code} className="border-t border-black/5 align-top">
-                  <td className="px-4 py-3 font-mono text-[13px] text-brand">{row.code}</td>
-                  <td className="px-4 py-3 text-[13px] font-medium text-ink">{row.name}</td>
-                  <td className="px-4 py-3 text-[12.5px] leading-relaxed text-ink-mid">{row.cause}</td>
-                  <td className="px-4 py-3 text-[12.5px] leading-relaxed text-ink-mid">{row.fix}</td>
+                <tr key={row.code} className="border-t border-line align-top">
+                  <td className="px-4 py-3 font-mono text-note text-brand">{row.code}</td>
+                  <td className="px-4 py-3 text-note font-medium text-ink">{row.name}</td>
+                  <td className="px-4 py-3 text-note leading-relaxed text-ink-mid">{row.cause}</td>
+                  <td className="px-4 py-3 text-note leading-relaxed text-ink-mid">{row.fix}</td>
                 </tr>
               ))}
             </tbody>
@@ -98,8 +98,8 @@ export default function ErrorsPage() {
       </section>
 
       <section id="retry" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">该怎么重试</h2>
-        <ul className="mt-3 space-y-2 text-[14px] leading-relaxed text-ink-mid">
+        <h2 className="text-heading font-bold text-ink">该怎么重试</h2>
+        <ul className="mt-3 space-y-2 text-body leading-relaxed text-ink-mid">
           <li>
             <span className="font-medium text-ink">4xx 不要重试</span>：401、403、404 重试多少次都一样，先修问题。
           </li>
@@ -113,7 +113,7 @@ export default function ErrorsPage() {
             <span className="font-medium text-ink">超时同理</span>：长文本请求建议放宽客户端超时，并配合流式输出，避免一直等首字节。
           </li>
         </ul>
-        <p className="mt-4 text-[13px] text-ink-mid">
+        <p className="mt-4 text-note text-ink-mid">
           关于当前的频率限制策略，见
           <Link href="/docs/api" className="mx-1 text-brand hover:underline">
             接口速查

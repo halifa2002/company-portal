@@ -53,7 +53,7 @@ export function ModelsClient(props: {
         }}
       >
         <div className="mx-auto max-w-7xl px-6 py-16 text-center md:py-20">
-          <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
+          <h1 className="text-section font-bold tracking-tight md:text-hero">
             <span
               style={{
                 background: 'var(--gradient-brand)',
@@ -64,12 +64,12 @@ export function ModelsClient(props: {
               模型广场
             </span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-ink/60">
+          <p className="mx-auto mt-4 max-w-2xl text-title text-ink-mid">
             当前提供 {props.models.length} 个模型，统一 OpenAI 兼容接口，一个 Key 全部调用
           </p>
 
           <form
-            className="mx-auto mt-8 flex max-w-2xl items-center overflow-hidden rounded-full border border-black/10 bg-white shadow-sm"
+            className="mx-auto mt-8 flex max-w-2xl items-center overflow-hidden rounded-full border border-line bg-white shadow-sm"
             onSubmit={(event) => {
               // 筛选是边打边生效的，这里让按钮/回车有个明确反馈：滚到结果区
               event.preventDefault();
@@ -84,11 +84,11 @@ export function ModelsClient(props: {
               onChange={(event) => setSearch(event.target.value)}
               placeholder="搜索模型名称、厂商、能力"
               aria-label="搜索模型"
-              className="flex-1 border-0 bg-transparent px-6 py-3.5 text-sm text-ink outline-none placeholder:text-ink/35"
+              className="flex-1 border-0 bg-transparent px-6 py-3.5 text-body text-ink outline-none placeholder:text-ink-muted"
             />
             <button
               type="submit"
-              className="mr-1.5 flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              className="mr-1.5 flex items-center gap-1.5 rounded-full px-5 py-2 text-body font-medium text-white transition-opacity hover:opacity-90"
               style={{ background: 'var(--gradient-primary, var(--brand-primary))' }}
             >
               <svg
@@ -113,24 +113,24 @@ export function ModelsClient(props: {
       {/* ─── 筛选 + 卡片 ─── */}
       <section id="model-results" className="mx-auto max-w-7xl px-6 py-10">
         {!props.pricingAvailable && (
-          <p className="mb-6 rounded-xl border border-warn/30 bg-warn/5 px-5 py-4 text-xs leading-relaxed text-ink/70">
+          <p className="mb-6 rounded-card border border-warn/30 bg-warn/5 px-5 py-4 text-meta leading-relaxed text-ink-soft">
             价格信息暂时不可用（本次构建没有连上计费接口），页面不显示具体单价，请以控制台下单时的价格为准。
           </p>
         )}
 
         {categories.length > 2 && (
           <div className="flex items-start gap-4">
-            <span className="mt-2 shrink-0 text-sm font-medium text-ink/60">模型分类</span>
+            <span className="mt-2 shrink-0 text-body font-medium text-ink-mid">模型分类</span>
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <button
                   key={category}
                   type="button"
                   onClick={() => setActiveCategory(category)}
-                  className={`rounded-lg px-3.5 py-1.5 text-sm transition-colors ${
+                  className={`rounded-control px-3.5 py-1.5 text-body transition-colors ${
                     activeCategory === category
                       ? 'border border-brand/30 bg-brand/8 font-medium text-brand'
-                      : 'border border-black/8 text-ink/60 hover:border-brand/30 hover:text-brand'
+                      : 'border border-line text-ink-mid hover:border-brand/30 hover:text-brand'
                   }`}
                 >
                   {category}
@@ -142,17 +142,17 @@ export function ModelsClient(props: {
 
         {vendors.length > 2 && (
           <div className="mt-4 flex items-start gap-4">
-            <span className="mt-2 shrink-0 text-sm font-medium text-ink/60">模型厂商</span>
+            <span className="mt-2 shrink-0 text-body font-medium text-ink-mid">模型厂商</span>
             <div className="flex flex-wrap gap-2">
               {vendors.map((vendor) => (
                 <button
                   key={vendor}
                   type="button"
                   onClick={() => setActiveVendor(vendor)}
-                  className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors ${
+                  className={`flex items-center gap-1.5 rounded-control border px-3 py-1.5 text-body transition-colors ${
                     activeVendor === vendor
                       ? 'border-brand/30 bg-brand/8 font-medium text-brand'
-                      : 'border-black/8 text-ink/60 hover:border-brand/30 hover:text-brand'
+                      : 'border-line text-ink-mid hover:border-brand/30 hover:text-brand'
                   }`}
                 >
                   {vendor !== '全部' && <VendorLogo vendor={vendor} size={16} />}
@@ -163,7 +163,7 @@ export function ModelsClient(props: {
           </div>
         )}
 
-        <p className="mt-6 text-xs text-ink/45">共 {filtered.length} 个模型</p>
+        <p className="mt-6 text-meta text-ink-muted">共 {filtered.length} 个模型</p>
 
         {filtered.length > 0 ? (
           <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -172,8 +172,8 @@ export function ModelsClient(props: {
             ))}
           </div>
         ) : (
-          <div className="mt-10 rounded-xl border border-black/5 bg-surface-tint-soft px-6 py-12 text-center">
-            <p className="text-sm text-ink/60">
+          <div className="mt-10 rounded-card border border-line bg-surface-tint-soft px-6 py-12 text-center">
+            <p className="text-body text-ink-mid">
               {props.models.length === 0
                 ? '暂无已接入的模型。模型接入后会自动出现在这里。'
                 : '没有匹配的模型，换个关键词或筛选条件试试。'}
@@ -181,7 +181,7 @@ export function ModelsClient(props: {
           </div>
         )}
 
-        <p className="mt-8 rounded-xl border border-black/5 bg-surface-tint-soft px-5 py-4 text-xs leading-relaxed text-ink/50">
+        <p className="mt-8 rounded-card border border-line bg-surface-tint-soft px-5 py-4 text-meta leading-relaxed text-ink-mid">
           模型清单与单价直接读取后台计费配置生成，与下单计费一致；后台调整价格或上下架模型后，重新构建即可同步。
         </p>
       </section>
@@ -197,7 +197,7 @@ function ModelCard(props: { model: ModelView }) {
     <article
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="flex flex-col rounded-xl border bg-white p-5 transition-all duration-200"
+      className="flex flex-col rounded-card border bg-white p-5 transition-all duration-200"
       style={{
         borderColor: hovered ? 'rgba(79,70,229,0.55)' : 'rgba(0,0,0,0.06)',
         boxShadow: hovered ? '0 4px 20px rgba(79,70,229,0.08)' : 'none',
@@ -206,23 +206,23 @@ function ModelCard(props: { model: ModelView }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           <VendorLogo vendor={props.model.vendorName} size={22} />
-          <span className="text-xs text-ink/55">{props.model.vendorName}</span>
+          <span className="text-meta text-ink-mid">{props.model.vendorName}</span>
         </div>
-        <span className="shrink-0 rounded border border-brand/20 bg-brand/5 px-2 py-0.5 text-xs text-brand">
+        <span className="whitespace-nowrap shrink-0 rounded border border-brand/20 bg-brand/5 px-2 py-0.5 text-meta text-brand">
           {props.model.category}
         </span>
       </div>
 
-      <h2 className="mt-2.5 text-base font-bold text-ink">{props.model.displayName}</h2>
-      <p className="mt-0.5 font-mono text-xs text-ink/45">{props.model.id}</p>
+      <h2 className="mt-2.5 text-title font-bold text-ink">{props.model.displayName}</h2>
+      <p className="mt-0.5 font-mono text-meta text-ink-muted">{props.model.id}</p>
 
       {props.model.description && (
-        <p className="mt-2.5 text-sm leading-relaxed text-ink/65">{props.model.description}</p>
+        <p className="mt-2.5 text-body leading-relaxed text-ink-soft">{props.model.description}</p>
       )}
 
       {props.model.useCase && (
-        <p className="mt-2 text-xs text-ink/50">
-          <span className="text-ink/40">用途：</span>
+        <p className="mt-2 text-meta text-ink-mid">
+          <span className="text-ink-muted">用途：</span>
           {props.model.useCase}
         </p>
       )}
@@ -232,7 +232,7 @@ function ModelCard(props: { model: ModelView }) {
           {props.model.capabilities.map((tag) => (
             <span
               key={tag}
-              className="rounded border border-brand/15 bg-brand/5 px-2 py-0.5 text-xs text-brand/80"
+              className="whitespace-nowrap rounded border border-brand/15 bg-brand/5 px-2 py-0.5 text-meta text-brand/80"
             >
               {tag}
             </span>
@@ -241,15 +241,15 @@ function ModelCard(props: { model: ModelView }) {
       )}
 
       <div className="mt-auto">
-        <dl className="mt-4 space-y-1.5 border-t border-black/5 pt-3 text-xs">
+        <dl className="mt-4 space-y-1.5 border-t border-line pt-3 text-meta">
           <div className="flex items-baseline justify-between gap-3">
-            <dt className="shrink-0 text-ink/45">输入价格</dt>
+            <dt className="shrink-0 text-ink-muted">输入价格</dt>
             <dd className="text-right font-medium text-ink">
               {modelPriceText(props.model.price, 'input')}
             </dd>
           </div>
           <div className="flex items-baseline justify-between gap-3">
-            <dt className="shrink-0 text-ink/45">输出价格</dt>
+            <dt className="shrink-0 text-ink-muted">输出价格</dt>
             <dd className="text-right font-medium text-ink">
               {modelPriceText(props.model.price, 'output')}
             </dd>
@@ -257,14 +257,14 @@ function ModelCard(props: { model: ModelView }) {
         </dl>
 
         <div className="mt-2.5 flex items-end justify-between gap-3">
-          <p className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink/45">
+          <p className="flex flex-wrap gap-x-4 gap-y-1 text-meta text-ink-muted">
             {props.model.contextWindow && <span>上下文 {props.model.contextWindow}</span>}
             {props.model.maxOutput && <span>最大输出 {props.model.maxOutput}</span>}
             {props.model.price.mode === 'tiered' && <span>分时计价</span>}
           </p>
           <Link
             href={`/models/${props.model.id}`}
-            className="shrink-0 text-xs text-brand hover:underline"
+            className="shrink-0 text-meta text-brand hover:underline"
           >
             查看详情 →
           </Link>

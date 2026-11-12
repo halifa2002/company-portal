@@ -86,22 +86,22 @@ export default function TermsPage() {
 
       <main>
         <section
-          className="border-b border-black/5"
+          className="border-b border-line"
           style={{ background: 'var(--gradient-hero)' }}
         >
           <div className="mx-auto max-w-4xl px-6 py-16 md:py-20">
-            <span className="text-xs font-medium tracking-[0.08em] text-brand">
+            <span className="text-meta font-medium tracking-[0.08em] text-brand">
               LEGAL · 服务协议
             </span>
-            <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink md:text-4xl">
+            <h1 className="mt-4 text-display font-bold tracking-tight text-ink md:text-section">
               服务协议
             </h1>
-            <p className="mt-3 text-[13px] text-ink-mid">更新日期：2026 年 11 月 11 日</p>
+            <p className="mt-3 text-note text-ink-mid">更新日期：2026 年 11 月 11 日</p>
           </div>
         </section>
 
         <section className="mx-auto max-w-3xl px-6 py-14">
-          <p className="text-[14px] leading-[1.9] text-ink-mid">
+          <p className="text-body leading-[1.9] text-ink-mid">
             这份协议说明你在使用 {brand.name} 时双方各自的权利与义务。条款按顺序编号，
             与页面上的功能一一对应，没有需要另行确认的隐藏约定。
           </p>
@@ -109,12 +109,12 @@ export default function TermsPage() {
           <div className="mt-10 space-y-9">
             {SECTIONS.map((section) => (
               <div key={section.title}>
-                <h2 className="text-[16px] font-semibold tracking-tight text-ink">
+                <h2 className="text-title font-semibold tracking-tight text-ink">
                   {section.title}
                 </h2>
                 <div className="mt-3 space-y-2.5">
                   {section.body.map((paragraph) => (
-                    <p key={paragraph} className="text-[14px] leading-[1.9] text-ink-mid">
+                    <p key={paragraph} className="text-body leading-[1.9] text-ink-mid">
                       {paragraph}
                     </p>
                   ))}
@@ -123,7 +123,7 @@ export default function TermsPage() {
             ))}
           </div>
 
-          <p className="mt-12 rounded-2xl border border-line bg-surface-tint px-5 py-4 text-[13px] leading-relaxed text-ink-mid">
+          <p className="mt-12 rounded-panel border border-line bg-surface-tint px-5 py-4 text-note leading-relaxed text-ink-mid">
             对本协议有疑问，可通过「关于」页列出的联系方式与我们沟通；涉及账号与数据的请求，
             我们会核对身份后处理。
           </p>

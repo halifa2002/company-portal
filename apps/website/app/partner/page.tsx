@@ -50,18 +50,18 @@ export default function PartnerPage() {
       <main>
         {/* ─── Hero ─── */}
         <section
-          className="relative overflow-hidden border-b border-black/5"
+          className="relative overflow-hidden border-b border-line"
           style={{
             background:
               'var(--gradient-hero)',
           }}
         >
           <div className="relative mx-auto max-w-4xl px-6 py-20 text-center md:py-24">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-white/70 px-3.5 py-1 text-xs font-medium tracking-wide text-brand">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-white/70 px-3.5 py-1 text-meta font-medium tracking-wide text-brand">
               PARTNER · 生态合作
             </span>
 
-            <h1 className="mt-6 text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+            <h1 className="mt-6 text-display font-bold leading-tight tracking-tight md:text-hero">
               <span className="text-ink">{brand.name} </span>
               <span
                 style={{
@@ -74,7 +74,7 @@ export default function PartnerPage() {
               </span>
             </h1>
 
-            <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-ink/60 md:text-base">
+            <p className="mx-auto mt-5 max-w-2xl text-body leading-relaxed text-ink-mid md:text-title">
               依托统一的模型接入能力，和集成商、渠道伙伴、企业客户一起，
               把 AI 能力落到真实的业务场景里。
             </p>
@@ -82,7 +82,7 @@ export default function PartnerPage() {
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <a
                 href={`mailto:${brand.email}?subject=%E7%94%9F%E6%80%81%E5%90%88%E4%BD%9C%E5%92%A8%E8%AF%A2`}
-                className="inline-flex items-center gap-2 rounded-xl px-8 py-3.5 text-sm font-semibold text-white shadow-[0_10px_26px_rgba(79,70,229,0.3)] transition-transform duration-300 hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 rounded-card px-8 py-3.5 text-body font-semibold text-white shadow-brand-lg transition-transform duration-300 hover:-translate-y-0.5"
                 style={{ background: 'var(--gradient-primary)' }}
               >
                 立即沟通
@@ -90,23 +90,23 @@ export default function PartnerPage() {
               </a>
               <Link
                 href="/docs"
-                className="rounded-xl border border-black/10 bg-white px-7 py-3.5 text-sm font-medium text-ink transition-colors hover:border-brand/30 hover:text-brand"
+                className="rounded-card border border-line bg-white px-7 py-3.5 text-body font-medium text-ink transition-colors hover:border-brand/30 hover:text-brand"
               >
                 先看产品能力
               </Link>
             </div>
 
-            <p className="mt-6 text-xs text-ink/40">
+            <p className="mt-6 text-meta text-ink-muted">
               合作政策仍在制定中，具体权益以双方沟通结果为准
             </p>
           </div>
         </section>
 
         {/* ─── 合作模式 ─── */}
-        <section className="border-b border-black/5 bg-white py-16">
+        <section className="border-b border-line bg-white py-16">
           <div className="mx-auto max-w-7xl px-6">
-            <h2 className="text-2xl font-bold tracking-tight text-ink md:text-3xl">合作模式</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/55">
+            <h2 className="text-heading font-bold tracking-tight text-ink md:text-display">合作模式</h2>
+            <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
               三类合作方向，按你的角色选最接近的一种先聊。
             </p>
 
@@ -114,28 +114,28 @@ export default function PartnerPage() {
               {TRACKS.map((track) => (
                 <article
                   key={track.tag}
-                  className="flex flex-col rounded-2xl border border-black/5 bg-white p-6 transition-colors duration-300 hover:border-brand/25"
+                  className="flex flex-col rounded-panel border border-line bg-white p-6 transition-colors duration-300 hover:border-brand/25"
                 >
-                  <span className="w-fit rounded border border-brand/20 bg-brand/5 px-2 py-0.5 text-xs font-medium text-brand">
+                  <span className="whitespace-nowrap w-fit rounded border border-brand/20 bg-brand/5 px-2 py-0.5 text-meta font-medium text-brand">
                     {track.tag}
                   </span>
-                  <h3 className="mt-3 text-lg font-bold leading-snug text-ink">{track.title}</h3>
+                  <h3 className="mt-3 text-title font-bold leading-snug text-ink">{track.title}</h3>
 
-                  <dl className="mt-4 space-y-3 text-[13px] leading-relaxed">
+                  <dl className="mt-4 space-y-3 text-note leading-relaxed">
                     <div>
-                      <dt className="text-ink/40">适用对象</dt>
-                      <dd className="mt-0.5 text-ink/65">{track.audience}</dd>
+                      <dt className="text-ink-muted">适用对象</dt>
+                      <dd className="mt-0.5 text-ink-soft">{track.audience}</dd>
                     </div>
                     <div>
-                      <dt className="text-ink/40">合作方式</dt>
-                      <dd className="mt-0.5 text-ink/65">{track.approach}</dd>
+                      <dt className="text-ink-muted">合作方式</dt>
+                      <dd className="mt-0.5 text-ink-soft">{track.approach}</dd>
                     </div>
                     <div>
-                      <dt className="text-ink/40">你能得到</dt>
+                      <dt className="text-ink-muted">你能得到</dt>
                       <dd className="mt-1">
                         <ul className="space-y-1.5">
                           {track.gains.map((gain) => (
-                            <li key={gain} className="flex items-start gap-2 text-ink/65">
+                            <li key={gain} className="flex items-start gap-2 text-ink-soft">
                               <span
                                 className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand/60"
                                 aria-hidden
@@ -155,17 +155,17 @@ export default function PartnerPage() {
 
         {/* ─── 合作流程 ─── */}
         <section className="mx-auto max-w-7xl px-6 py-16">
-          <h2 className="text-2xl font-bold tracking-tight text-ink md:text-3xl">怎么开始</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink/55">
+          <h2 className="text-heading font-bold tracking-tight text-ink md:text-display">怎么开始</h2>
+          <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
             四步走完，通常两周内可以跑通第一个场景。
           </p>
 
           <ol className="mt-8 grid gap-4 md:grid-cols-4">
             {STEPS.map((item) => (
-              <li key={item.step} className="rounded-xl border border-black/5 bg-surface-tint-soft p-5">
-                <span className="font-mono text-xs text-brand">{item.step}</span>
-                <h3 className="mt-2 text-base font-semibold text-ink">{item.title}</h3>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-ink/60">{item.desc}</p>
+              <li key={item.step} className="rounded-card border border-line bg-surface-tint-soft p-5">
+                <span className="font-mono text-meta text-brand">{item.step}</span>
+                <h3 className="mt-2 text-title font-semibold text-ink">{item.title}</h3>
+                <p className="mt-1.5 text-note leading-relaxed text-ink-mid">{item.desc}</p>
               </li>
             ))}
           </ol>
@@ -173,20 +173,20 @@ export default function PartnerPage() {
 
         {/* ─── 联系 ─── */}
         <section className="mx-auto max-w-4xl px-6 pb-20">
-          <div className="rounded-2xl bg-[var(--dark-surface)] px-8 py-12 text-center md:px-14">
-            <h2 className="text-2xl font-bold text-white">想先聊聊？</h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/60">
+          <div className="rounded-panel bg-[var(--dark-surface)] px-8 py-12 text-center md:px-14">
+            <h2 className="text-heading font-bold text-white">想先聊聊？</h2>
+            <p className="mx-auto mt-3 max-w-xl text-body leading-relaxed text-white/60">
               把场景、客户类型和预期合作方式发给我们，政策明确后会优先联系。
             </p>
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-4 text-sm">
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-4 text-body">
               <a
                 href={`mailto:${brand.email}?subject=%E7%94%9F%E6%80%81%E5%90%88%E4%BD%9C%E5%92%A8%E8%AF%A2`}
-                className="rounded-xl bg-white/10 px-6 py-3 font-medium text-white transition-colors hover:bg-white/15"
+                className="rounded-card bg-white/10 px-6 py-3 font-medium text-white transition-colors hover:bg-white/15"
               >
                 {brand.email}
               </a>
             </div>
-            <p className="mt-6 text-[11px] text-white/35">
+            <p className="mt-6 text-meta text-white/35">
               邮箱为占位地址，公司资料确定后替换
             </p>
           </div>

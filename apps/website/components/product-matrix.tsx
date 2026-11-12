@@ -81,10 +81,10 @@ function MatrixCardView(props: { card: MatrixCard }) {
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-[24px] p-8 transition-all duration-300 md:p-10 ${
+      className={`group relative overflow-hidden rounded-wide p-8 transition-all duration-300 md:p-10 ${
         dark
           ? 'text-white hover:-translate-y-0.5'
-          : 'border border-black/6 bg-surface-tint text-ink hover:-translate-y-0.5 hover:border-brand/25'
+          : 'border border-line bg-surface-tint text-ink hover:-translate-y-0.5 hover:border-brand/25'
       }`}
       style={dark ? { background: 'var(--matrix-dark)' } : undefined}
     >
@@ -99,13 +99,13 @@ function MatrixCardView(props: { card: MatrixCard }) {
       </div>
 
       <div className="relative z-10 flex h-full flex-col">
-        <h3 className={`text-[22px] font-bold tracking-tight md:text-2xl ${dark ? '' : 'text-ink'}`}>
+        <h3 className={`text-heading font-bold tracking-tight md:text-heading ${dark ? '' : 'text-ink'}`}>
           {props.card.title}
         </h3>
 
         <p
-          className={`mt-4 max-w-lg text-sm leading-relaxed md:text-[15px] ${
-            dark ? 'text-white/70' : 'text-ink/70'
+          className={`mt-4 max-w-lg text-body leading-relaxed md:text-body ${
+            dark ? 'text-white/70' : 'text-ink-soft'
           }`}
         >
           {props.card.desc}
@@ -115,7 +115,7 @@ function MatrixCardView(props: { card: MatrixCard }) {
           {props.card.points.map((point) => (
             <li
               key={point}
-              className={`flex items-center gap-2 text-[13px] ${dark ? 'text-white/75' : 'text-ink/70'}`}
+              className={`flex items-center gap-2 text-note ${dark ? 'text-white/75' : 'text-ink-soft'}`}
             >
               <span
                 aria-hidden
@@ -142,10 +142,10 @@ function MatrixCardView(props: { card: MatrixCard }) {
         <div className="mt-9 md:mt-auto md:pt-10">
           <Link
             href={props.card.href}
-            className={`inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all ${
+            className={`inline-flex items-center gap-2 rounded-card px-5 py-3 text-body font-semibold transition-all ${
               dark
                 ? 'bg-white text-[#1e1b4b] hover:-translate-y-px hover:bg-white/90'
-                : 'text-white shadow-[0_8px_20px_rgba(79,70,229,0.22)] hover:-translate-y-px'
+                : 'text-white shadow-brand hover:-translate-y-px'
             }`}
             // 渐变只能走 background 简写：Tailwind 方括号任意值那套写法生成的是
             // background-color，渐变会被整条丢掉，按钮就成了透明的。

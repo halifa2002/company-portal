@@ -97,18 +97,18 @@ export function CodePreview() {
   const sample = SAMPLES[tab];
 
   return (
-    <div className="overflow-hidden rounded-[20px] border border-black/5 bg-white shadow-[0_18px_50px_rgba(49,46,129,0.10)]">
+    <div className="overflow-hidden rounded-panel border border-line bg-white shadow-[var(--shadow-panel)]">
       {/* 协议标签 */}
-      <div className="flex items-center gap-1 border-b border-black/5 px-4 pt-3">
+      <div className="flex items-center gap-1 border-b border-line px-4 pt-3">
         {TABS.map((item) => (
           <button
             key={item}
             type="button"
             onClick={() => setTab(item)}
-            className={`relative px-3 pb-2.5 text-[13px] transition-colors ${
+            className={`relative px-3 pb-2.5 text-note transition-colors ${
               tab === item
                 ? 'font-medium text-ink'
-                : 'text-ink/45 hover:text-ink/70'
+                : 'text-ink-muted hover:text-ink-soft'
             }`}
           >
             {item}
@@ -117,7 +117,7 @@ export function CodePreview() {
             )}
           </button>
         ))}
-        <span className="ml-auto flex items-center gap-1.5 pb-2.5 text-[11px] text-ink/40">
+        <span className="ml-auto flex items-center gap-1.5 pb-2.5 text-meta text-ink-muted">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           200 OK
         </span>
@@ -126,33 +126,33 @@ export function CodePreview() {
       {/* 请求 */}
       <div className="px-5 pt-4">
         <div className="flex items-center gap-2">
-          <span className="rounded bg-brand-soft px-1.5 py-0.5 font-mono text-[10px] font-medium text-brand">
+          <span className="rounded bg-brand-soft px-1.5 py-0.5 font-mono text-meta font-medium text-brand">
             POST
           </span>
-          <span className="truncate font-mono text-[11px] text-ink/50">
+          <span className="truncate font-mono text-meta text-ink-mid">
             {sample.path}
           </span>
         </div>
-        <div className="mt-2.5 text-[10px] font-medium uppercase tracking-wider text-ink/35">
+        <div className="mt-2.5 text-meta font-medium uppercase tracking-wider text-ink-muted">
           Request
         </div>
-        <pre className="mt-1.5 overflow-x-auto font-mono text-[11.5px] leading-[1.75] text-ink/85">
+        <pre className="mt-1.5 overflow-x-auto font-mono text-meta leading-[1.75] text-ink">
           <code>{highlight(sample.request)}</code>
         </pre>
       </div>
 
       {/* 返回 */}
-      <div className="mt-3 border-t border-black/5 px-5 py-4">
-        <div className="text-[10px] font-medium uppercase tracking-wider text-ink/35">
+      <div className="mt-3 border-t border-line px-5 py-4">
+        <div className="text-meta font-medium uppercase tracking-wider text-ink-muted">
           Response
         </div>
-        <pre className="mt-1.5 overflow-x-auto font-mono text-[11.5px] leading-[1.75] text-ink/85">
+        <pre className="mt-1.5 overflow-x-auto font-mono text-meta leading-[1.75] text-ink">
           <code>{highlight(sample.response)}</code>
         </pre>
       </div>
 
       {/* 底部状态条 */}
-      <div className="flex items-center justify-between border-t border-black/5 bg-surface-tint-soft px-5 py-2.5 text-[10.5px] text-ink/40">
+      <div className="flex items-center justify-between border-t border-line bg-surface-tint-soft px-5 py-2.5 text-meta text-ink-muted">
         <span>示例响应 · 实际以调用结果为准</span>
         <span className="font-mono">STREAM · SSE</span>
       </div>
@@ -173,7 +173,7 @@ function highlight(code: string): React.ReactNode {
         if (!part) return null;
         if (part.startsWith('"') && part.endsWith('"')) {
           return (
-            <span key={j} className="text-ink/55">
+            <span key={j} className="text-ink-mid">
               {part}
             </span>
           );

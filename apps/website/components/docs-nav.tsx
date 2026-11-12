@@ -19,7 +19,7 @@ export function DocsSidebar() {
       <div className="sticky top-24 space-y-7">
         {DOC_GROUPS.map((group) => (
           <div key={group.title}>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-muted">
+            <div className="text-meta font-semibold uppercase tracking-[0.12em] text-ink-muted">
               {group.title}
             </div>
             <ul className="mt-2.5 space-y-0.5">
@@ -29,7 +29,7 @@ export function DocsSidebar() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className={`block rounded-md px-2.5 py-1.5 text-[13.5px] transition-colors ${
+                      className={`block rounded-control px-2.5 py-1.5 text-body transition-colors ${
                         active
                           ? 'bg-brand/8 font-medium text-brand'
                           : 'text-ink-mid hover:bg-black/[0.03] hover:text-ink'
@@ -61,10 +61,10 @@ export function DocsMobileNav() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`block whitespace-nowrap rounded-full border px-3 py-1.5 text-[13px] transition-colors ${
+                className={`block whitespace-nowrap rounded-full border px-3 py-1.5 text-note transition-colors ${
                   active
                     ? 'border-brand/20 bg-brand/8 font-medium text-brand'
-                    : 'border-black/5 text-ink-mid hover:text-ink'
+                    : 'border-line text-ink-mid hover:text-ink'
                 }`}
               >
                 {item.label}

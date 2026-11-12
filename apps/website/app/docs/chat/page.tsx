@@ -71,28 +71,28 @@ export default async function ChatPage() {
 
   return (
     <DocsShell>
-      <h1 className="text-3xl font-bold tracking-tight text-ink">文本与对话</h1>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
+      <h1 className="text-display font-bold tracking-tight text-ink">文本与对话</h1>
+      <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
         当前平台的全部模型都通过这一个接口调用。请求体与 OpenAI 的对话接口一致，
         换成你自己的 Key 就能直接跑。
       </p>
 
       <section id="endpoint" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">接口</h2>
-        <div className="mt-3 overflow-hidden rounded-xl border border-black/5">
-          <table className="w-full text-sm">
+        <h2 className="text-heading font-bold text-ink">接口</h2>
+        <div className="mt-3 overflow-hidden rounded-card border border-line">
+          <table className="w-full text-body">
             <tbody>
               <tr>
-                <td className="w-28 bg-surface-tint px-4 py-2.5 text-xs text-ink-mid">方法</td>
-                <td className="px-4 py-2.5 font-mono text-[13px] text-brand">POST</td>
+                <td className="w-28 bg-surface-tint px-4 py-2.5 text-meta text-ink-mid">方法</td>
+                <td className="px-4 py-2.5 font-mono text-note text-brand">POST</td>
               </tr>
-              <tr className="border-t border-black/5">
-                <td className="bg-surface-tint px-4 py-2.5 text-xs text-ink-mid">地址</td>
-                <td className="px-4 py-2.5 font-mono text-[13px] text-ink">{apiBase}/v1/chat/completions</td>
+              <tr className="border-t border-line">
+                <td className="bg-surface-tint px-4 py-2.5 text-meta text-ink-mid">地址</td>
+                <td className="px-4 py-2.5 font-mono text-note text-ink">{apiBase}/v1/chat/completions</td>
               </tr>
-              <tr className="border-t border-black/5">
-                <td className="bg-surface-tint px-4 py-2.5 text-xs text-ink-mid">模型清单</td>
-                <td className="px-4 py-2.5 font-mono text-[13px] text-ink">GET {apiBase}/v1/models</td>
+              <tr className="border-t border-line">
+                <td className="bg-surface-tint px-4 py-2.5 text-meta text-ink-mid">模型清单</td>
+                <td className="px-4 py-2.5 font-mono text-note text-ink">GET {apiBase}/v1/models</td>
               </tr>
             </tbody>
           </table>
@@ -100,14 +100,14 @@ export default async function ChatPage() {
       </section>
 
       <section id="params" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">请求参数</h2>
-        <p className="mt-2 text-[14px] leading-relaxed text-ink-mid">
+        <h2 className="text-heading font-bold text-ink">请求参数</h2>
+        <p className="mt-2 text-body leading-relaxed text-ink-mid">
           下面是最常用的几个，其余 OpenAI 同名参数同样支持。
         </p>
-        <div className="mt-3 overflow-x-auto rounded-xl border border-black/5">
-          <table className="w-full min-w-[560px] text-sm">
+        <div className="mt-3 overflow-x-auto rounded-card border border-line">
+          <table className="w-full min-w-[560px] text-body">
             <thead>
-              <tr className="bg-surface-tint text-left text-xs text-ink-mid">
+              <tr className="bg-surface-tint text-left text-meta text-ink-mid">
                 <th className="px-4 py-2.5 font-medium">参数</th>
                 <th className="px-4 py-2.5 font-medium">类型</th>
                 <th className="px-4 py-2.5 font-medium">必填</th>
@@ -116,11 +116,11 @@ export default async function ChatPage() {
             </thead>
             <tbody>
               {PARAMS.map((row) => (
-                <tr key={row.name} className="border-t border-black/5">
-                  <td className="px-4 py-2.5 font-mono text-[12.5px] text-ink">{row.name}</td>
-                  <td className="px-4 py-2.5 text-xs text-ink-mid">{row.type}</td>
-                  <td className="px-4 py-2.5 text-xs text-ink-mid">{row.required}</td>
-                  <td className="px-4 py-2.5 text-xs leading-relaxed text-ink-mid">{row.note}</td>
+                <tr key={row.name} className="border-t border-line">
+                  <td className="px-4 py-2.5 font-mono text-note text-ink">{row.name}</td>
+                  <td className="px-4 py-2.5 text-meta text-ink-mid">{row.type}</td>
+                  <td className="px-4 py-2.5 text-meta text-ink-mid">{row.required}</td>
+                  <td className="px-4 py-2.5 text-meta leading-relaxed text-ink-mid">{row.note}</td>
                 </tr>
               ))}
             </tbody>
@@ -132,9 +132,9 @@ export default async function ChatPage() {
       </section>
 
       <section id="response" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">响应结构</h2>
-        <p className="mt-2 text-[14px] leading-relaxed text-ink-mid">
-          <span className="font-mono text-[13px]">usage</span> 里的 token 数就是计费依据，
+        <h2 className="text-heading font-bold text-ink">响应结构</h2>
+        <p className="mt-2 text-body leading-relaxed text-ink-mid">
+          <span className="font-mono text-note">usage</span> 里的 token 数就是计费依据，
           和消费记录里的数字一致。
         </p>
         <div className="mt-3">
@@ -143,15 +143,15 @@ export default async function ChatPage() {
       </section>
 
       <section id="stream" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">流式输出</h2>
-        <p className="mt-2 text-[14px] leading-relaxed text-ink-mid">
-          传 <span className="font-mono text-[13px]">stream: true</span>，服务端按 SSE
-          逐块返回，最后一条是 <span className="font-mono text-[13px]">data: [DONE]</span>。
+        <h2 className="text-heading font-bold text-ink">流式输出</h2>
+        <p className="mt-2 text-body leading-relaxed text-ink-mid">
+          传 <span className="font-mono text-note">stream: true</span>，服务端按 SSE
+          逐块返回，最后一条是 <span className="font-mono text-note">data: [DONE]</span>。
         </p>
         <div className="mt-3">
           <CodeBlock label="流式调用" code={streamCurl} />
         </div>
-        <p className="mt-3 text-[13px] leading-relaxed text-ink-mid">
+        <p className="mt-3 text-note leading-relaxed text-ink-mid">
           出错时的处理方式见
           <Link href="/docs/errors" className="mx-1 text-brand hover:underline">
             错误码

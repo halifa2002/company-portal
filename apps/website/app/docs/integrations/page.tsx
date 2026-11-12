@@ -37,64 +37,64 @@ const CLIENTS = [
 export default function IntegrationsPage() {
   return (
     <DocsShell>
-      <h1 className="text-3xl font-bold tracking-tight text-ink">第三方工具接入</h1>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
+      <h1 className="text-display font-bold tracking-tight text-ink">第三方工具接入</h1>
+      <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
         所有 OpenAI 兼容的客户端、插件、IDE 都能接。要填的就是三个空：地址、Key、模型名。
       </p>
 
       <section id="common" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">通用三件事</h2>
-        <ul className="mt-3 space-y-2 text-[14px] leading-relaxed text-ink-mid">
+        <h2 className="text-heading font-bold text-ink">通用三件事</h2>
+        <ul className="mt-3 space-y-2 text-body leading-relaxed text-ink-mid">
           <li>
-            <span className="font-medium text-ink">接口地址</span>：填 <span className="font-mono text-[13px]">{apiBase}/v1</span>。
+            <span className="font-medium text-ink">接口地址</span>：填 <span className="font-mono text-note">{apiBase}/v1</span>。
             少数工具只要域名（不带 /v1），按它的输入框提示判断。
           </li>
           <li>
-            <span className="font-medium text-ink">API Key</span>：控制台「API 密钥」里创建，以 <span className="font-mono text-[13px]">sk-</span> 开头。
+            <span className="font-medium text-ink">API Key</span>：控制台「API 密钥」里创建，以 <span className="font-mono text-note">sk-</span> 开头。
           </li>
           <li>
-            <span className="font-medium text-ink">模型名</span>：必须写平台的模型 ID（如 <span className="font-mono text-[13px]">deepseek-flash</span>），
+            <span className="font-medium text-ink">模型名</span>：必须写平台的模型 ID（如 <span className="font-mono text-note">deepseek-flash</span>），
             不能写「DeepSeek V4 Pro」这种展示名。
           </li>
         </ul>
       </section>
 
       <section id="clients" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">常见客户端</h2>
+        <h2 className="text-heading font-bold text-ink">常见客户端</h2>
         <div className="mt-3 space-y-3">
           {CLIENTS.map((client) => (
-            <div key={client.name} className="rounded-xl border border-black/5 bg-white p-4">
-              <div className="text-sm font-semibold text-ink">{client.name}</div>
-              <dl className="mt-2 divide-y divide-black/[0.04] text-[13px]">
+            <div key={client.name} className="rounded-card border border-line bg-white p-4">
+              <div className="text-body font-semibold text-ink">{client.name}</div>
+              <dl className="mt-2 divide-y divide-black/[0.04] text-note">
                 {client.fields.map(([label, value]) => (
                   <div key={label} className="flex gap-4 py-1.5">
                     <dt className="w-24 shrink-0 text-ink-muted">{label}</dt>
-                    <dd className="font-mono text-[12.5px] text-ink-mid">{value}</dd>
+                    <dd className="font-mono text-note text-ink-mid">{value}</dd>
                   </div>
                 ))}
               </dl>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[13px] text-ink-mid">
+        <p className="mt-3 text-note text-ink-mid">
           其他客户端字段名可能不同，但本质一样：把 base_url 指到上面的地址，把 Key 填进去，模型名用平台 ID。
         </p>
       </section>
 
       <section id="pitfalls" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">容易填错的三个地方</h2>
-        <ul className="mt-3 space-y-2 text-[14px] leading-relaxed text-ink-mid">
+        <h2 className="text-heading font-bold text-ink">容易填错的三个地方</h2>
+        <ul className="mt-3 space-y-2 text-body leading-relaxed text-ink-mid">
           <li>
-            <span className="font-medium text-ink">地址多写了 /v1</span>：有的工具会自动补 /v1，再填一遍就变成 <span className="font-mono text-[12.5px]">/v1/v1</span>，直接 404。
+            <span className="font-medium text-ink">地址多写了 /v1</span>：有的工具会自动补 /v1，再填一遍就变成 <span className="font-mono text-note">/v1/v1</span>，直接 404。
           </li>
           <li>
-            <span className="font-medium text-ink">模型名写成展示名</span>：客户端下拉里没有我们的模型时会让你手填，填「DeepSeek V4 Pro」会 503，要填 <span className="font-mono text-[12.5px]">deepseek-v4-pro</span>。
+            <span className="font-medium text-ink">模型名写成展示名</span>：客户端下拉里没有我们的模型时会让你手填，填「DeepSeek V4 Pro」会 503，要填 <span className="font-mono text-note">deepseek-v4-pro</span>。
           </li>
           <li>
             <span className="font-medium text-ink">Key 带空格</span>：复制时容易带上首尾空格，几乎必然 401。
           </li>
         </ul>
-        <p className="mt-4 text-[13px] text-ink-mid">
+        <p className="mt-4 text-note text-ink-mid">
           模型 ID 的完整清单见
           <Link href="/models" className="mx-1 text-brand hover:underline">
             模型广场

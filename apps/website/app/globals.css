@@ -1,6 +1,13 @@
 @import 'tailwindcss';
 @import '@portal/design-tokens/theme.css';
 
+/*
+ * 让 Tailwind 也扫 packages/ui 里的类名。
+ * 组件放在 app 目录之外，自动探测默认只扫当前应用目录，
+ * 不显式声明的话 @portal/ui 里的按钮出来是没有样式的裸 HTML。
+ */
+@source '../../../packages/ui/src';
+
 :root {
   /*
    * 页脚底色：比 --dark-surface 再深一档。
@@ -9,17 +16,30 @@
   --footer-surface: #0f0e26;
 }
 
-/* 把品牌变量映射成 Tailwind 工具类，页面里就能写 bg-brand / text-ink */
+/*
+ * Tailwind 主题映射
+ *
+ * 与 apps/console/app/globals.css 是同一套（md 7.2「在 design-tokens 中统一维护」）。
+ * 官网与控制台的区别只在「用不用得上」，不在「有没有另一套值」：
+ * 官网多两档展示字号（section / hero）给首屏与区块大标题，控制台不许用；
+ * 官网用不上 Table / Modal，但颜色、字号、圆角、间距、焦点环完全同一份。
+ *
+ * 页面里再出现 text-[12.5px]、text-ink/70、border-black/5 这类临时值，都算写错了。
+ */
 @theme inline {
+  /* 品牌 */
   --color-brand: var(--brand-primary);
   --color-brand-hover: var(--brand-primary-hover);
   --color-brand-soft: var(--brand-primary-soft);
   --color-brand-accent: var(--brand-accent);
 
+  /* 文字四档（禁止再写 text-ink/60 这类透明度） */
   --color-ink: var(--neutral-text);
   --color-ink-soft: var(--neutral-text-soft);
   --color-ink-mid: var(--neutral-text-mid);
   --color-ink-muted: var(--neutral-text-muted);
+
+  /* 面与线 */
   --color-line: var(--neutral-border);
   --color-surface: var(--neutral-bg);
   --color-surface-subtle: var(--neutral-bg-subtle);
@@ -28,15 +48,72 @@
   --color-surface-tint-muted: var(--surface-tint-muted);
   --color-footer: var(--footer-surface);
 
+  /* 语义色：实色 / 深字 / 浅底 三件套 */
   --color-ok: var(--semantic-success);
+  --color-ok-text: var(--semantic-success-text);
+  --color-ok-soft: var(--semantic-success-soft);
   --color-warn: var(--semantic-warning);
+  --color-warn-text: var(--semantic-warning-text);
+  --color-warn-soft: var(--semantic-warning-soft);
   --color-danger: var(--semantic-danger);
+  --color-danger-text: var(--semantic-danger-text);
+  --color-danger-soft: var(--semantic-danger-soft);
+  --color-info: var(--semantic-info);
+  --color-info-text: var(--semantic-info-text);
+  --color-info-soft: var(--semantic-info-soft);
 
+  /* 字号：界面六档 + 展示两档（section / hero 仅官网） */
+  --text-meta: var(--font-size-xs);
+  --text-meta--line-height: 1.45;
+  --text-note: var(--font-size-sm);
+  --text-note--line-height: 1.5;
+  --text-body: var(--font-size-base);
+  --text-body--line-height: 1.55;
+  --text-title: var(--font-size-md);
+  --text-title--line-height: 1.4;
+  --text-heading: var(--font-size-lg);
+  --text-heading--line-height: 1.3;
+  --text-display: var(--font-size-xl);
+  --text-display--line-height: 1.15;
+  --text-section: var(--font-size-section);
+  --text-section--line-height: 1.2;
+  --text-hero: var(--font-size-hero);
+  --text-hero--line-height: 1.1;
+
+  /* 圆角：控件 8 / 卡片 12 / 面板 16，营销页大区块可到 24 */
+  --radius-control: var(--radius-sm);
   --radius-card: var(--radius-md);
   --radius-panel: var(--radius-lg);
+  --radius-wide: var(--radius-xl);
+
+  /* 间距别名：p-card 24 / gap-block 32 / px-page 24 */
+  --spacing-card: var(--space-card);
+  --spacing-block: var(--space-block);
+  --spacing-page: var(--space-page);
+
+  /* 内容最大宽度：max-w-content */
+  --container-content: var(--width-content);
+
+  /* 焦点环：shadow-focus */
+  --shadow-focus: var(--focus-ring);
+
+  /* 品牌光晕三档：静置 / 默认 / 强调（只有官网营销页用） */
+  --shadow-brand-sm: var(--elevation-brand-sm);
+  --shadow-brand: var(--elevation-brand);
+  --shadow-brand-lg: var(--elevation-brand-lg);
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  /*
+   * 展示字体（2026-11-12）：只给官网首屏那一个大标题用，控制台不许用。
+   *
+   * 首选 Noto Sans SC（思源黑体，本机 Variable 版已装，能取到真实的 500 字重）；
+   * 没装的机器退到 PingFang SC / 微软雅黑，字重会被吸到最近的一档。
+   * 不用衬线：中文衬线在大字号下往「杂志/出版物」偏，技术产品不合适；
+   * 也不用 700：中文黑体加到 700 在 68px 上笔画会糊成一团，看着笨重。
+   */
+  --font-display: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
@@ -51,3 +128,30 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * 键盘焦点环：与控制台同一份兜底。
+ * 官网原来 focus-visible 一处都没有，键盘用户按 Tab 看不出光标停在哪。
+ */
+a:focus-visible,
+button:focus-visible,
+[role='button']:focus-visible,
+[role='menuitem']:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* 尊重系统的「减少动画」设置 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

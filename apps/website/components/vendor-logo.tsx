@@ -124,7 +124,7 @@ export function VendorLogo(props: { vendor: string; size?: number }) {
 
   return (
     <span
-      className="flex shrink-0 items-center justify-center rounded-md font-semibold text-white"
+      className="flex shrink-0 items-center justify-center rounded-control font-semibold text-white"
       style={{
         width: size,
         height: size,

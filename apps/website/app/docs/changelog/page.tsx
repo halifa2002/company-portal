@@ -29,8 +29,8 @@ const ENTRIES: Entry[] = [
 export default function ChangelogPage() {
   return (
     <DocsShell>
-      <h1 className="text-3xl font-bold tracking-tight text-ink">更新记录</h1>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
+      <h1 className="text-display font-bold tracking-tight text-ink">更新记录</h1>
+      <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
         接口兼容性变更、模型上下架、文档修订都记在这里。新到旧排列。
       </p>
 
@@ -38,9 +38,9 @@ export default function ChangelogPage() {
         <div className="space-y-7">
           {ENTRIES.map((entry) => (
             <div key={entry.date} className="border-l-2 border-brand/20 pl-5">
-              <div className="font-mono text-xs text-brand">{entry.date}</div>
-              <h2 className="mt-1 text-base font-semibold text-ink">{entry.title}</h2>
-              <ul className="mt-2 space-y-1.5 text-[13.5px] leading-relaxed text-ink-mid">
+              <div className="font-mono text-meta text-brand">{entry.date}</div>
+              <h2 className="mt-1 text-title font-semibold text-ink">{entry.title}</h2>
+              <ul className="mt-2 space-y-1.5 text-body leading-relaxed text-ink-mid">
                 {entry.items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -49,9 +49,9 @@ export default function ChangelogPage() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-xl border border-black/5 bg-surface-tint-soft px-5 py-4">
-          <h3 className="text-sm font-semibold text-ink">关于模型上下架</h3>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-ink-mid">
+        <div className="mt-10 rounded-card border border-line bg-surface-tint-soft px-5 py-4">
+          <h3 className="text-body font-semibold text-ink">关于模型上下架</h3>
+          <p className="mt-1.5 text-note leading-relaxed text-ink-mid">
             模型下线会提前在控制台公告，并在这份记录里留一条，给调用方留出迁移时间。
             新增模型不需要你改代码——把 model 字段换成新 ID 即可。
           </p>

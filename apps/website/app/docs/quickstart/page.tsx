@@ -64,23 +64,23 @@ export default async function QuickstartPage() {
 
   return (
     <DocsShell>
-      <h1 className="text-3xl font-bold tracking-tight text-ink">快速开始</h1>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
+      <h1 className="text-display font-bold tracking-tight text-ink">快速开始</h1>
+      <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
         从零到跑通一次调用，四步。全程不需要装任何 SDK——能发 HTTP 请求就行。
       </p>
 
       <section id="steps" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">四步走</h2>
+        <h2 className="text-heading font-bold text-ink">四步走</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {steps.map((step) => (
-            <div key={step.n} className="rounded-xl border border-black/5 bg-white p-4">
-              <div className="font-mono text-xs text-brand">{step.n}</div>
-              <div className="mt-1 text-sm font-semibold text-ink">{step.title}</div>
-              <p className="mt-1 text-[12.5px] leading-relaxed text-ink-mid">{step.desc}</p>
+            <div key={step.n} className="rounded-card border border-line bg-white p-4">
+              <div className="font-mono text-meta text-brand">{step.n}</div>
+              <div className="mt-1 text-body font-semibold text-ink">{step.title}</div>
+              <p className="mt-1 text-note leading-relaxed text-ink-mid">{step.desc}</p>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[13px] text-ink-mid">
+        <p className="mt-3 text-note text-ink-mid">
           还没有账号？
           <a href={registerUrl} className="ml-1 font-medium text-brand hover:underline">
             去注册 →
@@ -89,9 +89,9 @@ export default async function QuickstartPage() {
       </section>
 
       <section id="curl" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">curl 调用</h2>
-        <p className="mt-2 text-[14px] leading-relaxed text-ink-mid">
-          下面用的是 <code className="rounded bg-black/5 px-1 font-mono text-[12.5px]">{model}</code>，换成任意可用模型都能跑。
+        <h2 className="text-heading font-bold text-ink">curl 调用</h2>
+        <p className="mt-2 text-body leading-relaxed text-ink-mid">
+          下面用的是 <code className="rounded bg-black/5 px-1 font-mono text-note">{model}</code>，换成任意可用模型都能跑。
         </p>
         <div className="mt-3">
           <CodeBlock label="cURL" code={curl} />
@@ -99,9 +99,9 @@ export default async function QuickstartPage() {
       </section>
 
       <section id="sdk" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">SDK 调用</h2>
-        <p className="mt-2 text-[14px] leading-relaxed text-ink-mid">
-          官方 openai SDK 直接可用，只改 <span className="font-mono text-[13px]">base_url</span> 和 Key 两处。
+        <h2 className="text-heading font-bold text-ink">SDK 调用</h2>
+        <p className="mt-2 text-body leading-relaxed text-ink-mid">
+          官方 openai SDK 直接可用，只改 <span className="font-mono text-note">base_url</span> 和 Key 两处。
         </p>
         <div className="mt-3 space-y-3">
           <CodeBlock label="Python" code={python} />
@@ -110,8 +110,8 @@ export default async function QuickstartPage() {
       </section>
 
       <section id="next" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">下一步</h2>
-        <ul className="mt-3 space-y-2 text-[14px] leading-relaxed text-ink-mid">
+        <h2 className="text-heading font-bold text-ink">下一步</h2>
+        <ul className="mt-3 space-y-2 text-body leading-relaxed text-ink-mid">
           <li>
             <Link href="/docs/protocols" className="text-brand hover:underline">
               协议选择

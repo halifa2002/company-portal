@@ -27,25 +27,25 @@ const ROUTES: Row[] = [
 const STATUS_TEXT: Record<Row['status'], { label: string; cls: string }> = {
   ready: { label: '可直接用', cls: 'border-ok/30 bg-ok/5 text-ok' },
   depends: { label: '视渠道而定', cls: 'border-warn/30 bg-warn/5 text-warn' },
-  off: { label: '暂未开放', cls: 'border-black/10 bg-black/[0.03] text-ink-muted' },
+  off: { label: '暂未开放', cls: 'border-line bg-black/[0.03] text-ink-muted' },
 };
 
 /** 接口速查：一张表说清网关有哪些路由、哪些现在就能用 */
 export default function ApiPage() {
   return (
     <DocsShell>
-      <h1 className="text-3xl font-bold tracking-tight text-ink">接口速查</h1>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-mid">
-        网关开放的接口一览。所有路径都拼在 <span className="font-mono text-[13px] text-brand">{apiBase}</span> 后面，
-        鉴权统一用 <span className="font-mono text-[13px]">Authorization: Bearer</span>。
+      <h1 className="text-display font-bold tracking-tight text-ink">接口速查</h1>
+      <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
+        网关开放的接口一览。所有路径都拼在 <span className="font-mono text-note text-brand">{apiBase}</span> 后面，
+        鉴权统一用 <span className="font-mono text-note">Authorization: Bearer</span>。
       </p>
 
       <section id="routes" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">全部路由</h2>
-        <div className="mt-3 overflow-x-auto rounded-xl border border-black/5">
-          <table className="w-full min-w-[680px] text-sm">
+        <h2 className="text-heading font-bold text-ink">全部路由</h2>
+        <div className="mt-3 overflow-x-auto rounded-card border border-line">
+          <table className="w-full min-w-[680px] text-body">
             <thead>
-              <tr className="bg-surface-tint text-left text-xs text-ink-mid">
+              <tr className="bg-surface-tint text-left text-meta text-ink-mid">
                 <th className="px-4 py-2.5 font-medium">方法</th>
                 <th className="px-4 py-2.5 font-medium">路径</th>
                 <th className="px-4 py-2.5 font-medium">说明</th>
@@ -56,12 +56,12 @@ export default function ApiPage() {
               {ROUTES.map((row) => {
                 const status = STATUS_TEXT[row.status];
                 return (
-                  <tr key={row.path} className="border-t border-black/5">
-                    <td className="px-4 py-2.5 font-mono text-xs text-brand">{row.method}</td>
-                    <td className="px-4 py-2.5 font-mono text-[12.5px] text-ink">{row.path}</td>
-                    <td className="px-4 py-2.5 text-[12.5px] text-ink-mid">{row.desc}</td>
+                  <tr key={row.path} className="border-t border-line">
+                    <td className="px-4 py-2.5 font-mono text-meta text-brand">{row.method}</td>
+                    <td className="px-4 py-2.5 font-mono text-note text-ink">{row.path}</td>
+                    <td className="px-4 py-2.5 text-note text-ink-mid">{row.desc}</td>
                     <td className="px-4 py-2.5">
-                      <span className={`inline-block rounded border px-2 py-0.5 text-[11.5px] ${status.cls}`}>
+                      <span className={`whitespace-nowrap rounded border px-2 py-0.5 text-meta ${status.cls}`}>
                         {status.label}
                       </span>
                     </td>
@@ -74,8 +74,8 @@ export default function ApiPage() {
       </section>
 
       <section id="status" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">可用状态说明</h2>
-        <ul className="mt-3 space-y-2 text-[14px] leading-relaxed text-ink-mid">
+        <h2 className="text-heading font-bold text-ink">可用状态说明</h2>
+        <ul className="mt-3 space-y-2 text-body leading-relaxed text-ink-mid">
           <li>
             <span className="font-medium text-ink">可直接用</span>：现在就能调通，有可用渠道。
           </li>
@@ -89,14 +89,14 @@ export default function ApiPage() {
       </section>
 
       <section id="limits" className="mt-9 scroll-mt-24">
-        <h2 className="text-xl font-bold text-ink">频率与超时</h2>
-        <p className="mt-2 text-[14px] leading-relaxed text-ink-mid">
+        <h2 className="text-heading font-bold text-ink">频率与超时</h2>
+        <p className="mt-2 text-body leading-relaxed text-ink-mid">
           平台侧目前没有对调用频率设固定上限，正常业务量不会被拦。遇到 429，基本是上游模型服务商在限流，处理方式是按指数退避重试。
         </p>
-        <p className="mt-2 text-[14px] leading-relaxed text-ink-mid">
+        <p className="mt-2 text-body leading-relaxed text-ink-mid">
           单次请求的超时取决于上游，长文本生成建议改用流式输出并在客户端放宽超时。批量任务请自行控制并发，别把账户打满。
         </p>
-        <p className="mt-3 text-[13px] text-ink-mid">
+        <p className="mt-3 text-note text-ink-mid">
           错误处理细节见
           <Link href="/docs/errors" className="mx-1 text-brand hover:underline">
             错误码

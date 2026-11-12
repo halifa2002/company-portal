@@ -67,11 +67,11 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
         }}
       >
         <div className="mx-auto max-w-5xl px-6 py-16 text-center md:py-20">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-white/70 px-3.5 py-1 text-xs font-medium tracking-wide text-brand">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-white/70 px-3.5 py-1 text-meta font-medium tracking-wide text-brand">
             PRICING · 价格中心
           </span>
 
-          <h1 className="mt-5 text-4xl font-bold tracking-tight md:text-5xl">
+          <h1 className="mt-5 text-section font-bold tracking-tight md:text-hero">
             <span className="text-ink">模型</span>
             <span
               style={{
@@ -84,22 +84,22 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
             </span>
           </h1>
 
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-ink/60">
+          <p className="mx-auto mt-4 max-w-2xl text-title leading-relaxed text-ink-mid">
             一屏对比各模型的输入、输出与缓存命中单价，价格与下单扣费一致。
           </p>
 
           {showSearch && (
-            <div className="mx-auto mt-8 flex max-w-2xl items-center overflow-hidden rounded-full border border-black/10 bg-white shadow-sm">
+            <div className="mx-auto mt-8 flex max-w-2xl items-center overflow-hidden rounded-full border border-line bg-white shadow-sm">
               <input
                 type="text"
                 value={keyword}
                 onChange={(event) => setKeyword(event.target.value)}
                 placeholder="搜索模型名称或厂商"
                 aria-label="搜索模型价格"
-                className="flex-1 border-0 bg-transparent px-6 py-3.5 text-sm text-ink outline-none placeholder:text-ink/35"
+                className="flex-1 border-0 bg-transparent px-6 py-3.5 text-body text-ink outline-none placeholder:text-ink-muted"
               />
               <span
-                className="mr-1.5 flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium text-white"
+                className="mr-1.5 flex items-center gap-1.5 rounded-full px-5 py-2 text-body font-medium text-white"
                 style={{ background: 'var(--gradient-primary, var(--brand-primary))' }}
               >
                 <svg
@@ -120,7 +120,7 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
             </div>
           )}
 
-          <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-ink/55">
+          <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-meta text-ink-mid">
             {['价格与实时计费同步', '只展示已接入可用模型', '按厂商与分类快速定位'].map((item) => (
               <li key={item} className="flex items-center gap-1.5">
                 <svg
@@ -147,7 +147,7 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
       {/* ─── 价格表 ─── */}
       <section className="mx-auto max-w-7xl px-6 py-12">
         {!props.pricingAvailable && (
-          <p className="mb-6 rounded-xl border border-warn/30 bg-warn/5 px-5 py-4 text-xs leading-relaxed text-ink/70">
+          <p className="mb-6 rounded-card border border-warn/30 bg-warn/5 px-5 py-4 text-meta leading-relaxed text-ink-soft">
             价格信息暂时不可用（本次构建没有连上计费接口），下表不显示具体单价，请以控制台下单时的价格为准。
           </p>
         )}
@@ -155,12 +155,12 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
         {groups.length > 0 ? (
           groups.map((group) => (
             <div key={group.category} className="mb-10 last:mb-0">
-              <h2 className="text-xl font-bold text-ink">{group.category}模型</h2>
+              <h2 className="text-heading font-bold text-ink">{group.category}模型</h2>
 
-              <div className="mt-4 hidden overflow-x-auto rounded-xl border border-black/5 md:block">
-                <table className="w-full min-w-[720px] text-sm">
+              <div className="mt-4 hidden overflow-x-auto rounded-card border border-line md:block">
+                <table className="w-full min-w-[720px] text-body">
                   <thead>
-                    <tr className="bg-surface-tint text-left text-xs text-ink/60">
+                    <tr className="bg-surface-tint text-left text-meta text-ink-mid">
                       <th className="px-5 py-3 font-medium">厂商</th>
                       <th className="px-5 py-3 font-medium">模型</th>
                       <th className="px-5 py-3 font-medium">输入价格（每百万 token）</th>
@@ -172,9 +172,9 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
                   </thead>
                   <tbody>
                     {group.models.map((model) => (
-                      <tr key={model.id} className="border-t border-black/5 align-top">
+                      <tr key={model.id} className="border-t border-line align-top">
                         <td className="px-5 py-4">
-                          <span className="flex items-center gap-2 text-ink/70">
+                          <span className="flex items-center gap-2 text-ink-soft">
                             <VendorLogo vendor={model.vendorName} size={16} />
                             {model.vendorName}
                           </span>
@@ -186,10 +186,10 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
                           >
                             {model.displayName}
                           </Link>
-                          <p className="mt-0.5 font-mono text-xs text-ink/40">{model.id}</p>
-                          <p className="mt-1 text-xs text-ink/45">上下文 {model.contextWindow}</p>
+                          <p className="mt-0.5 font-mono text-meta text-ink-muted">{model.id}</p>
+                          <p className="mt-1 text-meta text-ink-muted">上下文 {model.contextWindow}</p>
                           {model.price.mode === 'tiered' && model.price.schedule && (
-                            <p className="mt-1 text-xs leading-relaxed text-brand/70">
+                            <p className="mt-1 text-meta leading-relaxed text-brand/70">
                               分时计价：{model.price.schedule}
                             </p>
                           )}
@@ -220,7 +220,7 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
             </div>
           ))
         ) : (
-          <div className="rounded-xl border border-black/5 bg-surface-tint-soft px-6 py-12 text-center text-sm text-ink/60">
+          <div className="rounded-card border border-line bg-surface-tint-soft px-6 py-12 text-center text-body text-ink-mid">
             {props.models.length === 0
               ? '暂无已接入的模型。模型接入后价格会自动出现在这里。'
               : '没有匹配的模型，换个关键词试试。'}
@@ -230,7 +230,7 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
 
       {/* ─── 计费规则 ─── */}
       <section className="mx-auto max-w-7xl px-6 pb-20">
-        <h2 className="text-xl font-bold text-ink">计费规则</h2>
+        <h2 className="text-heading font-bold text-ink">计费规则</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           {[
             {
@@ -246,15 +246,15 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
               desc: '账户余额不足以支付预估费用时请求会被直接拒绝，不会产生持续欠费。',
             },
           ].map((item) => (
-            <div key={item.title} className="rounded-xl border border-black/5 bg-surface-tint-muted p-6">
-              <h3 className="text-base font-semibold text-ink">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink/60">{item.desc}</p>
+            <div key={item.title} className="rounded-card border border-line bg-surface-tint-muted p-6">
+              <h3 className="text-title font-semibold text-ink">{item.title}</h3>
+              <p className="mt-2 text-body leading-relaxed text-ink-mid">{item.desc}</p>
             </div>
           ))}
         </div>
 
         {/* 上面三张卡讲的是通则，剩下真正需要补一句的是「各家计费方式不一样」 */}
-        <p className="mt-4 text-xs leading-relaxed text-ink/45">
+        <p className="mt-4 text-meta leading-relaxed text-ink-muted">
           不同模型的计费方式可能不同（如按 token 分时计价、按次计价），具体以模型详情页为准。
         </p>
       </section>
@@ -264,7 +264,7 @@ export function PricingClient(props: { models: ModelView[]; pricingAvailable: bo
 
 function PriceCell(props: { lines: PriceLine[] | null }) {
   if (!props.lines) {
-    return <span className="text-ink/35">—</span>;
+    return <span className="text-ink-muted">—</span>;
   }
 
   if (props.lines.length === 1 && !props.lines[0].label) {
@@ -275,7 +275,7 @@ function PriceCell(props: { lines: PriceLine[] | null }) {
     <div className="space-y-1">
       {props.lines.map((line) => (
         <div key={line.label} className="flex items-baseline gap-2">
-          <span className="w-16 shrink-0 text-xs text-ink/40">{line.label}</span>
+          <span className="w-16 shrink-0 text-meta text-ink-muted">{line.label}</span>
           <span className="font-medium text-ink">{formatCnyPerMillion(line.value)}</span>
         </div>
       ))}
@@ -288,27 +288,27 @@ function MobilePriceCard(props: { model: ModelView }) {
   const model = props.model;
 
   return (
-    <div className="rounded-xl border border-black/5 bg-white p-4">
+    <div className="rounded-card border border-line bg-white p-4">
       <div className="flex items-center gap-2">
         <VendorLogo vendor={model.vendorName} size={16} />
-        <span className="text-xs text-ink/50">{model.vendorName}</span>
+        <span className="text-meta text-ink-mid">{model.vendorName}</span>
       </div>
 
       <Link
         href={`/models/${model.id}`}
-        className="mt-1.5 block text-sm font-semibold text-ink"
+        className="mt-1.5 block text-body font-semibold text-ink"
       >
         {model.displayName}
       </Link>
-      <p className="font-mono text-xs text-ink/40">{model.id}</p>
+      <p className="font-mono text-meta text-ink-muted">{model.id}</p>
 
-      <dl className="mt-3 space-y-2 border-t border-black/5 pt-3 text-xs">
+      <dl className="mt-3 space-y-2 border-t border-line pt-3 text-meta">
         <MobilePriceRow label="输入" lines={priceLines(model.price, 'input')} />
         <MobilePriceRow label="输出" lines={priceLines(model.price, 'output')} />
         <MobilePriceRow label="缓存命中" lines={priceLines(model.price, 'cache')} />
       </dl>
 
-      <p className="mt-2.5 text-xs text-ink/45">
+      <p className="mt-2.5 text-meta text-ink-muted">
         上下文 {model.contextWindow}
         {model.price.mode === 'tiered' && model.price.schedule && (
           <span className="mt-1 block leading-relaxed text-brand/70">
@@ -325,11 +325,11 @@ function MobilePriceRow(props: { label: string; lines: PriceLine[] | null }) {
 
   return (
     <div className="flex items-start justify-between gap-3">
-      <dt className="shrink-0 text-ink/45">{props.label}</dt>
+      <dt className="shrink-0 text-ink-muted">{props.label}</dt>
       <dd className="text-right">
         {props.lines.map((line) => (
           <div key={line.label || 'single'} className="flex items-baseline justify-end gap-2">
-            {line.label && <span className="text-ink/40">{line.label}</span>}
+            {line.label && <span className="text-ink-muted">{line.label}</span>}
             <span className="font-medium text-ink">{formatCnyPerMillion(line.value)}</span>
           </div>
         ))}

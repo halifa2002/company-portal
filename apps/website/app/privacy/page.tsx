@@ -91,22 +91,22 @@ export default function PrivacyPage() {
 
       <main>
         <section
-          className="border-b border-black/5"
+          className="border-b border-line"
           style={{ background: 'var(--gradient-hero)' }}
         >
           <div className="mx-auto max-w-4xl px-6 py-16 md:py-20">
-            <span className="text-xs font-medium tracking-[0.08em] text-brand">
+            <span className="text-meta font-medium tracking-[0.08em] text-brand">
               LEGAL · 隐私政策
             </span>
-            <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink md:text-4xl">
+            <h1 className="mt-4 text-display font-bold tracking-tight text-ink md:text-section">
               隐私政策
             </h1>
-            <p className="mt-3 text-[13px] text-ink-mid">更新日期：2026 年 11 月 11 日</p>
+            <p className="mt-3 text-note text-ink-mid">更新日期：2026 年 11 月 11 日</p>
           </div>
         </section>
 
         <section className="mx-auto max-w-3xl px-6 py-14">
-          <p className="text-[14px] leading-[1.9] text-ink-mid">
+          <p className="text-body leading-[1.9] text-ink-mid">
             用这个平台需要账号、需要计费、需要排查故障，所以必然会碰到一些信息。
             这份政策把「碰到了什么、为什么碰、放多久、你能否删掉」逐条写清楚。
           </p>
@@ -114,12 +114,12 @@ export default function PrivacyPage() {
           <div className="mt-10 space-y-9">
             {SECTIONS.map((section) => (
               <div key={section.title}>
-                <h2 className="text-[16px] font-semibold tracking-tight text-ink">
+                <h2 className="text-title font-semibold tracking-tight text-ink">
                   {section.title}
                 </h2>
                 <div className="mt-3 space-y-2.5">
                   {section.body.map((paragraph) => (
-                    <p key={paragraph} className="text-[14px] leading-[1.9] text-ink-mid">
+                    <p key={paragraph} className="text-body leading-[1.9] text-ink-mid">
                       {paragraph}
                     </p>
                   ))}
@@ -128,7 +128,7 @@ export default function PrivacyPage() {
             ))}
           </div>
 
-          <p className="mt-12 rounded-2xl border border-line bg-surface-tint px-5 py-4 text-[13px] leading-relaxed text-ink-mid">
+          <p className="mt-12 rounded-panel border border-line bg-surface-tint px-5 py-4 text-note leading-relaxed text-ink-mid">
             对信息处理有疑问，或需要查询、更正、删除你的信息，可通过「关于」页列出的联系方式联系我们。
           </p>
         </section>

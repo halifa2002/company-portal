@@ -44,22 +44,22 @@ export default async function AboutPage() {
       <main>
         {/* ─── Hero ─── */}
         <section
-          className="relative overflow-hidden border-b border-black/5"
+          className="relative overflow-hidden border-b border-line"
           style={{
             background:
               'var(--gradient-hero)',
           }}
         >
           <div className="relative mx-auto max-w-4xl px-6 py-20 text-center md:py-24">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-white/70 px-3.5 py-1 text-xs font-medium tracking-wide text-brand">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-white/70 px-3.5 py-1 text-meta font-medium tracking-wide text-brand">
               ABOUT · 关于我们
             </span>
 
-            <h1 className="mt-6 text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+            <h1 className="mt-6 text-display font-bold leading-tight tracking-tight md:text-hero">
               <span className="text-ink">{brand.tagline}</span>
             </h1>
 
-            <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-ink/60 md:text-base">
+            <p className="mx-auto mt-5 max-w-2xl text-body leading-relaxed text-ink-mid md:text-title">
               {brand.description}
             </p>
           </div>
@@ -67,8 +67,8 @@ export default async function AboutPage() {
 
         {/* ─── 我们做什么 ─── */}
         <section className="mx-auto max-w-4xl px-6 py-16">
-          <h2 className="text-2xl font-bold text-ink">我们做什么</h2>
-          <div className="mt-5 space-y-4 text-[15px] leading-[1.9] text-ink/65">
+          <h2 className="text-heading font-bold text-ink">我们做什么</h2>
+          <div className="mt-5 space-y-4 text-body leading-[1.9] text-ink-soft">
             <p>
               {brand.name} 是一个 AI 模型 API 聚合平台。上游接各家大模型，
               下面对开发者提供一个统一的、兼容 OpenAI 的接口—— 换模型只改一个
@@ -86,17 +86,17 @@ export default async function AboutPage() {
         </section>
 
         {/* ─── 平台现状（数字来自后端，不是写死的宣传语） ─── */}
-        <section className="border-y border-black/5 bg-white py-12">
+        <section className="border-y border-line bg-white py-12">
           <div className="mx-auto max-w-4xl px-6">
             <dl className="grid grid-cols-2 gap-6 md:grid-cols-4">
               {facts.map((fact) => (
                 <div key={fact.label}>
-                  <dd className="text-2xl font-bold text-ink">{fact.value}</dd>
-                  <dt className="mt-1 text-xs text-ink/45">{fact.label}</dt>
+                  <dd className="text-heading font-bold text-ink">{fact.value}</dd>
+                  <dt className="mt-1 text-meta text-ink-muted">{fact.label}</dt>
                 </div>
               ))}
             </dl>
-            <p className="mt-5 text-xs text-ink/40">
+            <p className="mt-5 text-meta text-ink-muted">
               以上数字实时取自平台模型目录，不包含未接入的模型。
             </p>
           </div>
@@ -104,12 +104,12 @@ export default async function AboutPage() {
 
         {/* ─── 原则 ─── */}
         <section className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-2xl font-bold text-ink">我们坚持的几件事</h2>
+          <h2 className="text-heading font-bold text-ink">我们坚持的几件事</h2>
           <div className="mt-6 grid gap-5 md:grid-cols-3">
             {PRINCIPLES.map((item) => (
-              <div key={item.title} className="rounded-xl border border-black/5 bg-surface-tint-soft p-6">
-                <h3 className="text-base font-bold text-ink">{item.title}</h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-ink/60">{item.desc}</p>
+              <div key={item.title} className="rounded-card border border-line bg-surface-tint-soft p-6">
+                <h3 className="text-title font-bold text-ink">{item.title}</h3>
+                <p className="mt-2.5 text-body leading-relaxed text-ink-mid">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -117,9 +117,9 @@ export default async function AboutPage() {
 
         {/* ─── 联系 ─── */}
         <section className="mx-auto max-w-4xl px-6 pb-20">
-          <div className="rounded-2xl bg-[var(--dark-surface)] p-8 text-white md:p-10">
-            <h2 className="text-xl font-bold">联系我们</h2>
-            <div className="mt-5 grid gap-2.5 text-sm text-white/70 sm:grid-cols-2">
+          <div className="rounded-panel bg-[var(--dark-surface)] p-8 text-white md:p-10">
+            <h2 className="text-heading font-bold">联系我们</h2>
+            <div className="mt-5 grid gap-2.5 text-body text-white/70 sm:grid-cols-2">
               <p>公司：{brand.company}</p>
               <p>
                 邮箱：
@@ -129,7 +129,7 @@ export default async function AboutPage() {
               </p>
               <p>备案：{brand.icp}</p>
             </div>
-            <p className="mt-6 text-xs text-white/40">
+            <p className="mt-6 text-meta text-white/40">
               公司主体、备案号与联系邮箱待公司资料确认后替换。
             </p>
           </div>

@@ -90,8 +90,12 @@ export default function UsagePage() {
   const [statLogs, setStatLogs] = useState<UsageLog[]>([]);
   const [statTruncated, setStatTruncated] = useState(false);
   const [total, setTotal] = useState(0);
-  /** 区间内失败请求数（日志 type=5），用来算成功率 */
-  const [failedCalls, setFailedCalls] = useState(0);
+  /**
+   * 区间内失败请求数（日志 type=5），用来算成功率。
+   * null = 这个数这次没取到。此时成功率不能算：分母少一块，
+   * 一次接口失败就会把成功率算成「100%」——比不显示更糟。
+   */
+  const [failedCalls, setFailedCalls] = useState<number | null>(null);
   const [trendMetric, setTrendMetric] = useState<'quota' | 'calls' | 'tokens'>('quota');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -113,6 +117,7 @@ export default function UsagePage() {
     const ts = rangeToTimestamps(range);
     let statsMissing = false;
     let logsMissing = false;
+    let failedMissing = false;
     try {
       await ensureMoneySettings();
       const [s, l, batch, failed] = await Promise.all([
@@ -134,14 +139,17 @@ export default function UsagePage() {
         // 失败调用记在 type=5 的日志里，只要总数，page_size 取 1 最省
         usageApi
           .listUsageLogs({ page: 1, page_size: 1, type: 5, ...ts })
-          .catch(() => ({ total: 0 })),
+          .catch(() => {
+            failedMissing = true;
+            return { total: 0 };
+          }),
       ]);
       setStat(s);
       setStatFailed(statsMissing);
       setLogsFailed(logsMissing);
       setLogs(l.items ?? []);
       setTotal(l.total ?? 0);
-      setFailedCalls(failed.total ?? 0);
+      setFailedCalls(failedMissing ? null : Number(failed.total ?? 0));
       const batchItems = batch.items ?? [];
       setStatLogs(batchItems);
       setStatTruncated((batch.total ?? 0) > batchItems.length);
@@ -207,9 +215,14 @@ export default function UsagePage() {
   }, [statLogs]);
 
   const dailyMax = daily.reduce((max, row) => Math.max(max, row[trendMetric]), 0);
-  /** 成功率 = 成功（type=2）÷（成功 + 失败（type=5）），两个数都来自后端分页总数 */
+  /**
+   * 成功率 = 成功（type=2）÷（成功 + 失败（type=5）），两个数都来自后端分页总数。
+   * 失败数没取到就整个不出这个数——分母缺一块会算成 100%，比不显示更误导。
+   */
   const successRate =
-    total + failedCalls > 0 ? (total / (total + failedCalls)) * 100 : null;
+    failedCalls === null || total + failedCalls === 0
+      ? null
+      : (total / (total + failedCalls)) * 100;
 
   return (
     <div className="min-h-screen md:pl-56">
@@ -271,13 +284,19 @@ export default function UsagePage() {
           <Metric
             label="请求成功率"
             value={
-              successRate === null
-                ? '这段时间没有调用'
-                : `${successRate.toFixed(1)}%`
+              failedCalls === null
+                ? ''
+                : successRate === null
+                  ? '这段时间没有调用'
+                  : `${successRate.toFixed(1)}%`
             }
             loading={loading}
-            failed={!loading && (statFailed || logsFailed)}
-            hint={`成功 ${formatNumber(total)} 次 · 失败 ${formatNumber(failedCalls)} 次`}
+            failed={!loading && (statFailed || logsFailed || failedCalls === null)}
+            hint={
+              failedCalls === null
+                ? undefined
+                : `成功 ${formatNumber(total)} 次 · 失败 ${formatNumber(failedCalls)} 次`
+            }
           />
         </div>
 

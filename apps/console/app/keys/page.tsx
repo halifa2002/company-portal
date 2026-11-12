@@ -150,7 +150,11 @@ export default function KeysPage() {
       id: token.id,
       name: token.name,
       unlimited: token.unlimited_quota,
-      amount: token.unlimited_quota ? '' : quotaToAmountValue(token.remain_quota).toFixed(2),
+      // 回填保留 4 位小数、不带千分位（输入框要用 Number() 读回）。
+      // 原来固定 2 位：1.2345 回填成 1.23，用户只是点开编辑再保存，额度就被悄悄改少了。
+      amount: token.unlimited_quota
+        ? ''
+        : Number(quotaToAmountValue(token.remain_quota).toFixed(4)).toString(),
       limitModels: token.model_limits_enabled,
       selected: token.model_limits_enabled
         ? token.model_limits.split(',').map((s) => s.trim()).filter(Boolean)

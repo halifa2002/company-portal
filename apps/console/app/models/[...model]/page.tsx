@@ -61,16 +61,34 @@ export default function ModelDetailPage() {
   const [available, setAvailable] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  /**
+   * 「价格表没拉到」和「价格表里确实没有这个模型」必须分开。
+   * 之前两者都走 catch → null，页面一律说「没有找到模型」，
+   * 明明是接口失败，却告诉用户这个模型不存在。
+   */
+  const [pricingFailed, setPricingFailed] = useState(false);
+  /** 可用模型列表没拉到，此时既不能说可用也不能说不可用 */
+  const [modelsFailed, setModelsFailed] = useState(false);
   const [tab, setTab] = useState<'curl' | 'node' | 'python'>('curl');
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
+    setPricingFailed(false);
+    setModelsFailed(false);
+    let pricingMissing = false;
+    let modelsMissing = false;
     try {
       await ensureMoneySettings();
       const [pricing, models] = await Promise.all([
-        modelsApi.listPricing().catch(() => null),
-        modelsApi.listUserModels().catch(() => [] as string[]),
+        modelsApi.listPricing().catch(() => {
+          pricingMissing = true;
+          return null;
+        }),
+        modelsApi.listUserModels().catch(() => {
+          modelsMissing = true;
+          return [] as string[];
+        }),
       ]);
       // http.get 已经把 { success, data } 的信封拆掉了，这里拿到的是数组本身；
       // 之前按 pricing.data 取，等于又拆了一次，所以永远找不到模型。
@@ -83,6 +101,8 @@ export default function ModelDetailPage() {
       const found = list.find((p) => p.model_name === modelName) ?? null;
       setItem(found);
       setAvailable(Array.isArray(models) && models.includes(modelName));
+      setPricingFailed(pricingMissing);
+      setModelsFailed(modelsMissing);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         router.replace('/login');
@@ -180,6 +200,15 @@ resp = client.chat.completions.create(
               </div>
             </div>
           </div>
+        ) : pricingFailed ? (
+          /* 价格表没拉到 ≠ 这个模型不存在。这里的说法必须区分开 */
+          <div className="mt-4">
+            <ErrorBox
+              message="价格表这次没读出来——这不代表模型不存在，重试一次看看"
+              onRetry={() => void load()}
+              retrying={loading}
+            />
+          </div>
         ) : !item ? (
           <div className="mt-8 rounded-card border border-line bg-surface px-5 py-16 text-center">
             <p className="text-sm text-ink">没有找到模型「{modelName}」</p>
@@ -200,10 +229,12 @@ resp = client.chat.completions.create(
                     {item.description || '管理员未填写模型说明。'}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <Tag
-                      ok={available}
-                      text={available ? '当前可用' : '当前不可用'}
-                    />
+                    {modelsFailed ? (
+                      /* 模型列表没拉到，说「不可用」等于把失败讲成事实 */
+                      <Tag text="可用状态未知" />
+                    ) : (
+                      <Tag ok={available} text={available ? '当前可用' : '当前不可用'} />
+                    )}
                     {item.owner_by && <Tag text={`来源 ${item.owner_by}`} />}
                     {item.tags
                       ?.split(/[,;]/)

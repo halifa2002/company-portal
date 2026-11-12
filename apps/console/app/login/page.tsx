@@ -36,9 +36,13 @@ export default function LoginPage() {
       router.replace('/');
     } catch (err) {
       if (err instanceof ApiError && err.status === 429 && err.retryAfter) {
+        // 等待提示改由倒计时自己渲染：归零时它自动消失，
+        // 不会出现「按钮已经能点、红字还挂着请等 12 分钟」。
         setCooldown(err.retryAfter);
+        setError('');
+      } else {
+        setError(err instanceof ApiError ? err.message : '登录失败，请重试');
       }
-      setError(err instanceof ApiError ? err.message : '登录失败，请重试');
     } finally {
       setLoading(false);
     }
@@ -94,10 +98,16 @@ export default function LoginPage() {
             />
           </label>
 
-          {error && (
+          {cooldown > 0 ? (
             <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-xs text-danger">
-              {error}
+              请求太频繁，请等 {cooldownLabel} 后重试
             </p>
+          ) : (
+            error && (
+              <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-xs text-danger">
+                {error}
+              </p>
+            )
           )}
 
           <button

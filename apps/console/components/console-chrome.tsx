@@ -127,21 +127,29 @@ function sectionOf(entry: (typeof items)[number]): string | undefined {
 }
 
 /**
- * 顶栏余额的模块级缓存。
- * 60 秒内翻页复用同一个值，不去碰接口；超时或退出登录后重新拉。
- * 存 null 表示"上次取失败了"，也照样缓存，避免失败时每个页面都重试一轮。
+ * 顶栏余额的模块级缓存（只存金额数字，单位在渲染时统一拼 moneyUnit()）。
+ *
+ * 60 秒内翻页复用同一个值，不去碰接口。
+ * 两条硬规则：
+ *   · 取失败不写缓存 —— 失败也被记住一分钟的话，用户点「重试」也换不回新结果，
+ *     看着就是页面坏了。失败后下次进页面重新问一次，代价只是一个请求。
+ *   · 退出登录必须清空 —— 否则下一个人 60 秒内登录，看到的是上一个人的余额。
  */
 const BALANCE_TTL = 60_000;
-let balanceCache: { at: number; value: string | null } | null = null;
+let balanceCache: { at: number; value: string } | null = null;
 
-function readBalanceCache(): string | null | undefined {
+function readBalanceCache(): string | undefined {
   if (!balanceCache) return undefined;
   if (Date.now() - balanceCache.at > BALANCE_TTL) return undefined;
   return balanceCache.value;
 }
 
-function writeBalanceCache(value: string | null) {
+function writeBalanceCache(value: string) {
   balanceCache = { at: Date.now(), value };
+}
+
+function clearBalanceCache() {
+  balanceCache = null;
 }
 
 
@@ -202,7 +210,7 @@ export function ConsoleTopbar({
   balance,
 }: {
   title: string;
-  /** 页面自己已经拿到余额时直接传入，省一次请求；不传则顶栏自己取 */
+  /** 页面自己已经拿到余额金额（不带单位）时直接传入，省一次请求；不传则顶栏自己取 */
   balance?: string;
 }) {
   const router = useRouter();
@@ -231,11 +239,11 @@ export function ConsoleTopbar({
       try {
         await ensureMoneySettings();
         const me = await authApi.getSelf();
-        const text = `${quotaToAmount(me.quota)} ${moneyUnit()}`;
+        const text = quotaToAmount(me.quota);
         writeBalanceCache(text);
         if (alive) setOwnBalance(text);
       } catch {
-        writeBalanceCache(null);
+        // 失败不入缓存：让下一次进入页面重新问一次，而不是把失败记住一分钟
         if (alive) setOwnBalance(null);
       }
     })();
@@ -265,6 +273,8 @@ export function ConsoleTopbar({
       // 后端登出失败也要让本地退出，否则页面卡住
     } finally {
       setAccessToken(null);
+      // 余额是上个账号的，退出时必须连缓存一起清掉，否则下一个人登录会看到它
+      clearBalanceCache();
       router.replace('/login');
     }
   }
@@ -327,7 +337,9 @@ export function ConsoleTopbar({
                 读取失败
               </span>
             ) : (
-              <span className="tabular-nums text-ink">{ownBalance}</span>
+              <span className="tabular-nums text-ink">
+                {ownBalance} {moneyUnit()}
+              </span>
             )}
           </span>
 

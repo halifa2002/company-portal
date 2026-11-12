@@ -1,7 +1,9 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { SiteHeader, SiteFooter } from '@/components/site-chrome';
 import { CodePreview } from '@/components/code-preview';
 import { brand, loginUrl, registerUrl } from '@/lib/brand';
+import { MODEL_CATALOG } from '@/lib/model-catalog';
+import { loadModelList, modelPriceText } from '@/lib/pricing';
 
 /**
  * 品牌官网首页 —— 对应 md 4.1「首页」九项要求：
@@ -12,31 +14,59 @@ import { brand, loginUrl, registerUrl } from '@/lib/brand';
  * 首屏整屏居中、大标题、流动光带背景；配色按 md 7.1 用靛蓝系。
  */
 
-/** ⚠️ 占位数据：接入后端后改为从 /api/pricing 与 /api/user/models 读取 */
+/**
+ * 平台能力。每条配自己的图标——四件完全不同的事共用一个勾，
+ * 看起来像四条一模一样的话，读者扫一眼就滑过去了。
+ */
 const capabilities = [
   {
     title: '一个 Key 调用多家模型',
     desc: '兼容 OpenAI、Claude、Gemini 三种主流协议，切换模型只改 model 字段，业务代码不用动。',
+    icon: (
+      <>
+        <circle cx="8" cy="12" r="3.2" />
+        <path d="M11.2 12H20m-2.2 0v2.4m-2.6-2.4v1.6" strokeLinecap="round" />
+      </>
+    ),
   },
   {
     title: '按实际用量计费',
     desc: '每次调用记录输入输出的 token 数与扣费金额，账单可逐笔追溯，不搞预存套路。',
+    icon: (
+      <>
+        <path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2z" strokeLinejoin="round" />
+        <path d="M9 8h6M9 12h4" strokeLinecap="round" />
+      </>
+    ),
   },
   {
     title: '多线路自动切换',
     desc: '同一模型可配置多条上游线路，单条异常时自动重试切换，业务侧无感知。',
+    icon: (
+      <>
+        <circle cx="6" cy="6" r="2.2" />
+        <circle cx="18" cy="6" r="2.2" />
+        <circle cx="12" cy="18" r="2.2" />
+        <path
+          d="M6 8.2v2.1a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V8.2M12 13.3v2.5"
+          strokeLinecap="round"
+        />
+      </>
+    ),
   },
   {
     title: '额度可分级管控',
     desc: '每个 Key 可单独设额度上限与模型权限，防止某个应用把预算吃光。',
+    icon: (
+      <>
+        <path
+          d="M12 3.2 19 6v5.2c0 4.2-2.9 6.9-7 8.4-4.1-1.5-7-4.2-7-8.4V6z"
+          strokeLinejoin="round"
+        />
+        <path d="M9.4 13.4V11m2.6 2.4V9.4m2.6 4V12" strokeLinecap="round" />
+      </>
+    ),
   },
-];
-
-const models = [
-  { name: '通用对话', desc: '问答、写作、摘要、翻译', tag: 'Chat' },
-  { name: '深度推理', desc: '复杂逻辑、数学、多步推导', tag: 'Reasoning' },
-  { name: '代码生成', desc: '补全、重构、解释、单测', tag: 'Code' },
-  { name: '多模态理解', desc: '图片识别、文档解析、视频摘要', tag: 'Vision' },
 ];
 
 const steps = [
@@ -45,7 +75,14 @@ const steps = [
   { no: '03', title: '直接调用', desc: '沿用原有 SDK 与代码，不需要改调用逻辑。' },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  /**
+   * 模型名与单价都以后端 /api/pricing 为准（md 4.1 第 4 条「核心模型展示」）。
+   * 拿不到价格时仍是真实模型名，单价显示「以控制台为准」，绝不编数字。
+   */
+  const { models } = await loadModelList(MODEL_CATALOG);
+  const featured = models.slice(0, 4);
+
   return (
     <>
       <SiteHeader />
@@ -187,8 +224,7 @@ export default function HomePage() {
                 我们提供什么
               </h2>
               <p className="mt-4 text-base leading-relaxed text-ink/60">
-                把多家模型厂商的接口统一成一套协议，按实际用量收费，
-                让团队不用为每一家单独对接、单独对账。
+                多家模型厂商的接口统一成一套协议，按量计费，团队不用一家家对接，对账也只有一份。
               </p>
             </div>
 
@@ -196,14 +232,16 @@ export default function HomePage() {
               {capabilities.map((item) => (
                 <div key={item.title} className="flex gap-4">
                   <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path
-                        d="M3 8.5 6.2 11.5 13 4.5"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      aria-hidden
+                    >
+                      {item.icon}
                     </svg>
                   </span>
                   <div>
@@ -220,16 +258,16 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ============ 核心模型展示 ============ */}
+        {/* ============ 核心模型展示（md 4.1 首页第 4 条）============ */}
         <section className="border-b border-black/5 bg-surface-tint py-20">
           <div className="mx-auto max-w-7xl px-6">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <h2 className="text-3xl font-bold tracking-tight text-ink md:text-4xl">
-                  覆盖常见使用场景
+                  核心模型展示
                 </h2>
                 <p className="mt-3 text-base text-ink/60">
-                  具体可用模型以控制台「模型广场」为准，价格与计费保持同步
+                  模型与单价取自平台实时计费配置，完整清单一律在模型广场
                 </p>
               </div>
               <Link
@@ -240,24 +278,50 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {models.map((model) => (
-                <div
-                  key={model.name}
-                  className="group rounded-[18px] border border-black/5 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/25 hover:shadow-[0_12px_32px_rgba(49,46,129,0.08)]"
-                >
-                  <span className="inline-block rounded bg-brand-soft px-2 py-0.5 text-[11px] font-medium text-brand">
-                    {model.tag}
-                  </span>
-                  <h3 className="mt-3.5 text-base font-semibold text-ink">
-                    {model.name}
-                  </h3>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-ink/55">
-                    {model.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
+            {featured.length === 0 ? (
+              <p className="mt-10 rounded-[18px] border border-black/5 bg-white px-6 py-8 text-sm text-ink/60">
+                模型清单这次没读到，可先到
+                <Link href="/models" className="mx-1 text-brand hover:underline">
+                  模型广场
+                </Link>
+                查看。
+              </p>
+            ) : (
+              <div className="mt-10 grid gap-4 sm:grid-cols-2">
+                {featured.map((model) => (
+                  <Link
+                    key={model.id}
+                    href={`/models/${encodeURIComponent(model.id)}`}
+                    className="group flex flex-col rounded-[18px] border border-black/5 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/25 hover:shadow-[0_12px_32px_rgba(49,46,129,0.08)]"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <span className="inline-block rounded bg-brand-soft px-2 py-0.5 text-[11px] font-medium text-brand">
+                          {model.category}
+                        </span>
+                        <h3 className="mt-3.5 text-base font-semibold text-ink">
+                          {model.displayName}
+                        </h3>
+                      </div>
+                      <span className="shrink-0 pt-1 font-mono text-[11px] text-ink/35">
+                        {model.vendorName}
+                      </span>
+                    </div>
+
+                    <p className="mt-1.5 flex-1 text-[13px] leading-relaxed text-ink/55">
+                      {model.useCase || model.description}
+                    </p>
+
+                    <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-black/5 pt-3">
+                      <span className="text-[11px] text-ink/45">输入单价</span>
+                      <span className="text-sm font-semibold text-ink">
+                        {modelPriceText(model.price, 'input')}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

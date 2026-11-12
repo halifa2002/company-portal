@@ -256,11 +256,11 @@ export default function KeysPage() {
             </div>
           )}
 
-          {/* 页面头部 */}
+          {/* 页面头部。标题只有顶栏那一个——这里再来个「管理调用凭证」，
+              等于同一页两个名字，用户还得猜是不是两件事 */}
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-ink">管理调用凭证</h2>
-              <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-ink-muted">
+              <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
                 应用通过密钥调用本平台。可以给每个密钥单独限额、限制可用模型，
                 因此给不同应用各建一个，出问题好定位。
               </p>
@@ -355,18 +355,18 @@ export default function KeysPage() {
           </div>
 
           <div className="mt-3 overflow-hidden rounded-card border border-line bg-surface">
-            <div className="hidden overflow-x-auto lg:block">
-              <table className="w-full text-sm lg:min-w-[720px] xl:min-w-[1040px]">
+            <div className="hidden overflow-x-auto xl:block">
+              <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-line text-left text-xs text-ink-muted">
                     <th className="px-4 py-2.5 font-normal">名称</th>
                     <th className="px-4 py-2.5 font-normal">状态</th>
                     <th className="px-4 py-2.5 font-normal">密钥</th>
                     <th className="px-4 py-2.5 font-normal">额度</th>
-                    <th className="hidden px-4 py-2.5 font-normal xl:table-cell">分组</th>
-                    <th className="hidden px-4 py-2.5 font-normal xl:table-cell">模型</th>
-                    <th className="hidden px-4 py-2.5 font-normal xl:table-cell">创建时间</th>
-                    <th className="hidden px-4 py-2.5 font-normal xl:table-cell">最后使用</th>
+                    <th className="hidden px-4 py-2.5 font-normal 2xl:table-cell">分组</th>
+                    <th className="hidden px-4 py-2.5 font-normal 2xl:table-cell">模型</th>
+                    <th className="hidden px-4 py-2.5 font-normal 2xl:table-cell">创建时间</th>
+                    <th className="hidden px-4 py-2.5 font-normal 2xl:table-cell">最后使用</th>
                     <th className="px-4 py-2.5 font-normal">过期</th>
                     <th className="px-4 py-2.5 text-right font-normal">操作</th>
                   </tr>
@@ -425,16 +425,16 @@ export default function KeysPage() {
                           <td className="px-4 py-3 text-xs text-ink-muted">
                             {token.unlimited_quota ? '不限额' : quotaToAmount(token.remain_quota)}
                           </td>
-                          <td className="hidden px-4 py-3 text-xs text-ink-muted xl:table-cell">
+                          <td className="hidden px-4 py-3 text-xs text-ink-muted 2xl:table-cell">
                             {token.group || 'default'}
                           </td>
-                          <td className="hidden px-4 py-3 text-xs text-ink-muted xl:table-cell">
+                          <td className="hidden px-4 py-3 text-xs text-ink-muted 2xl:table-cell">
                             {token.model_limits_enabled ? `限定 ${limited} 个` : '全部'}
                           </td>
-                          <td className="hidden px-4 py-3 text-xs text-ink-muted xl:table-cell">
+                          <td className="hidden px-4 py-3 text-xs text-ink-muted 2xl:table-cell">
                             {token.created_time ? formatTime(token.created_time) : PLACEHOLDER_DASH}
                           </td>
-                          <td className="hidden px-4 py-3 text-xs text-ink-muted xl:table-cell">
+                          <td className="hidden px-4 py-3 text-xs text-ink-muted 2xl:table-cell">
                             {token.accessed_time ? formatTime(token.accessed_time) : '从未使用'}
                           </td>
                           <td className="px-4 py-3 text-xs text-ink-muted">
@@ -466,7 +466,7 @@ export default function KeysPage() {
               </table>
             </div>
 
-            <div className="lg:hidden">
+            <div className="xl:hidden">
               {loading ? (
                 <div className="px-4 py-5">
                   <BlockLoading lines={3} />

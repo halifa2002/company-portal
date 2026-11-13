@@ -13,7 +13,7 @@
    * 页脚底色：比 --dark-surface 再深一档。
    * 页脚铺满整幅，用 --dark-surface 会发紫发闷；这一档偏中性，白底页面收尾更干净。
    */
-  --footer-surface: #0f0e26;
+  --footer-surface: #030f1b;
 }
 
 /*
@@ -32,6 +32,25 @@
   --color-brand-hover: var(--brand-primary-hover);
   --color-brand-soft: var(--brand-primary-soft);
   --color-brand-accent: var(--brand-accent);
+  --color-accent-warm: var(--accent-warm);
+  --color-accent-warm-deep: var(--accent-warm-deep);
+
+  /*
+   * 品牌色阶 10 档（2026-11-13 补回）：
+   * theme.css 里已经有一整条阶梯，但这里不映射，bg-brand-950 这类类名就不存在，
+   * 深色整幅会退回透明、白字压在浅底上——整段看起来像漏了背景。
+   * 用法约束见 theme.css 的注释，这里只做映射。
+   */
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
 
   /* 文字四档（禁止再写 text-ink/60 这类透明度） */
   --color-ink: var(--neutral-text);
@@ -153,5 +172,148 @@ textarea:focus-visible,
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================ 首屏与跑马灯 ============================ */
+
+/*
+ * 这里放 Tailwind 表达不了的三样东西：逐字入场、渐变文字、无缝跑马灯。
+ * 2026-11-13 重写：颜色全部改走 theme.css 的变量，一个硬编码色值都不留，
+ * 换肤时不用再翻这个文件。
+ */
+
+/* ---------- 首屏大标题 ---------- */
+
+@keyframes hero-char-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.32em);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.hero-ch {
+  display: inline-block;
+  animation: hero-char-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/*
+ * 高亮词：background-clip 只裁元素自己直接包含的文字，所以这个 span 里不能再包别的 span。
+ * padding + 等量负 margin 撑大绘制盒——行高收得紧时，g/y/p 的下伸会落在盒外被切掉，
+ * 撑大不改排版位置。
+ */
+@keyframes hero-grad-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.hero-grad {
+  background-image: linear-gradient(
+    96deg,
+    var(--accent-warm) 0%,
+    var(--accent-warm-deep) 52%,
+    #c2410c 100%
+  );
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  padding: 0.08em 0.04em 0.18em;
+  margin: -0.08em -0.04em -0.18em;
+  /* 入场和渐变呼吸同时跑：前者只有一次，后者循环 */
+  animation:
+    hero-char-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both,
+    hero-grad-shift 6.5s ease-in-out infinite;
+  animation-delay: var(--d, 0ms), 0ms;
+}
+
+/* ---------- 厂牌跑马灯 ---------- */
+
+@keyframes marquee-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* 两侧渐隐：进出不留硬切口 */
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+}
+
+/* 内容重复两份、走 -50% 才是无缝循环；慢了像静止，快了像故障 */
+.marquee-track {
+  animation: marquee-slide 42s linear infinite;
+}
+
+.marquee-mask:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ============================ 网关拓扑图 ============================ */
+
+/*
+ * 这两个类名 2026-11-13 之前只有调用、没有定义（gateway-diagram.tsx 里写了
+ * className="gateway-pulse"，globals.css 里一条 @keyframes 都没有），
+ * 结果那张拓扑图上的「流光」和「虚线环」是死的——线就静在那儿，
+ * 看着像文档里贴的插图。补在这里。
+ */
+
+@keyframes gateway-dash {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+/* 沿线跑的短弧：路径上写了 pathLength=100，所以 100 这个数就是一圈 */
+.gateway-pulse {
+  animation: gateway-dash 3.4s linear infinite;
+}
+
+@keyframes gateway-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 中心节点外面那一圈虚线：转得很慢，只是让画面别完全静止 */
+.gateway-ring {
+  animation: gateway-spin 48s linear infinite;
+}
+
+/* 减少动画时：不逐字、不呼吸、不滚动，高亮词退回实色（否则透明字会消失） */
+@media (prefers-reduced-motion: reduce) {
+  .hero-ch,
+  .hero-grad,
+  .marquee-track {
+    animation: none;
+  }
+  .hero-grad {
+    background: none;
+    color: var(--brand-600);
   }
 }

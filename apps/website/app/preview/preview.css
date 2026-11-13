@@ -1,0 +1,495 @@
+/*
+ * 预览版专用样式（2026-11-13 第七版）
+ *
+ * 只被 app/preview/home/page.tsx 引入，所有选择器都挂在 .pvw 下，正式页不加载。
+ *
+ * 结构参考 teamorouter.com；质感参考 fireworks.ai 顶部
+ * （白→浅色的垂直渐变 + 底部半调网点 + 胶囊按钮）。
+ *
+ * 配色守领导文档 7.1：浅底、深字、蓝作强调。
+ * fireworks 那套暖橙/品红只借「渐变的克制」和「网点纹理」，色相一律换成品牌蓝。
+ */
+
+.pvw {
+  --pv-max: 1120px;
+  --pv-line: #e4ebf3;
+  --pv-line-soft: #eef3f9;
+  --pv-ink: #06223f;
+  --pv-ink-mid: #4a5f78;
+  --pv-ink-muted: #7d8fa3;
+  --pv-tint: #f6fafd;
+  --pv-brand: #0a74e0;
+}
+
+/* ------------------------------------------------------------ 容器 / 段落 */
+
+.pvw .pv-wrap {
+  width: 100%;
+  max-width: var(--pv-max);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+@media (min-width: 768px) {
+  .pvw .pv-wrap {
+    padding-inline: 32px;
+  }
+}
+
+/*
+ * 段落留白 76 / 96。
+ * 上一版是 88 / 116，两段相邻时空隙 232——页面被切成一节一节，
+ * 每节都像独立页面。收到 96 之后读起来是「一本册子」而不是「一叠单页」。
+ */
+.pvw .pv-sec {
+  padding-block: 76px;
+}
+
+@media (min-width: 768px) {
+  .pvw .pv-sec {
+    padding-block: 96px;
+  }
+}
+
+.pvw .pv-h2 {
+  font-size: clamp(30px, 3.4vw, 46px);
+  line-height: 1.14;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  color: var(--pv-ink);
+  text-wrap: balance;
+}
+
+.pvw .pv-sub {
+  margin-top: 16px;
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--pv-ink-mid);
+  text-wrap: pretty;
+}
+
+/* 段落小标：参考站那种「全大写 + 宽字距 + 前面一颗点」，保留 */
+.pvw .pv-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pv-ink-muted);
+}
+
+.pvw .pv-eyebrow::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--pv-brand);
+}
+
+/* ------------------------------------------------------ 首屏背景（fireworks 质感） */
+
+/*
+ * 白 → 淡蓝的垂直渐变。参考站从暖白过渡到橙，我们换成蓝：
+ * 起手白，中间一点点冷，底部收在 #e3f0fd。不铺任何图片。
+ */
+/*
+ * 第八版：渐变收到几乎看不见。
+ * 上一版把渐变当主角（底部压到 #d8eafc），整屏是一块彩色——
+ * 颜色一多，「只有三种颜色」这条就守不住了，页面也就跟着发糊。
+ * 现在只留白到极淡蓝的一档过渡。
+ */
+/*
+ * 第十二版：终于把颜色做足了。
+ *
+ * 参考站 fireworks 的首屏是白到橙的大渐变，一眼有颜色；
+ * 我们前面几版一路不敢上色，底部收到 #f5faff——那几乎就是白色，
+ * 屏幕上等于没有背景，整屏就是一张白纸，所以怎么排都「拉垮」。
+ *
+ * 领导文档要求的是「浅底、深字」。#c9e4ff 仍然是浅色底，
+ * 只是浅得有颜色、有方向，和纯白是两回事。
+ */
+.pvw .pv-hero-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, #ffffff 0%, #f6fbff 22%, #e2f1ff 58%, #cbe4ff 100%);
+}
+
+/*
+ * 半调网点：fireworks 首屏最像「印刷品」的那一层。
+ * 22px 一格、点很小、透明度低，靠 mask 从中段开始往下慢慢显形——
+ * 上半截干净放标题，下半截有肌理托住图。
+ */
+.pvw .pv-hero-dots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(10, 96, 190, 0.26) 1.2px, transparent 1.2px);
+  background-size: 18px 18px;
+  -webkit-mask-image: linear-gradient(180deg, transparent 4%, rgba(0, 0, 0, 0.22) 32%, #000 92%);
+  mask-image: linear-gradient(180deg, transparent 4%, rgba(0, 0, 0, 0.22) 32%, #000 92%);
+}
+
+/* 首屏顶部一层极淡的冷光，让白不要死白 */
+.pvw .pv-hero-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(64% 46% at 50% 0%, rgba(206, 231, 255, 0.55) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(46% 40% at 88% 12%, rgba(178, 222, 255, 0.3) 0%, rgba(255, 255, 255, 0) 72%);
+}
+
+/* ------------------------------------------------------------------ 按钮 */
+
+/*
+ * 直角，不是胶囊。
+ * 整页（价格表、快速接入、卡片）都已经切成直角，
+ * 按钮再留 999px 圆角就和它们不是一家人。
+ */
+.pvw .pv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 50px;
+  padding-inline: 26px;
+  border-radius: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+/*
+ * 钥匙按钮 = **反色 + 滑块**，两件事同时做。
+ *
+ * 平时：白底、深蓝字、深蓝描边；左边一块深蓝小方片装着白钥匙。
+ * hover：整块翻成深蓝底白字；那块方片滑到右边、同时翻成白底深钥匙；
+ *        左右 padding 互换，文字被方片让开。整块宽度始终不变。
+ *
+ * 方片和按钮互为反色，所以无论停在左边还是右边，它都看得见——
+ * 这是滑块能成立的前提（上一版方片和按钮同色就看不出来了）。
+ */
+.pvw .pv-btn--key {
+  position: relative;
+  gap: 0;
+  padding: 0 24px 0 60px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid var(--pv-ink);
+  color: var(--pv-ink);
+  transition:
+    padding 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.26s ease,
+    color 0.26s ease;
+}
+
+.pvw .pv-btn--key:hover {
+  padding: 0 60px 0 24px;
+  background: var(--pv-ink);
+  color: #ffffff;
+}
+
+.pvw .pv-knob {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 42px;
+  height: calc(100% - 4px);
+  border-radius: 0;
+  background: var(--pv-ink);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    left 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.26s ease,
+    color 0.26s ease;
+}
+
+.pvw .pv-btn--key:hover .pv-knob {
+  left: calc(100% - 44px);
+  background: #ffffff;
+  color: var(--pv-ink);
+}
+
+/*
+ * 副按钮降级成「文字 + 箭头」——没有框。
+ * 两个都带框的时候，眼睛分不出哪个是主按钮；一个有框一个没框，
+ * 不用加颜色、不用加粗，主次自己就出来了。
+ */
+.pvw .pv-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 50px;
+  padding-inline: 8px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--pv-ink);
+  transition: color 0.18s ease;
+}
+
+.pvw .pv-text-link:hover {
+  color: var(--pv-brand);
+}
+
+.pvw .pv-btn--primary {
+  background: var(--pv-ink);
+  color: #ffffff;
+}
+
+.pvw .pv-btn--primary:hover {
+  background: #0b3a63;
+}
+
+.pvw .pv-btn--ghost {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid #cfe0f0;
+  color: var(--pv-ink);
+  backdrop-filter: blur(6px);
+}
+
+.pvw .pv-btn--ghost:hover {
+  border-color: #9dc2e4;
+  background: #ffffff;
+}
+
+.pvw .pv-btn--sm {
+  height: 40px;
+  padding-inline: 18px;
+  font-size: 13.5px;
+}
+
+/* 箭头：单独一个元素，和文字之间留出固定间距，不再是文字里的一个字符 */
+.pvw .pv-arrow {
+  display: inline-block;
+  transition: transform 0.22s ease;
+}
+
+.pvw .pv-btn:hover .pv-arrow,
+.pvw .pv-link:hover .pv-arrow {
+  transform: translateX(3px);
+}
+
+.pvw .pv-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--pv-brand);
+}
+
+/* ---------------------------------------------------------- 实时价格大表 */
+
+/*
+ * 一整张表，不是六张卡。
+ * 外框 1px，格与格之间用虚线分——参考站最见效的一处：
+ * 六张独立卡片落在浅底上像六张贴纸，拼成一张表立刻有「系统」的样子。
+ */
+/*
+ * 直角，不是圆角。
+ * 参考站整张表是切边的：外框直角、内部虚线直通到底、格子一律不带弧度。
+ * 圆角会让「一张表」变回「一组卡片」——这是两种完全不同的东西。
+ */
+.pvw .pv-table {
+  border: 1px solid var(--pv-line);
+  border-radius: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.pvw .pv-table-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .pvw .pv-table-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pvw .pv-cell {
+  padding: 22px 24px 0;
+  border-bottom: 1px dashed var(--pv-line);
+}
+
+@media (min-width: 900px) {
+  .pvw .pv-cell {
+    border-right: 1px dashed var(--pv-line);
+  }
+  .pvw .pv-cell:nth-child(3n) {
+    border-right: 0;
+  }
+}
+
+.pvw .pv-cell:last-child {
+  border-bottom: 0;
+}
+
+/* 价格：原价划掉，实价大字 */
+.pvw .pv-price {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  /*
+   * 22：试过 27，但我们的价格是区间（¥2.19-4.38），比参考站的单个 $2.16 长一倍，
+   * 27 放不进半格、直接折成两行，比小字还难看。22 是能塞下的上限。
+   */
+  font-size: 22px;
+  white-space: nowrap;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--pv-ink);
+}
+
+.pvw .pv-price-was {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: #a6b4c4;
+  text-decoration: line-through;
+}
+
+/* 折扣角标 */
+.pvw .pv-badge {
+  border-radius: 4px;
+  background: var(--pv-ink);
+  padding: 3px 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/*
+ * 表里每格底部的「快速接入」。
+ * 参考站这里是一个**四边虚线的整宽小框**，不是一个「文字 + 箭头」——
+ * 框是「块」，字是「点」，块让每格有收口，字让格底发虚。
+ */
+.pvw .pv-cell-action {
+  margin: 20px 0 18px;
+  border: 1px dashed var(--pv-line);
+  border-radius: 0;
+  padding-block: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--pv-ink-mid);
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.pvw .pv-cell-action:hover {
+  border-color: #c9d9e8;
+}
+
+.pvw .pv-cell-action:hover {
+  color: var(--pv-brand);
+}
+
+/* ---------------------------------------------------------------- 数字条 */
+
+.pvw .pv-statline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--pv-line);
+  border-bottom: 1px solid var(--pv-line);
+}
+
+.pvw .pv-statline > div {
+  padding: 26px 12px;
+  text-align: center;
+}
+
+.pvw .pv-statline > div + div {
+  border-left: 1px solid var(--pv-line);
+}
+
+.pvw .pv-statline b {
+  display: block;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--pv-ink);
+}
+
+.pvw .pv-statline span {
+  display: block;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--pv-ink-muted);
+}
+
+/* ------------------------------------------------------- 首屏高亮词改蓝 */
+
+/*
+ * 全局 .hero-grad 是暖橙（那一档留给"数字与优惠"）。
+ * 领导文档 7.1 要求强调色是蓝或靛蓝，首屏高亮词是全页最显眼的强调，
+ * 必须是蓝的——所以预览版在这里覆盖成品牌蓝，正式版不受影响。
+ */
+.pvw .hero-grad {
+  background-image: linear-gradient(96deg, #3fa9ff 0%, #188df9 52%, #0a6ad4 100%);
+}
+
+/* ------------------------------------------------ 平台能力段（沿用旧类名） */
+
+.pvw .pv-head {
+  margin-inline: auto;
+  max-width: 660px;
+  text-align: center;
+}
+
+.pvw .pv-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.pvw .pv-stat {
+  display: grid;
+  border-block: 1px solid var(--pv-line);
+}
+
+.pvw .pv-stat > div {
+  padding: 24px 12px;
+  text-align: center;
+}
+
+.pvw .pv-stat > div + div {
+  border-left: 1px solid var(--pv-line);
+}
+
+.pvw .pv-card {
+  border: 1px solid var(--pv-line);
+  border-radius: 10px;
+  background: #ffffff;
+  transition:
+    border-color 0.24s ease,
+    box-shadow 0.24s ease,
+    transform 0.24s ease;
+}
+
+.pvw .pv-card--hover:hover {
+  border-color: #c9d9e8;
+  box-shadow: 0 14px 32px -22px rgba(10, 37, 64, 0.45);
+  transform: translateY(-2px);
+}

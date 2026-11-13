@@ -1,0 +1,462 @@
+/**
+ * /preview/home 专用样式底座（2026-11-13 第四版）
+ *
+ * 只被 app/preview/home/page.tsx 引入，正式首页不加载它。
+ *
+ * 第三版只做了「统一」：段间距、虚线、居中标题、卡片、按钮各一套。
+ * 结果页面确实整齐了，但也确实空了——统一不等于有层次，一段白底接着一段白底，
+ * 中间只隔一条 1px 虚线，扫下来还是一张白纸。
+ *
+ * 这一版补的是**层次**，四件事：
+ *
+ *   1. 底色分区   —— 段落不再白 / 白 / 白，改成 白 → 浅蓝灰 → 白 → 深海军蓝 → …
+ *                   深浅交替才能把长页面切成章节，光靠留白切不开。
+ *   2. 字号落差   —— 大标题 45 上限，正文 15 行距 1.8，小标统一 10.5 等宽。
+ *                   三者拉开，页面才"远看有重点、近看有细节"。
+ *   3. 边框分层   —— 细边框分两档：卡片框 --pv-line，卡内分隔 --pv-line-soft。
+ *                   一档边框用到底，卡片就会像线框图。
+ *   4. 纹理       —— 网点、柔光、虚线只出现在需要它托一下的位置，
+ *                   每段都撒一遍是壁纸，不是纹理。
+ *
+ * 配色不动：领导文档 7.1 —— 浅底、深字、蓝作强调、边框轻、圆角适度。
+ * 深色块只有两处：中间「接入示例」（代码本来就该在深底上）+ 页脚。
+ */
+
+/* ---------------------------------------------------------------- 变量 */
+
+.pvw {
+  /* 内容宽度：比第三版再收 40px。1240 在 1440 屏上两侧只剩 100，
+     字贴屏幕边缘走；1200 才留得住"页面有边"的感觉。 */
+  --pv-max: 1200px;
+
+  /* 圆角三档：控件 4 / 卡片 6 / 面板 10 */
+  --radius-control: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+
+  /* 边框两档 */
+  --pv-line: #e3eaf2;
+  --pv-line-soft: #eef2f7;
+
+  /* 分区底色 */
+  --pv-tint: #f6f9fc;
+  --pv-tint-deep: #eef4fa;
+
+  /* 深色块 */
+  --pv-dark: #06223f;
+  --pv-dark-2: #0a2e4f;
+
+  --neutral-border: var(--pv-line);
+  --neutral-bg-subtle: var(--pv-tint);
+
+  background: #ffffff;
+}
+
+/* ------------------------------------------------------------ 容器与段落 */
+
+.pvw .pv-wrap {
+  width: 100%;
+  max-width: var(--pv-max);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+@media (min-width: 768px) {
+  .pvw .pv-wrap {
+    padding-inline: 32px;
+  }
+}
+
+/*
+ * 段落留白：76 / 108。
+ * 第三版 84 / 120，加上居中标题 56 的底距，一段从标题到内容有 176px 空气，
+ * 而内容只有三行字——空的不是留白，是内容撑不住留白。
+ * 收一档，再把内容密度补上去，同一个高度看起来才不空。
+ */
+.pvw .pv-sec {
+  position: relative;
+  padding-block: 76px;
+}
+
+@media (min-width: 768px) {
+  .pvw .pv-sec {
+    padding-block: 108px;
+  }
+}
+
+/* 窄一档：给收口的段落用，不单独成立一节 */
+.pvw .pv-sec--tight {
+  padding-block: 52px;
+}
+
+@media (min-width: 768px) {
+  .pvw .pv-sec--tight {
+    padding-block: 64px;
+  }
+}
+
+/* 底色分区 */
+.pvw .pv-tint {
+  background: var(--pv-tint);
+}
+
+.pvw .pv-tint-deep {
+  background: var(--pv-tint-deep);
+}
+
+.pvw .pv-dark {
+  background: var(--pv-dark);
+  color: #ffffff;
+}
+
+/* 段与段的分界：只在同色相邻时用，跨底色不加线（底色本身就是分界） */
+.pvw .pv-rule {
+  border-top: 1px dashed #dbe3ec;
+}
+
+/* ---------------------------------------------------------- 段落标题 */
+
+.pvw .pv-head {
+  margin-inline: auto;
+  max-width: 660px;
+  text-align: center;
+}
+
+/* 左对齐头：全页都居中会累，价格 / 模型 / 问答这三段用左头 */
+.pvw .pv-head--left {
+  margin-inline: 0;
+  max-width: none;
+  text-align: left;
+}
+
+.pvw .pv-h2 {
+  font-size: clamp(28px, 3.2vw, 45px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--neutral-text);
+  text-wrap: balance;
+}
+
+/* 段内小标题（双栏那两栏用） */
+.pvw .pv-h3 {
+  font-size: clamp(21px, 1.8vw, 27px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--neutral-text);
+}
+
+.pvw .pv-sub {
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--neutral-text-mid);
+  text-wrap: pretty;
+}
+
+.pvw .pv-head--left .pv-sub {
+  margin-inline: 0;
+  max-width: 32em;
+}
+
+/* 深色段里的标题与说明 */
+.pvw .pv-dark .pv-h2 {
+  color: #ffffff;
+}
+
+.pvw .pv-dark .pv-sub {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/*
+ * eyebrow：一颗点 + 一行等宽小字，包一圈极浅的边框。
+ * 第三版是裸字，落在白底上像"没加载完的角标"；有边界才像个标签。
+ */
+.pvw .pv-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 11px 5px 9px;
+  border: 1px solid var(--pv-line);
+  border-radius: 999px;
+  background: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--neutral-text-mid);
+}
+
+.pvw .pv-eyebrow::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--brand-primary);
+}
+
+/* 深色底上的同一个标签：透明白框，不用浅底白框（会像贴纸） */
+.pvw .pv-dark .pv-eyebrow {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.pvw .pv-dark .pv-eyebrow::before {
+  background: #5eb0f5;
+}
+
+/* 旧名保留：首屏小标、框内小标题还在用 pv-kicker */
+.pvw .pv-kicker {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--neutral-text-muted);
+}
+
+.pvw .pv-dark .pv-kicker {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---------------------------------------------------------------- 卡片 */
+
+/*
+ * 卡片两档：
+ *   .pv-card      —— 一块内容，带一层极淡底色，hover 抬一档
+ *   .pv-hair-list —— 不画框的行，用细线分隔（清单、能力条目用这个）
+ *
+ * 第三版所有卡片都是「白底 + 1px 浅框」，落在白底上等于没画，
+ * 远看一堆灰虚线框 = 线框图 = 简陋。浅底上的卡片现在给一层底色，
+ * 至少在浅色分区里能看出"这是一块"。
+ */
+.pvw .pv-card {
+  position: relative;
+  border: 1px solid var(--pv-line);
+  border-radius: var(--radius-md);
+  background: #fbfdff;
+  transition:
+    border-color 0.24s ease,
+    background-color 0.24s ease,
+    box-shadow 0.24s ease,
+    transform 0.24s ease;
+}
+
+.pvw a.pv-card:hover,
+.pvw .pv-card--hover:hover {
+  border-color: #c9d9e8;
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -18px rgba(10, 37, 64, 0.4);
+}
+
+/* 白底分区里的卡片：底色反过来要更白一档，靠边框与阴影立住 */
+.pvw .pv-sec--plain .pv-card {
+  background: #ffffff;
+}
+
+/* 只用细线分的行：读起来像一份清单，不像一堆盒子 */
+.pvw .pv-hair-list {
+  border-top: 1px solid var(--pv-line);
+}
+
+.pvw .pv-hair-list > * {
+  border-bottom: 1px solid var(--pv-line);
+}
+
+/* ---------------------------------------------------------------- 按钮 */
+
+.pvw .pv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding-inline: 18px;
+  border-radius: var(--radius-control);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.pvw .pv-btn--primary {
+  background: var(--neutral-text);
+  border: 1px solid var(--neutral-text);
+  color: #ffffff;
+  box-shadow: 0 8px 20px -12px rgba(6, 34, 63, 0.6);
+}
+
+.pvw .pv-btn--primary:hover {
+  background: var(--brand-700);
+  border-color: var(--brand-700);
+  box-shadow: 0 10px 24px -12px rgba(10, 116, 224, 0.55);
+}
+
+.pvw .pv-btn--ghost {
+  background: #ffffff;
+  border: 1px solid var(--pv-line);
+  color: var(--neutral-text);
+}
+
+.pvw .pv-btn--ghost:hover {
+  border-color: var(--neutral-text);
+}
+
+/* 深色底上的次级按钮：白底太炸，用透明白框 */
+.pvw .pv-btn--on-dark {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.pvw .pv-btn--on-dark:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* 大一号：只给首屏和页尾两处 */
+.pvw .pv-btn--lg {
+  height: 52px;
+  padding-inline: 26px;
+  font-size: 15px;
+}
+
+/* ---------------------------------------------------------------- 数字 */
+
+.pvw .pv-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/*
+ * 数据条：一排数字、竖线分隔、上下各一条细线。
+ * 参考站用这一条把"我们有多大"一次说完，比三张卡省地方，也更有份量。
+ */
+.pvw .pv-stat {
+  display: grid;
+  border-block: 1px solid var(--pv-line);
+}
+
+.pvw .pv-stat > div {
+  padding: 26px 16px;
+  text-align: center;
+}
+
+.pvw .pv-stat > div + div {
+  border-left: 1px solid var(--pv-line);
+}
+
+.pvw .pv-stat b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: clamp(30px, 3.4vw, 40px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--neutral-text);
+}
+
+.pvw .pv-stat span {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--neutral-text-muted);
+}
+
+/* -------------------------------------------------------------- 纹理 */
+
+/*
+ * 网点：只做「一小块区域内的浅纹理」，靠 mask 由中心往外化开。
+ * 铺满整幅的是壁纸，不是纹理——所以这里 mask 收得很紧。
+ */
+.pvw .pv-dots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(13, 58, 110, 0.14) 1px, transparent 1px);
+  background-size: 18px 18px;
+  opacity: 0.55;
+  mask-image: radial-gradient(62% 58% at 50% 40%, #000 0%, transparent 76%);
+  -webkit-mask-image: radial-gradient(62% 58% at 50% 40%, #000 0%, transparent 76%);
+}
+
+.pvw .pv-dots--dark {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  opacity: 0.5;
+}
+
+/*
+ * 首屏的蓝雾：中间托亮、四角收回白，让标题浮起来。
+ *
+ * 2026-11-13 第五版：首屏撑满一屏之后，标题和图之间多出 200 多像素，
+ * 光只有上半截、下半截是纯白，那张拓扑图就悬在空气里。
+ * 加第二团雾托在图的位置（at 50% 78%），两团叠起来是一整片，
+ * 但每团都很淡，白底仍然是白底——领导文档 7.1 的浅底没有破。
+ */
+/*
+ * 首屏底色：上白、下浅蓝。
+ *
+ * 首屏撑到一屏高之后，地址条和拓扑图之间有三百多像素的空白。
+ * 光靠留白，这片空白就是"没做完"；给底下三分之一一层极浅的蓝，
+ * 空白变成"有底色的呼吸"——参考站整屏是彩色光晕，道理一样，
+ * 只是色相和明度都守在领导文档 7.1 的浅底里（最深 #ebf4fd）。
+ */
+.pvw .pv-hero {
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 52%, #f6fafe 76%, #eef6fe 100%);
+}
+
+.pvw .pv-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 44% at 50% 16%, rgba(212, 235, 255, 0.85) 0%, rgba(240, 248, 255, 0.5) 46%, rgba(255, 255, 255, 0) 80%),
+    radial-gradient(56% 32% at 50% 78%, rgba(222, 240, 255, 0.6) 0%, rgba(246, 251, 255, 0.32) 55%, rgba(255, 255, 255, 0) 84%),
+    radial-gradient(46% 36% at 92% 2%, rgba(172, 220, 255, 0.34) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+/* 页尾收束：一条浅蓝渐变 + 网点，全页唯一一次"整块有颜色"的浅色 */
+.pvw .pv-band {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 120% at 12% 118%, rgba(24, 141, 249, 0.34) 0%, rgba(24, 141, 249, 0) 62%),
+    radial-gradient(58% 120% at 90% 116%, rgba(56, 177, 255, 0.28) 0%, rgba(56, 177, 255, 0) 60%),
+    linear-gradient(180deg, #e4f3ff 0%, #d5ebff 54%, #c8e5ff 100%);
+}
+
+.pvw .pv-band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(13, 58, 110, 0.2) 1px, transparent 1px);
+  background-size: 13px 13px;
+  opacity: 0.42;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, #000 60%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, #000 60%);
+}
+
+/* --------------------------------------------------- 首屏高亮词改蓝 */
+
+/*
+ * 全局 .hero-grad 是暖橙（那一档留给"数字与优惠"）。
+ * 领导文档 7.1 要求强调色是蓝或靛蓝，首屏高亮词是全页最显眼的强调，
+ * 它必须是蓝的——所以预览版在这里覆盖成品牌蓝，正式版不受影响。
+ */
+.pvw .hero-grad {
+  background-image: linear-gradient(96deg, #38b1ff 0%, #188df9 52%, #0a74e0 100%);
+}

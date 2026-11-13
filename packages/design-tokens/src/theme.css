@@ -7,52 +7,104 @@
  * 配色依据 md 7.1：蓝色或靛蓝色为主，具体色值待设计确认。
  */
 :root {
-  --brand-primary: #4f46e5;
-  --brand-primary-hover: #4338ca;
-  --brand-primary-soft: #eef2ff;
-  --brand-accent: #6366f1;
-  --brand-hero-from: #e0e7ff;
-  --brand-hero-to: #dbeafe;
+  /*
+   * ============ 主色改档（2026-11-13）============
+   *
+   * 原来的 #4f46e5 是 Tailwind indigo-600，这个色值在 AI 产品里用得太密
+   * （几乎所有大模型工具站都长这样），远看是「紫」，近看也压不住。
+   *
+   * 换成海军蓝家族（hue 210）：同一个色相一路铺到文字、底色、深色块，
+   * 整页不再有「紫气」。md 7.1 第 420 行要求「蓝色或靛蓝色」，
+   * 这里是蓝色一档，没跳出约束；具体色值本来就是「设计阶段确定」。
+   *
+   * 取色依据是 Stripe 公开规范的深海军蓝 #0A2540（正文色）+ 同类高明度蓝，
+   * 不是拍脑袋调饱和。
+   */
+  --brand-primary: #188df9;
+  --brand-primary-hover: #0a74e0;
+  --brand-primary-soft: #e3f3ff;
+  --brand-accent: #38b1ff;
+  /*
+   * 暖色强调（2026-11-13）：整页只有蓝和灰，远处看是一张蓝纸，没人想点。
+   * 这个橙只允许出现在三个地方：首屏高亮词、主行动按钮、价格/优惠这类"数字"。
+   * 不铺面积，不做背景——它是指示灯，不是墙纸。
+   */
+  --accent-warm: #e8a33d;
+  --accent-warm-deep: #c2410c;
+  /* 青柠只给深色底用：白底上它的对比度不足 1.5:1，什么都压不住 */
+  --accent-lime: #affd1d;
+  --brand-hero-from: #f4faff;
+  --brand-hero-to: #e3f3ff;
 
-  --dark-surface: #1e1b4b;
+  /*
+   * ============ 品牌色阶（2026-11-13）============
+   *
+   * 领导文档 7.1 只要求"蓝或靛蓝作为品牌强调色"，没规定不许有层次。
+   * 之前全站实际只有三档（#EEF2FF / #6366F1 / #1E1B4B），
+   * 结果就是"单薄"——该有的中间档全空着，页面只能靠留白撑。
+   *
+   * 现在补成一条完整阶梯，色相不动（同一个靛蓝家族），只拉明度。
+   * 用法约束（写进规矩，不是建议）：
+   *   50–100  = 大面积浅底（卡片面、整段色块）
+   *   200–300 = 线、次要图形、深色背景上的文字
+   *   400     = 首屏色带亮部（唯一允许"发光"的一档）
+   *   500–600 = 可点元素（按钮、链接、焦点环）
+   *   700     = hover / 按下
+   *   900–950 = 深色整幅
+   * 新加一个色相之前，先问能不能用这条阶梯解决。
+   */
+  --brand-50: #eff8ff;
+  --brand-100: #e3f3ff;
+  --brand-200: #b9e1ff;
+  --brand-300: #7ccbff;
+  --brand-400: #38b1ff;
+  --brand-500: #188df9;
+  --brand-600: #188df9;
+  --brand-700: #0a74e0;
+  --brand-900: #0d3a6e;
+  --brand-950: #0a3a5f;
+
+  --dark-surface: #0a3a5f;
   --dark-text: #ffffff;
   --dark-text-muted: rgba(255, 255, 255, 0.72);
 
   --neutral-bg: #ffffff;
-  --neutral-bg-subtle: #f9fafb;
+  --neutral-bg-subtle: #f4fafe;
   /*
    * 边框只有这一档（2026-11-12）：
    * 原来「浅边框」有两种写法——border-line 和手写的 border-black/5（60 处），
-   * 两者深浅还不一样，卡片挨着放会一深一浅。现在统一到 #e7e9ef，
+   * 两者深浅还不一样，卡片挨着放会一深一浅。现在统一到 #e1e8f0，
    * 页面里禁止再写 border-black/5、border-gray-200 这类。
    */
-  --neutral-border: #e7e9ef;
+  --neutral-border: #dce8f0;
   /*
-   * 正文四档（2026-11-12 定稿）：只用实色，禁止 text-ink/60 这种透明度写法。
+   * 正文四档（2026-11-12 定稿，2026-11-13 换色相）：只用实色，禁止 text-ink/60 这种透明度写法。
    * 透明度叠在不同底色上出来的深浅都不一样，同一页两处「说明文字」看着不是一档。
-   *   标题 #101828 → 强调句 #344054 → 正文 #5c6675 → 辅助 #667085
-   * 辅助色比初稿的浅灰深一档：12px 的字用更浅的颜色白底对比度只有 3:1，
-   * 看着就是「糊」，这是之前很多人说字不清楚的原因之一。
+   *   标题 #0A2540 → 强调句 #1E3A54 → 正文 #445A70 → 辅助 #64798D
+   *
+   * 标题从近黑 #101828 换成深海军蓝 #0A2540：黑字白底没有色调，整页会像个表格；
+   * 海军蓝是 Stripe 那套「基础设施看着很贵」的底子，也是唯一能让主色不显孤立的办法。
+   * 辅助色比初稿的浅灰深一档：12px 的字用更浅的颜色白底对比度只有 3:1，看着就是「糊」。
    */
-  --neutral-text: #101828;
-  --neutral-text-soft: #344054;
-  --neutral-text-mid: #5c6675;
-  --neutral-text-muted: #667085;
+  --neutral-text: #06223f;
+  --neutral-text-soft: #123a52;
+  --neutral-text-mid: #45647a;
+  --neutral-text-muted: #688091;
   --neutral-text-inverse: #ffffff;
 
-  /* 浅色块与浅色底（靛蓝偏冷，比紫色更中性） */
-  --surface-tint: #f5f7ff;
-  --surface-tint-soft: #fafbff;
-  --surface-tint-muted: #f7f8ff;
+  /* 浅色块与浅色底（跟着主色走海军蓝，去掉原来的紫洗感） */
+  --surface-tint: #e8f4fb;
+  --surface-tint-soft: #f4fafe;
+  --surface-tint-muted: #eef7fc;
 
   /*
    * 官网首屏渐变、品牌渐变、代码块深色底：值只在这里写一次，页面引用变量。
    * md 7.1 第 420 行把强调色限定在「蓝色或靛蓝色」，所以两条渐变都收在同一色相里，
    * 不再掺紫（原来 40%/70% 处是 #f0e8ff、#f5f0ff，品牌渐变尾段是 #a855f7，都跑出色相范围）。
    */
-  --gradient-hero: linear-gradient(135deg, #eef1ff 0%, #e9edff 40%, #f0f3ff 70%, #fafbff 100%);
-  --gradient-brand: linear-gradient(135deg, #6366f1 0%, #4f46e5 52%, #312e81 100%);
-  --code-surface: #0f172a;
+  --gradient-hero: linear-gradient(135deg, #edf3fa 0%, #e8f0f8 40%, #f1f6fb 70%, #fafcfe 100%);
+  --gradient-brand: linear-gradient(135deg, #38b1ff 0%, #188df9 52%, #0a5cbd 100%);
+  --code-surface: #0a1929;
 
   /*
    * 语义色三件套：实色（图标/圆点）、深字（文字）、浅底（状态标签/提示条）。
@@ -88,10 +140,10 @@
    * 焦点环。全站原来 focus-visible 0 处：键盘用户按 Tab 走一遍，
    * 根本看不出光标停在哪。所有可点元素统一用这个外环。
    */
-  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px rgba(79, 70, 229, 0.45);
+  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px rgba(27, 90, 160, 0.45);
 
   --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
-  --shadow-panel: 0 12px 40px rgba(49, 46, 129, 0.08);
+  --shadow-panel: 0 12px 40px rgba(10, 37, 64, 0.08);
   --shadow-popover: 0 12px 32px rgba(16, 24, 40, 0.12);
 
   /*
@@ -103,19 +155,21 @@
    * 前缀用 elevation- 而不是 shadow-：@theme 里要映射成 shadow-brand*，
    * 同名会变成自己引用自己的死循环。
    */
-  --elevation-brand-sm: 0 4px 12px rgba(79, 70, 229, 0.3);
-  --elevation-brand: 0 6px 18px rgba(79, 70, 229, 0.28);
-  --elevation-brand-lg: 0 10px 26px rgba(79, 70, 229, 0.34);
+  --elevation-brand-sm: 0 4px 12px rgba(27, 90, 160, 0.28);
+  --elevation-brand: 0 6px 18px rgba(27, 90, 160, 0.26);
+  --elevation-brand-lg: 0 10px 26px rgba(27, 90, 160, 0.32);
 
-  /* 主按钮渐变（靛蓝 → 深靛蓝） */
-  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 55%, #3730a3 100%);
+  /* 主按钮渐变（海军蓝 → 深海军蓝） */
+  --gradient-primary: linear-gradient(135deg, #38b1ff 0%, #188df9 55%, #0a74e0 100%);
+  /* 暖色行动按钮：整页唯一的"叫你点我"的颜色，只用主行动，别给次要按钮 */
+  --gradient-warm: linear-gradient(135deg, #f0bd5e 0%, #e8a33d 44%, #c2410c 100%);
 
   /*
    * 深色功能卡（首页产品矩阵）的底色。
    * 比 --dark-surface 更沉一档：卡片面积大，纯 #1e1b4b 会发紫发闷，
    * 带一点渐变让它有纵深，右下角的线框装饰才立得起来。
    */
-  --matrix-dark: linear-gradient(148deg, #201e4d 0%, #17163a 52%, #0e0d27 100%);
+  --matrix-dark: linear-gradient(148deg, #0c2d4d 0%, #082138 52%, #041625 100%);
 
   /*
    * ============ 字号（2026-11-12）============

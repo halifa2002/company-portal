@@ -46,8 +46,12 @@ function GuestEntry() {
       </Link>
       <Link
         href={loginUrl}
-        className="rounded-full px-5 py-2 text-body font-medium text-white 2xl:px-7 2xl:py-2.5 shadow-brand transition-all duration-300 hover:-translate-y-px hover:shadow-brand-lg"
-        style={{ background: 'var(--gradient-primary)' }}
+        /*
+         * 登录按钮（2026-11-13）：圆角胶囊 → 直角实心。
+         * 导航栏里放不下「箭头块 + 文字块」的完整拼接，所以只取那个语言的另一半：
+         * 直角、实色、不带投影。它跟首屏、收尾两处的大按钮是同一套，只是缩小版。
+         */
+        className="bg-[#06223f] px-5 py-2 text-body font-medium text-white transition-colors duration-200 hover:bg-[#0a3257] 2xl:px-6 2xl:py-2.5"
       >
         登录
       </Link>

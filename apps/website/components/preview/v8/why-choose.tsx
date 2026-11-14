@@ -83,7 +83,7 @@ export function WhyChoose() {
           {HEADLINERS.map((item) => (
             <div
               key={item.title}
-              className='flex flex-col justify-between rounded-[20px] bg-brand-50 p-8 sm:p-10'
+              className='flex flex-col justify-between bg-brand-50 p-8 sm:p-10'
             >
               <div>
                 <h3 className='text-[26px] leading-snug font-semibold tracking-tight text-ink sm:text-[30px]'>
@@ -95,7 +95,7 @@ export function WhyChoose() {
               </div>
               <Link
                 href={item.href}
-                className='mt-8 inline-flex w-fit items-center gap-1 rounded-lg bg-white px-4 py-2 text-sm font-medium text-brand shadow-[0_1px_2px_rgba(6,34,63,0.08)] transition-colors hover:bg-white/80'
+                className='mt-8 inline-flex w-fit items-center gap-1 bg-white px-4 py-2 text-sm font-medium text-brand shadow-[0_1px_2px_rgba(6,34,63,0.08)] transition-colors hover:bg-white/80'
               >
                 {item.cta}
                 <span aria-hidden='true'>→</span>
@@ -107,7 +107,7 @@ export function WhyChoose() {
         {/* 下方四张浅灰卡：图标 + 大标题 + 要点 */}
         <div className='mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
           {PILLARS.map((pillar) => (
-            <div key={pillar.title} className='rounded-[20px] bg-surface-subtle p-6 sm:p-7'>
+            <div key={pillar.title} className='bg-surface-subtle p-6 sm:p-7'>
               <div className='flex justify-center'>
                 <span className='flex size-14 items-center justify-center rounded-2xl bg-white text-brand shadow-[0_1px_3px_rgba(6,34,63,0.06)]'>
                   {pillar.icon}
@@ -137,4 +137,5 @@ export function WhyChoose() {
     </section>
   );
 }
+
 

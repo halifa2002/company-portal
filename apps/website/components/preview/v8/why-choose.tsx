@@ -85,29 +85,34 @@ const CARD_TEXTURES = ['/textures/why-circuit.jpg', '/textures/why-ripple.jpg'];
 
 function CardTexture({ index }: { index: number }) {
   const src = CARD_TEXTURES[index % CARD_TEXTURES.length];
-  // 深卡纹理不斜置（2026-11-15 用户澄清：斜着放是指下面四个符号，不是这两张卡）。
   // 第二张垂直翻转：一张纹理的密处落在右上、另一张落在右下，避免两张构图雷同。
-  const transform = index === 1 ? 'scaleY(-1)' : undefined;
+  const flip = index === 1 ? 'scaleY(-1)' : undefined;
   return (
     <>
-      <div
-        aria-hidden='true'
-        className='pointer-events-none absolute inset-0 bg-cover bg-center opacity-90 transition-opacity duration-500 ease-out group-hover/card:opacity-100'
-        style={{ backgroundImage: `url('${src}')`, transform }}
-      />
+      {/* 外层只负责翻转，内层负责悬停变换 —— 同一元素上 inline transform 会压掉
+          Tailwind 的 group-hover:rotate/-translate，所以拆成两层。 */}
+      <div aria-hidden='true' className='pointer-events-none absolute inset-0' style={{ transform: flip }}>
+        {/* 悬停时纹理轻微旋转 + 上移（实测硅基流动的右下装饰是 rotate 0.6°→1.4° + 上移 4px→10px）。
+            基础 scale-[1.05] 是给旋转留余量，否则满幅底图转起来会露边。 */}
+        <div
+          aria-hidden='true'
+          className='absolute inset-0 scale-[1.05] bg-cover bg-center opacity-90 transition-[opacity,transform] duration-500 ease-out group-hover/card:-translate-y-1 group-hover/card:rotate-[0.8deg] group-hover/card:opacity-100'
+          style={{ backgroundImage: `url('${src}')` }}
+        />
+      </div>
       {/* 左侧压成实色保白字可读，向右放开让纹理显出来 */}
       <div
         aria-hidden='true'
         className='pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/70 to-brand-950/10'
       />
-      {/* 悬停时右下角亮起一层辉光：只让「光」出现，不动底图。
-          整图缩放会把所有线条一起推近，看起来是图片在放大而不是光照上来。 */}
+      {/* 悬停高光：两层径向渐变淡入（实测硅基流动用的是同款做法 —— 一层左上白光 +
+          一层右下彩光，opacity 0→1，不是改背景色也不是缩放底图）。 */}
       <div
         aria-hidden='true'
-        className='pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 ease-out group-hover/card:opacity-100'
+        className='pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-out group-hover/card:opacity-100'
         style={{
           background:
-            'radial-gradient(62% 78% at 88% 82%, rgba(56,177,255,0.28) 0%, rgba(56,177,255,0.10) 42%, transparent 72%)',
+            'radial-gradient(circle at 18% 6%, rgba(255,255,255,0.13), transparent 34%), radial-gradient(circle at 88% 84%, rgba(56,177,255,0.26), transparent 62%)',
         }}
       />
     </>
@@ -126,7 +131,7 @@ export function WhyChoose() {
           {HEADLINERS.map((item, index) => (
             <div
               key={item.title}
-              className='group/card relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 ring-1 ring-transparent transition-[background-color,box-shadow] duration-200 hover:bg-brand-900 hover:ring-brand-300 sm:p-10'
+              className='group/card relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.012] sm:p-10'
             >
               <CardTexture index={index} />
               <div className='relative'>
@@ -158,8 +163,18 @@ export function WhyChoose() {
           {PILLARS.map((pillar, index) => (
             <div
               key={pillar.title}
-              className='relative overflow-hidden border border-ink bg-surface p-6 transition-[background-color,border-color] duration-200 hover:border-brand-200 hover:bg-surface-subtle sm:p-7'
+              className='group relative overflow-hidden border border-ink bg-surface p-6 transition-[transform,background-color,border-color] duration-300 ease-out hover:-translate-y-2 hover:scale-[1.012] hover:border-brand-200 hover:bg-surface-subtle sm:p-7'
             >
+              {/* 悬停高光：与深卡同一套做法（实测硅基流动 = 上浮 + 渐变层淡入），
+                  浅色卡上用品牌蓝而不是白色，白卡上白光看不出来。 */}
+              <div
+                aria-hidden='true'
+                className='pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100'
+                style={{
+                  background:
+                    'radial-gradient(circle at 50% -10%, rgba(24,141,249,0.12), transparent 58%)',
+                }}
+              />
               <div className='relative flex justify-center'>
                 <img
                   src={pillar.icon}

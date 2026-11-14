@@ -104,6 +104,61 @@ function CircuitMotif({ flip = false }: { flip?: boolean }) {
   );
 }
 
+/**
+ * 白卡的装饰：四张卡各一种纹样（不同形状，避免同图案重复出现）。
+ * 统一规格：右下角、96px、品牌浅蓝细线、纯装饰（aria-hidden + pointer-events-none）。
+ */
+function CardMotif({ variant }: { variant: number }) {
+  const cls =
+    'pointer-events-none absolute -right-3 -bottom-3 h-24 w-24 text-brand-200';
+
+  if (variant === 0) {
+    // 层叠横线 —— 对应「稳定性」
+    return (
+      <svg aria-hidden='true' className={cls} viewBox='0 0 96 96' fill='none'>
+        <g stroke='currentColor' strokeWidth='1.4' strokeLinecap='round'>
+          <path d='M12 34h72' />
+          <path d='M12 52h72' />
+          <path d='M12 70h72' />
+        </g>
+      </svg>
+    );
+  }
+  if (variant === 1) {
+    // 三点连线 —— 对应「智能」
+    return (
+      <svg aria-hidden='true' className={cls} viewBox='0 0 96 96' fill='none'>
+        <g stroke='currentColor' strokeWidth='1.4' strokeLinecap='round'>
+          <path d='M22 70 48 42 74 70' />
+          <circle cx='22' cy='70' r='4' />
+          <circle cx='48' cy='42' r='4' />
+          <circle cx='74' cy='70' r='4' />
+        </g>
+      </svg>
+    );
+  }
+  if (variant === 2) {
+    // 方中套方 —— 对应「安全性」
+    return (
+      <svg aria-hidden='true' className={cls} viewBox='0 0 96 96' fill='none'>
+        <g stroke='currentColor' strokeWidth='1.4'>
+          <rect x='26' y='26' width='58' height='58' />
+          <rect x='44' y='44' width='22' height='22' />
+        </g>
+      </svg>
+    );
+  }
+  // 错位方块 —— 对应「扩展性」
+  return (
+    <svg aria-hidden='true' className={cls} viewBox='0 0 96 96' fill='none'>
+      <g stroke='currentColor' strokeWidth='1.4'>
+        <rect x='34' y='10' width='52' height='52' />
+        <rect x='10' y='36' width='52' height='52' />
+      </g>
+    </svg>
+  );
+}
+
 export function WhyChoose() {
   return (
     <section id='why-choose' className='border-b border-line py-16 md:py-24'>
@@ -146,12 +201,13 @@ export function WhyChoose() {
 
         {/* 下方四张卡：生图图标 + 大标题 + 要点（外框黑色细线，按用户 2026-11-15 要求） */}
         <div className='mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-          {PILLARS.map((pillar) => (
+          {PILLARS.map((pillar, index) => (
             <div
               key={pillar.title}
-              className='border border-ink bg-surface p-6 sm:p-7'
+              className='relative overflow-hidden border border-ink bg-surface p-6 sm:p-7'
             >
-              <div className='flex justify-center'>
+              <CardMotif variant={index} />
+              <div className='relative flex justify-center'>
                 <img
                   src={pillar.icon}
                   alt=''
@@ -160,10 +216,10 @@ export function WhyChoose() {
                   className='size-[104px] object-contain'
                 />
               </div>
-              <h3 className='mt-4 text-center text-[26px] font-semibold tracking-tight text-ink'>
+              <h3 className='relative mt-4 text-center text-[26px] font-semibold tracking-tight text-ink'>
                 {pillar.title}
               </h3>
-              <ul className='mt-4 space-y-2'>
+              <ul className='relative mt-4 space-y-2'>
                 {pillar.points.map((point) => (
                   <li
                     key={point}
@@ -184,6 +240,7 @@ export function WhyChoose() {
     </section>
   );
 }
+
 
 
 

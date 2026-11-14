@@ -16,6 +16,9 @@ export type { BadgeTone } from './badge';
 export { Segmented } from './segmented';
 export type { SegmentedOption } from './segmented';
 
+export { Navigation } from './navigation';
+export type { NavigationItem } from './navigation';
+
 export { LogoMark } from './logo';
 export type { LogoMarkSize } from './logo';
 

@@ -5,6 +5,7 @@ import { V8Footer } from '@/components/preview/v8/shell';
 import { V8Hero } from '@/components/preview/v8/hero';
 import { AnnouncementBar } from '@/components/preview/v8/announcement-bar';
 import { QuickStartSection } from '@/components/preview/v8/quickstart-section';
+import { WhyChoose } from '@/components/preview/v8/why-choose';
 import { RequestFlow, Capabilities } from '@/components/preview/v8/capabilities';
 import { TwoPaths } from '@/components/preview/v8/two-paths';
 import { ProductPreview } from '@/components/preview/v8/product-preview';
@@ -81,6 +82,9 @@ export default async function PreviewHomePageV8() {
          * 卡片里每条模型还只能显示输入/输出两个数，信息量比表格少。价格表已含
          * 全部 27 个模型与「看全部模型」入口，概览层不需要单独占一屏。
          */}
+        {/* 2026-11-14 用户要求：在价格广告栏前面加一屏「为什么选择虫洞 AI」（参照硅基流动的同类版块） */}
+        <Reveal><WhyChoose /></Reveal>
+
         <Reveal><PricingTable models={models} pricingAvailable={pricingAvailable} /></Reveal>
 
         {/* 讲清楚「为什么是这个价」，紧跟价格表，不让人对着数字猜 */}
@@ -140,3 +144,4 @@ export default async function PreviewHomePageV8() {
     </div>
   );
 }
+

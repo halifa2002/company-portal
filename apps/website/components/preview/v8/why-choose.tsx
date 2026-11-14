@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 「为什么选择虫洞 AI」——插在「模型与价格」广告栏之前的一屏。
  *
  * 2026-11-14 用户口径演变：
@@ -36,36 +36,36 @@ const PILLARS = [
     icon: '/icons/why-stability.png',
     title: '高稳定性',
     points: [
-      '统一网关背后可挂多条上游线路，某条出错自动换下一条重试。',
-      '每个 Key 单独设额度与可用模型，一个应用超支不影响其他应用。',
-      '调用成功率、额度消耗、渠道健康都能在控制台看到。',
+      '多线路自动切换重试',
+      'Key 单独设额度与模型',
+      '成功率与渠道健康可视',
     ],
   },
   {
     icon: '/icons/why-intelligence.png',
     title: '高智能',
     points: [
-      '对话、推理、编程、多模态模型统一接入，后台接上即可用。',
-      '换模型只改请求里的 model 字段，SDK 与鉴权都不用动。',
-      '三套协议共用一套地址，客户端不必分别适配。',
+      '对话推理编程统一接入',
+      '换模型只改 model 字段',
+      '三协议共用一套地址',
     ],
   },
   {
     icon: '/icons/why-security.png',
     title: '高安全性',
     points: [
-      '整套服务可部署在自有服务器上，请求与数据不经过第三方。',
-      'Key 支持模型白名单、额度上限与来源 IP 限制。',
-      '管理后台可只对办公网开放，公网与管理入口分开。',
+      '可部署在自有服务器',
+      'Key 白名单与额度上限',
+      '后台仅对办公网开放',
     ],
   },
   {
     icon: '/icons/why-extensibility.png',
     title: '高扩展性',
     points: [
-      '新增模型只改后台渠道配置，官网模型页与价格表自动更新。',
-      '基于开源网关，可跟随官方版本升级，也能私有化改造。',
-      '官网、控制台与后台分仓维护，界面调整不影响计费与鉴权。',
+      '加模型只改后台配置',
+      '跟随官方版本升级',
+      '前后端分仓可改造',
     ],
   },
 ];
@@ -122,10 +122,10 @@ export function WhyChoose() {
                   className='size-[104px] object-contain'
                 />
               </div>
-              <h3 className='mt-5 text-center text-[26px] font-semibold tracking-tight text-ink'>
+              <h3 className='mt-4 text-center text-[26px] font-semibold tracking-tight text-ink'>
                 {pillar.title}
               </h3>
-              <ul className='mt-5 space-y-3'>
+              <ul className='mt-4 space-y-2'>
                 {pillar.points.map((point) => (
                   <li
                     key={point}
@@ -146,6 +146,7 @@ export function WhyChoose() {
     </section>
   );
 }
+
 
 
 

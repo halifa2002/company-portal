@@ -62,7 +62,7 @@ export function WhyChoose() {
       <div className='mx-auto max-w-[1280px] px-6'>
         {/* 标题区（2026-11-14 用户口径：不要额外的文案，直接一行大字） */}
         <h2 className='text-center text-[40px] leading-tight font-semibold tracking-tight text-ink sm:text-[64px]'>
-          为什么选择黑洞 AI
+          为什么选择虫洞 AI
         </h2>
 
         {/* 两张主卡：一张深色收口，一张浅色展开 */}
@@ -125,5 +125,6 @@ export function WhyChoose() {
     </section>
   );
 }
+
 
 

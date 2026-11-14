@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 「为什么选择虫洞 AI」——插在「模型与价格」广告栏之前的一屏。
  *
  * 2026-11-14 用户口径演变：
@@ -71,14 +71,17 @@ const PILLARS = [
 ];
 
 /**
- * 深色卡右下角的装饰：电路走线纹样（蓝 + 绿细线，圆角折弯 + 方块节点）。
+ * 深色卡的装饰：电路走线纹样（蓝 + 绿细线，圆角折弯 + 方块节点）。
  * 纯装饰 —— aria-hidden + pointer-events-none，不参与读屏与点击。
+ * 第二张卡传 flip，纹样镜像到左下角，避免两张卡长得一模一样。
  */
-function CircuitMotif() {
+function CircuitMotif({ flip = false }: { flip?: boolean }) {
   return (
     <svg
       aria-hidden='true'
-      className='pointer-events-none absolute -right-2 bottom-0 h-44 w-44 opacity-45'
+      className={`pointer-events-none absolute bottom-0 h-44 w-44 opacity-45 ${
+        flip ? '-left-2 scale-x-[-1]' : '-right-2'
+      }`}
       viewBox='0 0 176 176'
       fill='none'
     >
@@ -101,26 +104,6 @@ function CircuitMotif() {
   );
 }
 
-/**
- * 白卡右上角的装饰：两个错位的方框（品牌浅蓝细线）。
- * 同样纯装饰。
- */
-function BlockMotif() {
-  return (
-    <svg
-      aria-hidden='true'
-      className='pointer-events-none absolute -top-3 -right-3 h-28 w-28 text-brand-100'
-      viewBox='0 0 112 112'
-      fill='none'
-    >
-      <g stroke='currentColor' strokeWidth='1.6'>
-        <rect x='34' y='8' width='66' height='66' />
-        <rect x='8' y='38' width='66' height='66' />
-      </g>
-    </svg>
-  );
-}
-
 export function WhyChoose() {
   return (
     <section id='why-choose' className='border-b border-line py-16 md:py-24'>
@@ -131,12 +114,12 @@ export function WhyChoose() {
 
         {/* 上方两张深色大卡：标题 / 说明 / 按钮 + 右下角电路纹装饰 */}
         <div className='mt-12 grid gap-4 md:grid-cols-2'>
-          {HEADLINERS.map((item) => (
+          {HEADLINERS.map((item, index) => (
             <div
               key={item.title}
               className='relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 sm:p-10'
             >
-              <CircuitMotif />
+              <CircuitMotif flip={index === 1} />
               <div className='relative'>
                 <h3 className='text-[30px] leading-snug font-semibold tracking-tight text-white sm:text-[36px]'>
                   {item.title}
@@ -166,10 +149,9 @@ export function WhyChoose() {
           {PILLARS.map((pillar) => (
             <div
               key={pillar.title}
-              className='relative overflow-hidden border border-ink bg-surface p-6 sm:p-7'
+              className='border border-ink bg-surface p-6 sm:p-7'
             >
-              <BlockMotif />
-              <div className='relative flex justify-center'>
+              <div className='flex justify-center'>
                 <img
                   src={pillar.icon}
                   alt=''
@@ -178,10 +160,10 @@ export function WhyChoose() {
                   className='size-[104px] object-contain'
                 />
               </div>
-              <h3 className='relative mt-4 text-center text-[26px] font-semibold tracking-tight text-ink'>
+              <h3 className='mt-4 text-center text-[26px] font-semibold tracking-tight text-ink'>
                 {pillar.title}
               </h3>
-              <ul className='relative mt-4 space-y-2'>
+              <ul className='mt-4 space-y-2'>
                 {pillar.points.map((point) => (
                   <li
                     key={point}
@@ -202,6 +184,8 @@ export function WhyChoose() {
     </section>
   );
 }
+
+
 
 
 

@@ -12,7 +12,7 @@
  */
 
 import Link from 'next/link';
-import { ArrowRight, Blocks, BrainCircuit, ShieldCheck, Waves } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 /** 上方两张主卡：标题 + 说明 + 按钮（对应硅基流动那两张大卡的写法） */
 const HEADLINERS = [
@@ -33,7 +33,7 @@ const HEADLINERS = [
 /** 下方四张卡：图标 + 大标题 + 要点（对应硅基流动「高稳定性 / 高智能 …」那排） */
 const PILLARS = [
   {
-    icon: <Waves size={38} strokeWidth={1.5} aria-hidden='true' />,
+    icon: '/icons/why-stability.png',
     title: '高稳定性',
     points: [
       '统一网关背后可挂多条上游线路，某条出错自动换下一条重试。',
@@ -42,7 +42,7 @@ const PILLARS = [
     ],
   },
   {
-    icon: <BrainCircuit size={38} strokeWidth={1.5} aria-hidden='true' />,
+    icon: '/icons/why-intelligence.png',
     title: '高智能',
     points: [
       '对话、推理、编程、多模态模型统一接入，后台接上即可用。',
@@ -51,7 +51,7 @@ const PILLARS = [
     ],
   },
   {
-    icon: <ShieldCheck size={38} strokeWidth={1.5} aria-hidden='true' />,
+    icon: '/icons/why-security.png',
     title: '高安全性',
     points: [
       '整套服务可部署在自有服务器上，请求与数据不经过第三方。',
@@ -60,7 +60,7 @@ const PILLARS = [
     ],
   },
   {
-    icon: <Blocks size={38} strokeWidth={1.5} aria-hidden='true' />,
+    icon: '/icons/why-extensibility.png',
     title: '高扩展性',
     points: [
       '新增模型只改后台渠道配置，官网模型页与价格表自动更新。',
@@ -83,19 +83,19 @@ export function WhyChoose() {
           {HEADLINERS.map((item) => (
             <div
               key={item.title}
-              className='flex flex-col justify-between bg-brand-50 p-8 sm:p-10'
+              className='flex flex-col justify-between bg-brand-950 p-8 sm:p-10'
             >
               <div>
-                <h3 className='text-[26px] leading-snug font-semibold tracking-tight text-ink sm:text-[30px]'>
+                <h3 className='text-[26px] leading-snug font-semibold tracking-tight text-white sm:text-[30px]'>
                   {item.title}
                 </h3>
-                <p className='mt-4 text-body leading-relaxed text-ink-mid'>
+                <p className='mt-4 text-body leading-relaxed text-white/70'>
                   {item.desc}
                 </p>
               </div>
               <Link
                 href={item.href}
-                className='group mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-ink px-5 text-note font-medium text-white transition-colors hover:bg-ink/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500'
+                className='group mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-white px-5 text-note font-medium text-ink transition-colors hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300'
               >
                 {item.cta}
                 <ArrowRight
@@ -109,14 +109,18 @@ export function WhyChoose() {
           ))}
         </div>
 
-        {/* 下方四张浅灰卡：图标 + 大标题 + 要点 */}
+        {/* 下方四张卡：生图图标 + 大标题 + 要点（外框黑色细线，按用户 2026-11-15 要求） */}
         <div className='mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
           {PILLARS.map((pillar) => (
-            <div key={pillar.title} className='border border-line bg-surface p-6 sm:p-7'>
+            <div key={pillar.title} className='border border-ink bg-surface p-6 sm:p-7'>
               <div className='flex justify-center'>
-                <span className='flex size-14 items-center justify-center rounded-2xl bg-white text-brand shadow-[0_1px_3px_rgba(6,34,63,0.06)]'>
-                  {pillar.icon}
-                </span>
+                <img
+                  src={pillar.icon}
+                  alt=''
+                  width={64}
+                  height={64}
+                  className='size-16 object-contain'
+                />
               </div>
               <h3 className='mt-5 text-center text-[22px] font-semibold tracking-tight text-ink'>
                 {pillar.title}
@@ -142,6 +146,8 @@ export function WhyChoose() {
     </section>
   );
 }
+
+
 
 
 

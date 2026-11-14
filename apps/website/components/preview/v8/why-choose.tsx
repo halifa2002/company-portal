@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 「为什么选择虫洞 AI」——插在「模型与价格」广告栏之前的一屏。
  *
  * 2026-11-14 用户口径演变：
@@ -12,7 +12,7 @@
  */
 
 import Link from 'next/link';
-import { Blocks, BrainCircuit, ShieldCheck, Waves } from 'lucide-react';
+import { ArrowRight, Blocks, BrainCircuit, ShieldCheck, Waves } from 'lucide-react';
 
 /** 上方两张主卡：标题 + 说明 + 按钮（对应硅基流动那两张大卡的写法） */
 const HEADLINERS = [
@@ -95,10 +95,15 @@ export function WhyChoose() {
               </div>
               <Link
                 href={item.href}
-                className='mt-8 inline-flex w-fit items-center gap-1 bg-white px-4 py-2 text-sm font-medium text-brand shadow-[0_1px_2px_rgba(6,34,63,0.08)] transition-colors hover:bg-white/80'
+                className='group mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-ink px-5 text-note font-medium text-white transition-colors hover:bg-ink/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500'
               >
                 {item.cta}
-                <span aria-hidden='true'>→</span>
+                <ArrowRight
+                  size={16}
+                  strokeWidth={1.8}
+                  aria-hidden='true'
+                  className='transition-transform group-hover:translate-x-0.5'
+                />
               </Link>
             </div>
           ))}
@@ -107,7 +112,7 @@ export function WhyChoose() {
         {/* 下方四张浅灰卡：图标 + 大标题 + 要点 */}
         <div className='mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
           {PILLARS.map((pillar) => (
-            <div key={pillar.title} className='bg-surface-subtle p-6 sm:p-7'>
+            <div key={pillar.title} className='border border-line bg-surface p-6 sm:p-7'>
               <div className='flex justify-center'>
                 <span className='flex size-14 items-center justify-center rounded-2xl bg-white text-brand shadow-[0_1px_3px_rgba(6,34,63,0.06)]'>
                   {pillar.icon}
@@ -137,5 +142,6 @@ export function WhyChoose() {
     </section>
   );
 }
+
 
 

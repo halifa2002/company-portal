@@ -108,57 +108,62 @@ function CircuitMotif({ flip = false }: { flip?: boolean }) {
  * 白卡的装饰：四张卡各一种纹样（不同形状，避免同图案重复出现）。
  * 统一规格：右下角、96px、品牌浅蓝细线、纯装饰（aria-hidden + pointer-events-none）。
  */
+/**
+ * 白卡的装饰：四张卡各一种**实心浅色块**（不是细线，细线在小尺寸下像划痕）。
+ * 统一规格：右下角出血、152px、品牌浅蓝 #e3f3ff、纯装饰。
+ */
 function CardMotif({ variant }: { variant: number }) {
   const cls =
-    'pointer-events-none absolute -right-3 -bottom-3 h-24 w-24 text-brand-200';
+    'pointer-events-none absolute -right-6 -bottom-8 h-[152px] w-[152px] text-brand-100';
 
   if (variant === 0) {
-    // 层叠横线 —— 对应「稳定性」
+    // 三层横条 —— 对应「稳定性」
     return (
-      <svg aria-hidden='true' className={cls} viewBox='0 0 96 96' fill='none'>
-        <g stroke='currentColor' strokeWidth='1.4' strokeLinecap='round'>
-          <path d='M12 34h72' />
-          <path d='M12 52h72' />
-          <path d='M12 70h72' />
-        </g>
+      <svg aria-hidden='true' className={cls} viewBox='0 0 152 152' fill='currentColor'>
+        <rect x='18' y='34' width='116' height='18' rx='6' opacity='0.9' />
+        <rect x='18' y='64' width='116' height='18' rx='6' opacity='0.65' />
+        <rect x='18' y='94' width='116' height='18' rx='6' opacity='0.4' />
       </svg>
     );
   }
   if (variant === 1) {
-    // 三点连线 —— 对应「智能」
+    // 三个圆点 + 粗连线 —— 对应「智能」
     return (
-      <svg aria-hidden='true' className={cls} viewBox='0 0 96 96' fill='none'>
-        <g stroke='currentColor' strokeWidth='1.4' strokeLinecap='round'>
-          <path d='M22 70 48 42 74 70' />
-          <circle cx='22' cy='70' r='4' />
-          <circle cx='48' cy='42' r='4' />
-          <circle cx='74' cy='70' r='4' />
-        </g>
+      <svg aria-hidden='true' className={cls} viewBox='0 0 152 152' fill='currentColor'>
+        <path
+          d='M40 110 L76 62 L112 110'
+          stroke='currentColor'
+          strokeWidth='10'
+          fill='none'
+          strokeLinecap='round'
+          opacity='0.45'
+        />
+        <circle cx='40' cy='110' r='14' opacity='0.9' />
+        <circle cx='76' cy='62' r='14' opacity='0.9' />
+        <circle cx='112' cy='110' r='14' opacity='0.9' />
       </svg>
     );
   }
   if (variant === 2) {
-    // 方中套方 —— 对应「安全性」
+    // 方中挖方 —— 对应「安全性」
     return (
-      <svg aria-hidden='true' className={cls} viewBox='0 0 96 96' fill='none'>
-        <g stroke='currentColor' strokeWidth='1.4'>
-          <rect x='26' y='26' width='58' height='58' />
-          <rect x='44' y='44' width='22' height='22' />
-        </g>
+      <svg aria-hidden='true' className={cls} viewBox='0 0 152 152' fill='currentColor'>
+        <path
+          fillRule='evenodd'
+          d='M28 28h96v96H28V28zm28 28v40h40V56H56z'
+          opacity='0.75'
+        />
       </svg>
     );
   }
-  // 错位方块 —— 对应「扩展性」
+  // 两个叠加方块 —— 对应「扩展性」
   return (
-    <svg aria-hidden='true' className={cls} viewBox='0 0 96 96' fill='none'>
-      <g stroke='currentColor' strokeWidth='1.4'>
-        <rect x='34' y='10' width='52' height='52' />
-        <rect x='10' y='36' width='52' height='52' />
-      </g>
+    <svg aria-hidden='true' className={cls} viewBox='0 0 152 152' fill='currentColor'>
+      <rect x='54' y='22' width='76' height='76' rx='10' opacity='0.45' />
+      <rect x='22' y='54' width='76' height='76' rx='10' opacity='0.85' />
     </svg>
   );
 }
-
 export function WhyChoose() {
   return (
     <section id='why-choose' className='border-b border-line py-16 md:py-24'>
@@ -240,6 +245,8 @@ export function WhyChoose() {
     </section>
   );
 }
+
+
 
 
 

@@ -85,7 +85,7 @@ export function V8Hero(props: { modelCount: number; vendors: string[] }) {
               </Link>
               <Link
                 href="/docs/quickstart"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-[4px] border border-ink/15 bg-white/80 px-6 text-[15px] font-medium text-ink backdrop-blur transition-colors hover:border-ink/35 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-[4px] border border-ink/15 bg-white/80 px-6 text-[15px] font-medium text-ink backdrop-blur transition-[border-color,background-color,box-shadow] duration-200 ease-out hover:border-ink/45 hover:bg-white hover:shadow-[0_4px_14px_rgba(10,58,95,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
               >
                 查看接入文档
               </Link>

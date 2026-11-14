@@ -1,10 +1,11 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { registerUrl } from '@/lib/brand';
 import { V8HeroHeadline } from './hero-headline';
 import { AddressBar } from './address-bar';
 import { RoutingDiagram } from './routing-diagram';
 import { TrustStrip } from './trust-strip';
 import { Reveal } from './motion';
+import { KeyRound } from 'lucide-react';
 
 /**
  * v8 首屏（v9，2026-11-14：居中单焦点 + 蓝族网格背景 + 一张路由图）
@@ -69,24 +70,17 @@ export function V8Hero(props: { modelCount: number; vendors: string[] }) {
 
           <Reveal delay={300}>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+              {/* 主 CTA：悬停时钥匙从左侧滑到右侧（照 teamorouter 的「旋钮」做法），
+                  但**不做整体反色** —— 反色会让主按钮变成和次按钮一样的白底细框，
+                  鼠标一放上去主次就反转了。这里只让图标让位。
+                  left 用 calc 定位到最右：按钮宽 = 内容宽，所以 100% - 图标宽 - 内边距。 */}
               <Link
                 href={registerUrl}
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-[4px] bg-ink px-6 text-[15px] font-medium text-white transition-colors hover:bg-ink/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                className="group relative inline-flex h-12 items-center justify-center rounded-[4px] bg-ink pl-[52px] pr-6 text-[15px] font-medium text-white transition-[background-color,padding] duration-300 ease-out hover:bg-ink/90 hover:pl-6 hover:pr-[52px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
               >
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <circle cx="8" cy="15" r="4" />
-                  <path d="m10.8 12.2 8.2-8.2M15.5 4.5 19 8" />
-                </svg>
+                <span className="absolute left-1.5 top-1.5 flex h-9 w-9 items-center justify-center rounded-[2px] bg-white/95 text-ink transition-[left] duration-300 ease-out group-hover:left-[calc(100%-2.625rem)]">
+                  <KeyRound size={16} strokeWidth={1.9} aria-hidden />
+                </span>
                 获取 API Key
               </Link>
               <Link

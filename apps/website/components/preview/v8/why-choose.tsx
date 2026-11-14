@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 「为什么选择虫洞 AI」——插在「模型与价格」广告栏之前的一屏。
  *
  * 2026-11-14 用户口径演变：
@@ -74,7 +74,7 @@ export function WhyChoose() {
   return (
     <section id='why-choose' className='border-b border-line py-16 md:py-24'>
       <div className='mx-auto max-w-[1280px] px-6'>
-        <h2 className='text-center text-[40px] leading-tight font-semibold tracking-tight text-ink sm:text-[60px]'>
+        <h2 className='text-center text-[44px] leading-tight font-semibold tracking-tight text-ink sm:text-[68px]'>
           为什么选择虫洞 AI
         </h2>
 
@@ -86,10 +86,10 @@ export function WhyChoose() {
               className='flex flex-col justify-between bg-brand-950 p-8 sm:p-10'
             >
               <div>
-                <h3 className='text-[26px] leading-snug font-semibold tracking-tight text-white sm:text-[30px]'>
+                <h3 className='text-[30px] leading-snug font-semibold tracking-tight text-white sm:text-[36px]'>
                   {item.title}
                 </h3>
-                <p className='mt-4 text-body leading-relaxed text-white/70'>
+                <p className='mt-4 text-[17px] leading-relaxed text-white/75'>
                   {item.desc}
                 </p>
               </div>
@@ -122,18 +122,18 @@ export function WhyChoose() {
                   className='size-[104px] object-contain'
                 />
               </div>
-              <h3 className='mt-4 text-center text-[22px] font-semibold tracking-tight text-ink'>
+              <h3 className='mt-5 text-center text-[26px] font-semibold tracking-tight text-ink'>
                 {pillar.title}
               </h3>
               <ul className='mt-5 space-y-3'>
                 {pillar.points.map((point) => (
                   <li
                     key={point}
-                    className='flex gap-2 text-meta leading-relaxed text-ink-mid'
+                    className='flex gap-2.5 text-[15px] leading-[1.75] text-ink-mid'
                   >
                     <span
                       aria-hidden='true'
-                      className='mt-[7px] size-1 shrink-0 rounded-full bg-ink-muted/50'
+                      className='mt-[9px] size-1 shrink-0 rounded-full bg-ink-muted/60'
                     />
                     <span>{point}</span>
                   </li>
@@ -146,6 +146,7 @@ export function WhyChoose() {
     </section>
   );
 }
+
 
 
 

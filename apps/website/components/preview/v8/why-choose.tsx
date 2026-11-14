@@ -144,7 +144,7 @@ export function WhyChoose() {
               </div>
               <Link
                 href={item.href}
-                className='relative mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-white px-5 text-note font-medium text-ink transition-colors duration-200 group-hover/card:bg-brand-500 group-hover/card:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300'
+                className='relative mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-white px-5 text-note font-medium text-ink transition-colors duration-200 group-hover/card:bg-brand-700 group-hover/card:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300'
               >
                 {item.cta}
                 <ArrowRight

@@ -43,7 +43,7 @@ const PATHS = [
 
 export function TwoPaths() {
   return (
-    <section className="relative border-b border-line bg-white py-20 md:py-28">
+    <section className="relative border-b border-line bg-white py-14 md:py-20">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         {/* 标题区 */}
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,420px)] md:items-end md:gap-12">
@@ -62,7 +62,7 @@ export function TwoPaths() {
         </div>
 
         {/* 双栏 */}
-        <div className="mt-12 grid gap-6 lg:grid-cols-2 lg:gap-8">
+        <div className="mt-9 grid gap-6 lg:grid-cols-2 lg:gap-8">
           {PATHS.map((path) => (
             <div
               key={path.title}

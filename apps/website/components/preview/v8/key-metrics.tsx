@@ -1,4 +1,4 @@
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+﻿import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { CountUp } from './motion';
 
 /**
@@ -74,7 +74,7 @@ const METRICS: Metric[] = [
 
 export function KeyMetrics() {
   return (
-    <section className="relative overflow-hidden border-b border-line py-20 md:py-28">
+    <section className="relative overflow-hidden border-b border-line py-14 md:py-20">
       {/* 背景细网格：52px 一格、5% 透明度、径向淡出（只做肌理，不做主角） */}
       <div
         aria-hidden
@@ -110,7 +110,7 @@ export function KeyMetrics() {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {METRICS.map((metric) => (
             <div
               key={metric.label}

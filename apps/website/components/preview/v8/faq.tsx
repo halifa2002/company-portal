@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { registerUrl } from '@/lib/brand';
 import { Arrow } from '@/components/ui/arrow';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
@@ -47,7 +47,7 @@ const FAQ = [
 
 export function Faq() {
   return (
-    <section className="bg-white py-20 md:py-28">
+    <section className="bg-white py-14 md:py-20">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-20">
           {/* 左：标题与出口 */}
@@ -87,7 +87,7 @@ export function Faq() {
           <div>
             {FAQ.map((item) => (
               <details key={item.q} className="group border-b border-line first:border-t">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 marker:hidden [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-4 marker:hidden [&::-webkit-details-marker]:hidden">
                   <span className="text-[16.5px] font-medium text-ink transition-colors group-hover:text-brand-700">
                     {item.q}
                   </span>

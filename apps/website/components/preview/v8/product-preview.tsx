@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { consoleUrl } from '@/lib/brand';
 import { Arrow } from '@/components/ui/arrow';
 import { buttonStyles } from '@/components/ui/button';
@@ -38,7 +38,7 @@ const POINTS = [
 
 export function ProductPreview() {
   return (
-    <section className="border-b border-line py-20 md:py-28">
+    <section className="border-b border-line py-14 md:py-20">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-16">
           {/* 左：说明 */}

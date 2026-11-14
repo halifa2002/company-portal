@@ -1,4 +1,4 @@
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+﻿import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 /**
  * S7：为什么是这个价（2026-11-14 视觉第四版）。
@@ -25,9 +25,9 @@ const STEPS = [
   },
   {
     no: '02',
-    label: '平台加价层',
+    label: '平台运营层',
     icon: <ArcIcon />,
-    points: ['在采购价上加一层固定服务费', '用于网关、计费、对账与技术支持'],
+    points: ['采购价基础上收取固定平台服务费', '用于网关、计费、对账与技术支持'],
   },
   {
     no: '03',
@@ -39,7 +39,7 @@ const STEPS = [
 
 export function PriceLogic() {
   return (
-    <section className="relative overflow-hidden border-b border-line py-20 md:py-28">
+    <section className="relative overflow-hidden border-b border-line py-14 md:py-20">
       <div className="relative mx-auto w-full max-w-[1280px] px-6">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,420px)] md:items-end md:gap-12">
           <div>
@@ -57,7 +57,7 @@ export function PriceLogic() {
         </div>
 
         {/* 三步流程：抽象图标居中 → 步骤号 + 标题 → 要点列表 */}
-        <ol className="mt-14 grid gap-6 md:grid-cols-3">
+        <ol className="mt-10 grid gap-6 md:grid-cols-3">
           {STEPS.map((step, index) => (
             <li
               key={step.label}
@@ -100,7 +100,7 @@ export function PriceLogic() {
           ))}
         </ol>
 
-        <p className="mt-8 border-t border-line pt-4 text-meta text-ink-muted">
+        <p className="mt-6 border-t border-line pt-4 text-meta text-ink-muted">
           单价以后端计费规则为准；本页为口径说明，不构成报价。
         </p>
       </div>
@@ -142,7 +142,7 @@ function ArcIcon() {
         strokeDasharray="74 40"
         transform="rotate(-90 32 32)"
       />
-      {/* 点睛：靛蓝实心核，也是「加价层」本体 */}
+      {/* 点睛：靛蓝实心核，也是「运营层」本体 */}
       <circle cx="32" cy="32" r="8" fill="var(--color-brand-indigo)" />
     </svg>
   );

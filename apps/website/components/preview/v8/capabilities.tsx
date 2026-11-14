@@ -1,4 +1,4 @@
-/**
+﻿/**
  * v8 首页两块内容（2026-11-14 第二版：拆成两个模块）
  *
  * 原来它们是一个 section：标题「同一套地址、Key 和账单」下面挂着
@@ -80,7 +80,7 @@ const UPSTREAMS = [
 /** 模块一：请求怎么走（过程） */
 export function RequestFlow() {
   return (
-    <section className="border-b border-line py-20 md:py-28">
+    <section className="border-b border-line py-14 md:py-20">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,420px)] md:items-end md:gap-12">
           <div>
@@ -165,7 +165,7 @@ export function RequestFlow() {
 /** 模块二：平台能力（价值） */
 export function Capabilities() {
   return (
-    <section className="border-b border-line py-20 md:py-28">
+    <section className="border-b border-line py-14 md:py-20">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,420px)] md:items-end md:gap-12">
           <div>
@@ -182,7 +182,7 @@ export function Capabilities() {
           </p>
         </div>
 
-        <ul className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
+        <ul className="mt-9 grid gap-x-10 gap-y-8 sm:grid-cols-2">
           {CAPABILITIES.map((item) => (
             <li key={item.no} className="border-t border-line pt-4">
               <div className="flex items-start justify-between">
@@ -199,7 +199,7 @@ export function Capabilities() {
           ))}
         </ul>
 
-        <p className="mt-10 border-t border-line pt-5 text-meta leading-relaxed text-ink-muted">
+        <p className="mt-8 border-t border-line pt-4 text-meta leading-relaxed text-ink-muted">
           另外几条也能自己核：业务数据不落库 · 额度按 Key 隔离 · 每笔调用可追溯到单次请求 ·
           协议与官方文档一致。
         </p>

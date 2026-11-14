@@ -57,7 +57,7 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
 
   if (!props.pricingAvailable) {
     return (
-      <section className="border-b border-line bg-white py-20 md:py-28">
+      <section className="border-b border-line bg-white py-14 md:py-20">
         <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
           <SectionHead
             eyebrow="模型与价格"
@@ -70,7 +70,7 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
   }
 
   return (
-    <section className="border-b border-line bg-white py-20 md:py-28">
+    <section className="border-b border-line bg-white py-14 md:py-20">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <SectionHead
           eyebrow="模型与价格"
@@ -146,13 +146,13 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
              */}
             <thead className="sticky top-[65px] z-10 border-b border-line bg-surface-subtle">
               <tr className="text-meta uppercase tracking-[0.08em] text-ink-muted">
-                <th className="py-3 pr-4 font-medium">模型</th>
-                <th className="hidden py-3 pr-4 font-medium sm:table-cell">厂商</th>
-                <th className="hidden py-3 pr-4 font-medium md:table-cell">分类</th>
-                <th className="py-3 pr-4 text-right font-medium">
+                <th className="py-2.5 pr-4 font-medium">模型</th>
+                <th className="hidden py-2.5 pr-4 font-medium sm:table-cell">厂商</th>
+                <th className="hidden py-2.5 pr-4 font-medium md:table-cell">分类</th>
+                <th className="py-2.5 pr-4 text-right font-medium">
                   输入<span className="hidden lg:inline"> / 百万 tokens</span>
                 </th>
-                <th className="py-3 text-right font-medium">
+                <th className="py-2.5 pr-4 text-right font-medium">
                   输出<span className="hidden lg:inline"> / 百万 tokens</span>
                 </th>
               </tr>
@@ -163,7 +163,7 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
                   key={model.id}
                   className="border-t border-line transition-colors duration-150 hover:bg-brand-50/40"
                 >
-                  <td className="py-3 pr-4">
+                  <td className="py-2.5 pr-4">
                     <Link
                       href={`/models/${encodeURIComponent(model.id)}`}
                       className="group flex items-start gap-3"
@@ -179,16 +179,16 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
                       </span>
                     </Link>
                   </td>
-                  <td className="hidden py-3 pr-4 text-meta text-ink-mid sm:table-cell">
+                  <td className="hidden py-2.5 pr-4 text-meta text-ink-mid sm:table-cell">
                     {model.vendorName}
                   </td>
-                  <td className="hidden py-3 pr-4 text-meta text-ink-mid md:table-cell">
+                  <td className="hidden py-2.5 pr-4 text-meta text-ink-mid md:table-cell">
                     {model.category}
                   </td>
-                  <td className="whitespace-nowrap py-3 pr-4 text-right text-note text-ink">
+                  <td className="whitespace-nowrap py-2.5 pr-4 text-right text-note text-ink">
                     <PriceCell text={modelPriceText(model.price, 'input')} />
                   </td>
-                  <td className="whitespace-nowrap py-3 text-right text-note text-ink">
+                  <td className="whitespace-nowrap py-2.5 pr-4 text-right text-note text-ink">
                     <PriceCell text={modelPriceText(model.price, 'output')} />
                   </td>
                 </tr>

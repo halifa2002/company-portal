@@ -81,7 +81,7 @@ export function QuickStartSection() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,760px)] lg:items-start lg:gap-14">
+        <div className="mt-9 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,760px)] lg:items-start lg:gap-14">
           {/* 左：这段能干什么 + 两个入口 */}
           <div className="space-y-5">
             <p className="text-note leading-relaxed text-ink-mid">

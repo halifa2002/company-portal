@@ -148,7 +148,7 @@ export function WhyChoose() {
           {PILLARS.map((pillar, index) => (
             <div
               key={pillar.title}
-              className='relative overflow-hidden border border-ink bg-surface p-6 sm:p-7'
+              className='relative overflow-hidden border border-ink bg-surface p-6 transition-[background-color,border-color] duration-200 hover:border-brand-200 hover:bg-surface-subtle sm:p-7'
             >
               <div className='relative flex justify-center'>
                 <img

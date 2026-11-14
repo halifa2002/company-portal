@@ -83,7 +83,7 @@ export default async function PreviewHomePageV8() {
          * 全部 27 个模型与「看全部模型」入口，概览层不需要单独占一屏。
          */}
         {/* 2026-11-14 用户要求：在价格广告栏前面加一屏「为什么选择虫洞 AI」（参照硅基流动的同类版块） */}
-        <Reveal><WhyChoose /></Reveal>
+        <WhyChoose />
 
         <Reveal><PricingTable models={models} pricingAvailable={pricingAvailable} /></Reveal>
 

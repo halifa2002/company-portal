@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 「为什么选择虫洞 AI」——插在「模型与价格」广告栏之前的一屏。
  *
  * 2026-11-14 用户要求：参照硅基流动首页的「为什么选择硅基流动」一屏，
@@ -15,7 +15,6 @@
 
 import { Blocks, BrainCircuit, ShieldCheck, Waves } from 'lucide-react';
 
-import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 /** 四张卡：icon 用 lucide 线性，22px / 1.6 描边，与平台能力那屏一致 */
 const PILLARS = [
@@ -59,24 +58,15 @@ const PILLARS = [
 
 export function WhyChoose() {
   return (
-    <section className='border-b border-line py-16 md:py-24'>
+    <section id='why-choose' className='border-b border-line py-16 md:py-24'>
       <div className='mx-auto max-w-[1280px] px-6'>
-        {/* 标题区：字号是本屏的主角，按用户要求「字要大」 */}
-        <div className='max-w-[820px]'>
-          <SectionEyebrow>为什么选择虫洞 AI</SectionEyebrow>
-          <h2 className='mt-4 text-[36px] leading-[1.15] font-semibold tracking-tight text-ink sm:text-[52px]'>
-            一个 Key，接得住业务，
-            <br className='hidden sm:block' />
-            也接得住账单
-          </h2>
-          <p className='mt-5 max-w-[640px] text-lg leading-relaxed text-ink-mid'>
-            把多家的模型收到一个地址后面，接入方式只有一套；用量、额度与扣费都记在同一处，
-            出了问题能追到具体请求。
-          </p>
-        </div>
+        {/* 标题区（2026-11-14 用户口径：不要额外的文案，直接一行大字） */}
+        <h2 className='text-center text-[40px] leading-tight font-semibold tracking-tight text-ink sm:text-[64px]'>
+          为什么选择黑洞 AI
+        </h2>
 
         {/* 两张主卡：一张深色收口，一张浅色展开 */}
-        <div className='mt-10 grid gap-4 md:grid-cols-2'>
+        <div className='mt-12 grid gap-4 md:grid-cols-2'>
           <div className='rounded-2xl bg-[#0b1b2b] p-8 text-white sm:p-10'>
             <p className='text-note font-semibold text-brand-300'>一套地址</p>
             <p className='mt-3 text-[28px] leading-snug font-semibold tracking-tight sm:text-[34px]'>
@@ -135,3 +125,5 @@ export function WhyChoose() {
     </section>
   );
 }
+
+

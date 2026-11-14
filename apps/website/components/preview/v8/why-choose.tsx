@@ -104,16 +104,16 @@ function CardTexture({ index }: { index: number }) {
   );
 }
 /**
- * 白卡的装饰：四张卡各一张生图图案（2026-11-15 用户否掉手绘 SVG 后改为生图）。
- * 规格统一为「浅蓝玻璃质感 + 纯白底 + 居中留白」，因此直接用 mix-blend-multiply：
- * 卡片底色是纯白 #ffffff，白底相乘后不可见，只留浅蓝图案，无需抠图。
- * 图案语义与顶部四张主体图标一一对应：层叠 / 三节点 / 盾牌 / 模块交叠。
+ * 白卡的装饰：右下角一簇细线电路（2026-11-15 生图版，参照硅基流动那套 PCB 语言）。
+ * 纯白底 + 单一浅蓝线（#7ccbff）、圆角直角走线、嵌套方框与焊盘阵列，整体微微倾斜。
+ * 卡片底是纯白 #ffffff，白底用 mix-blend-multiply 直接消失，不用抠图。
+ * 四张各一种构图：阶梯走线 / 芯片群 / 互锁方框 / 长带延伸。
  */
 const MOTIF_IMAGES = [
-  '/textures/why-mark-layer.png',
-  '/textures/why-mark-graph.png',
-  '/textures/why-mark-shield.png',
-  '/textures/why-mark-module.png',
+  '/textures/why-line-1.png',
+  '/textures/why-line-2.png',
+  '/textures/why-line-3.png',
+  '/textures/why-line-4.png',
 ];
 
 function CardMotif({ variant }: { variant: number }) {
@@ -122,9 +122,9 @@ function CardMotif({ variant }: { variant: number }) {
       src={MOTIF_IMAGES[variant % MOTIF_IMAGES.length]}
       alt=''
       aria-hidden='true'
-      width={148}
-      height={148}
-      className='pointer-events-none absolute -right-6 -bottom-8 size-[148px] opacity-65 mix-blend-multiply select-none'
+      width={210}
+      height={210}
+      className='pointer-events-none absolute -right-5 -bottom-7 size-[138px] opacity-75 mix-blend-multiply select-none'
     />
   );
 }
@@ -209,9 +209,6 @@ export function WhyChoose() {
     </section>
   );
 }
-
-
-
 
 
 

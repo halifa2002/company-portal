@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { LogoMark } from '@portal/ui';
 import { brand, registerUrl } from '@/lib/brand';
+import { Arrow } from '@/components/ui/arrow';
 
 /**
  * v8 预览页的页脚。
@@ -66,9 +67,10 @@ export function V8Footer() {
             </p>
             <Link
               href={registerUrl}
-              className="mt-5 inline-flex items-center gap-1.5 text-meta font-medium text-white/80 transition-colors hover:text-white"
+              className="group mt-5 inline-flex items-center gap-2 text-meta font-medium text-white/80 transition-colors hover:text-white"
             >
-              创建账号 <span aria-hidden>→</span>
+              创建账号
+              <Arrow />
             </Link>
           </div>
 

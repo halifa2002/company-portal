@@ -15,15 +15,29 @@
  * 不摆任何具体百分比或金额（C-D-02：没接真实数据就不许出现数字）。
  */
 
+import { Gauge, Layers, Plug, ReceiptText } from 'lucide-react';
 import { FlowStrip } from './flow';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
-/** 每条能力配一枚 24×24 线性图标：尺寸小、只有描边，不用彩色块，避免装饰化 */
+/**
+ * 每条的图标（2026-11-14 第三次定稿：改回线性图标，用 lucide 这套现成的）。
+ *
+ * 演进：18px 手写线性 → 64px 自绘几何双色 → **22px lucide 线性**。
+ * 为什么放弃自绘几何：
+ *   ① 审美疲劳。四枚都是「圆角块 + 一颗点」同源形状，连看四个像复制粘贴；
+ *      而图标并列成组时，读者靠的恰恰是**轮廓差异**（层叠 / 票据 / 表盘 / 插头）。
+ *   ② 自绘的成本与风险都由我们承担（配色、比例、每加一条都要新画一枚），
+ *      而 lucide 是已经调好比例与描边的现成图标库，项目里本来就有这个依赖。
+ *   ③ 分工更清楚：**几何双色只留在「价格口径」那三枚大图里**（88px、单发、当插画），
+ *      成组出现的小图标一律走线性单色——成组要差异，单发要气质。
+ *
+ * 规格统一：22px、strokeWidth 1.6、颜色 ink-muted（白底 4.80:1，过 4.5 正文标准）。
+ */
 const ICONS: Record<string, React.ReactNode> = {
-  '01': <path d="M12 3 3 8l9 5 9-5-9-5Zm-9 11 9 5 9-5" />,
-  '02': <path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Zm3 5h6m-6 4h6" />,
-  '03': <path d="M4 14a8 8 0 0 1 16 0M12 14l4-4" />,
-  '04': <path d="M4 8h12l-3-3m11 11H8l3 3" />,
+  '01': <Layers size={22} strokeWidth={1.6} className="text-ink-muted" />,
+  '02': <ReceiptText size={22} strokeWidth={1.6} className="text-ink-muted" />,
+  '03': <Gauge size={22} strokeWidth={1.6} className="text-ink-muted" />,
+  '04': <Plug size={22} strokeWidth={1.6} className="text-ink-muted" />,
 };
 
 const CAPABILITIES = [
@@ -66,7 +80,7 @@ const UPSTREAMS = [
 /** 模块一：请求怎么走（过程） */
 export function RequestFlow() {
   return (
-    <section className="border-b border-line bg-white py-20 md:py-28">
+    <section className="border-b border-line py-20 md:py-28">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,420px)] md:items-end md:gap-12">
           <div>
@@ -87,13 +101,13 @@ export function RequestFlow() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           {/* ① 路由判定 */}
-          <div className="border-t border-neutral-300 pt-5">
+          <div className="border-t border-line pt-5">
             <div className="flex items-baseline justify-between gap-4">
               <h3 className="text-note font-semibold text-ink">一次请求，为什么会落到某家上游</h3>
               <span className="shrink-0 text-meta text-ink-muted">按顺序判断</span>
             </div>
 
-            <ol className="mt-4 divide-y divide-neutral-200 border-y border-neutral-300">
+            <ol className="mt-4 divide-y divide-line border-y border-line">
               {ROUTE_RULES.map((rule, index) => (
                 <li key={rule.when} className="flex items-start gap-3 py-2.5 text-meta">
                   <span className="shrink-0 font-mono text-ink-muted">
@@ -114,13 +128,13 @@ export function RequestFlow() {
           </div>
 
           {/* ② 故障切换 */}
-          <div className="border-t border-neutral-300 pt-5">
+          <div className="border-t border-line pt-5">
             <div className="flex items-baseline justify-between gap-4">
               <h3 className="text-note font-semibold text-ink">上游出错，自动换下一条线路</h3>
               <span className="shrink-0 text-meta text-ink-muted">线路角色</span>
             </div>
 
-            <ul className="mt-4 divide-y divide-neutral-200 border-y border-neutral-300">
+            <ul className="mt-4 divide-y divide-line border-y border-line">
               {UPSTREAMS.map((item) => (
                 <li
                   key={item.name}
@@ -129,7 +143,7 @@ export function RequestFlow() {
                   <span
                     aria-hidden
                     className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-                      item.role === '主线路' ? 'bg-brand-500' : 'bg-neutral-400'
+                      item.role === '主线路' ? 'bg-brand-500' : 'bg-ink-muted'
                     }`}
                   />
                   <span className="truncate">{item.name}</span>
@@ -151,7 +165,7 @@ export function RequestFlow() {
 /** 模块二：平台能力（价值） */
 export function Capabilities() {
   return (
-    <section className="border-b border-line bg-white py-20 md:py-28">
+    <section className="border-b border-line py-20 md:py-28">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,420px)] md:items-end md:gap-12">
           <div>
@@ -170,25 +184,12 @@ export function Capabilities() {
 
         <ul className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
           {CAPABILITIES.map((item) => (
-            <li key={item.no} className="border-t border-neutral-300 pt-4">
+            <li key={item.no} className="border-t border-line pt-4">
               <div className="flex items-start justify-between">
                 <span className="font-mono text-meta tracking-[0.1em] text-ink-muted">
                   {item.no}
                 </span>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                  className="text-ink-muted"
-                >
-                  {ICONS[item.no]}
-                </svg>
+                {ICONS[item.no]}
               </div>
               <h3 className="mt-2 text-heading font-semibold tracking-tight text-ink">
                 {item.title}
@@ -206,3 +207,5 @@ export function Capabilities() {
     </section>
   );
 }
+
+

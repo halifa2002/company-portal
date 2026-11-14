@@ -18,6 +18,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { Arrow } from '@/components/ui/arrow';
 
 function Spark() {
   return (
@@ -51,9 +52,10 @@ export function AnnouncementBar(props: { modelCount: number }) {
           <span className="text-white/75">OpenAI / Claude / Gemini 三协议共用一套地址</span>
           <Link
             href="/models"
-            className="ml-2 whitespace-nowrap font-medium text-accent-warm transition-colors hover:text-accent-warm/80"
+            className="group ml-2 inline-flex items-center gap-1.5 whitespace-nowrap font-medium text-accent-warm transition-colors hover:text-accent-warm/80"
           >
-            查看模型清单 →
+            查看模型清单
+            <Arrow />
           </Link>
         </p>
 

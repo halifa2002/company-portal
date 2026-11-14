@@ -1,5 +1,6 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { registerUrl } from '@/lib/brand';
+import { Arrow } from '@/components/ui/arrow';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 /**
@@ -67,10 +68,10 @@ export function Faq() {
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <Link
                 href="/docs/faq"
-                className="inline-flex h-10 items-center gap-1.5 rounded-none border border-ink/25 bg-white px-4 text-meta font-medium text-ink transition-colors hover:border-ink/50 hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                className="group inline-flex h-10 items-center gap-2 rounded-none border border-ink/25 bg-white px-4 text-meta font-medium text-ink transition-colors hover:border-ink/50 hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
               >
                 查看全部问题
-                <span aria-hidden>→</span>
+                <Arrow />
               </Link>
               <Link
                 href={registerUrl}
@@ -85,7 +86,7 @@ export function Faq() {
           {/* 右：细线列表（原生 details，无 JS） */}
           <div>
             {FAQ.map((item) => (
-              <details key={item.q} className="group border-b border-dashed border-neutral-400 first:border-t">
+              <details key={item.q} className="group border-b border-line first:border-t">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 marker:hidden [&::-webkit-details-marker]:hidden">
                   <span className="text-[16.5px] font-medium text-ink transition-colors group-hover:text-brand-700">
                     {item.q}

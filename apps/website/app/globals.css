@@ -395,17 +395,21 @@ textarea:focus-visible,
  * 这里 6px 一格、0.5px 半径、透明度 0.05，只在放大看时出现印刷网点的质感，不会成条纹。
  */
 .closing-canvas {
-  background-color: #eef6ff;
-  background-image: url('/hero/closing-canvas.webp');
+  /* 2026-11-14 用户问「这里是不是深一点比较好」→ 改成深色收尾：
+     同一张 AI 云图外面压一层深蓝渐变（不是纯色平涂），最后一屏沉下来，
+     和页脚接得上，也把白色的主按钮衬出来。 */
+  background-color: #0a3a5f;
+  background-image: linear-gradient(132deg, rgba(8, 38, 68, 0.95) 0%, rgba(11, 58, 104, 0.90) 55%, rgba(18, 88, 143, 0.82) 100%),
+    url('/hero/closing-canvas.webp');
   background-size: cover;
   background-position: 50% 40%;
   background-repeat: no-repeat;
 }
 
 .closing-dots {
-  background-image: radial-gradient(rgba(24, 106, 190, 0.5) 0.5px, transparent 0.5px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.55) 0.5px, transparent 0.5px);
   background-size: 6px 6px;
-  opacity: 0.28;
+  opacity: 0.16;
   -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.8) 45%, rgba(0, 0, 0, 0.35) 100%);
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.8) 45%, rgba(0, 0, 0, 0.35) 100%);
 }
@@ -442,3 +446,61 @@ textarea:focus-visible,
   background-size: 160px 160px;
 }
 
+.surface-texture {
+  /* 2026-11-14 方案 B：底色近白微冷 + 一张 AI 生成的浅蓝云雾图当材质。
+   * 不做平铺 —— 试过 512 无缝平铺（镜像法 / 绕边混合法）都会在接缝处显出方格，
+   * 而这张图对比只有十级亮度、还是模糊的，拉伸到整屏看不出来，且全站共用一次缓存。 */
+  background-color: #fbfcfe;
+  background-image: url("/textures/mist-bg.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ==========================================================================
+ * 章节材质（2026-11-14 第十六版 · 治「斑马纹」）
+ *
+ * 问题：原来每一屏各自挂 .surface-texture，四块浅蓝屏就是同一张云图被裁了四刀，
+ * 每刀都在区块边界重新 cover 一次 —— 云纹在接缝处断开，滚动时是一道道横带。
+ *
+ * 做法：把相邻的几屏包进一个容器，材质只挂在**容器**上，里面的 section 全部透明。
+ * 整章共用一幅 cover 图，云纹从头连到尾，页面上只剩「换章」时才变一次底色。
+ *
+ * 为什么仍然用 cover：容器高约 2900px，图会被拉伸到 1.8 倍。这张图本来就只有
+ * 19 级亮度、没有细节（模糊云雾），放大 1.8 倍肉眼看不出；换成平铺反而回到接缝问题。
+ * ========================================================================== */
+.chapter-mist {
+  background-color: #fbfcfe;
+  background-image: url("/textures/mist-bg.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ==========================================================================
+ * 转化带（2026-11-14 第十七版 · 定为「纯渐变」）
+ *
+ * 演进：生图水彩天空（青绿色相 184°，出界）→ 叠收尾 CTA 的云图（压到 87–97%）
+ * → **去掉照片层，只留渐变**（本版）。
+ *
+ * 为什么最后把照片删干净：
+ *   ① 实测贡献≈0。照片被压在 0.87–0.97 的深蓝下面，整条从左到右看到的就是一条
+ *      干净的渐变（#112f4e → #275e8c），照片只贡献 1–3 级的明度抖动，肉眼不可见；
+ *   ② 参考站里没有这种用法。fireworks 的深色段是纯深色 + 一层极淡径向光，
+ *      teamorouter 的同类价格带是整块彩色照片 —— 没有一个在深色带上叠半调/网点。
+ *      所以这条带就该是「渐变」，不该再造第五种材质；
+ *   ③ 留着它只是在注释里自我安慰，还多一次解码。
+ *
+ * 【深色两档的规矩，后续照这个用】
+ *   扁带子（高度 ~200px、功能位：让人停一下、给按钮）→ **只用渐变**，不做纹理；
+ *   整幅收口（首屏 / 收尾 CTA，情绪位）→ **图 + 网点 + 光晕**，该花的钱花在这里。
+ * ========================================================================== */
+.band-canvas {
+  background-color: #0a3a5f;
+  background-image: linear-gradient(
+    100deg,
+    rgba(8, 38, 68, 0.97) 0%,
+    rgba(11, 58, 104, 0.93) 55%,
+    rgba(16, 78, 128, 0.87) 100%
+  );
+}

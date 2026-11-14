@@ -74,7 +74,7 @@ const METRICS: Metric[] = [
 
 export function KeyMetrics() {
   return (
-    <section className="relative overflow-hidden border-b border-line surface-neutral py-20 md:py-28">
+    <section className="relative overflow-hidden border-b border-line py-20 md:py-28">
       {/* 背景细网格：52px 一格、5% 透明度、径向淡出（只做肌理，不做主角） */}
       <div
         aria-hidden
@@ -89,16 +89,23 @@ export function KeyMetrics() {
       />
 
       <div className="relative mx-auto w-full max-w-[1280px] px-6 md:px-10">
-        {/* 标题：改成居中，和参考站一致（数字区更需要一个居中的入口） */}
-        <div className="mx-auto max-w-[46em] text-center">
-          <SectionEyebrow>平台能力</SectionEyebrow>
-          <h2
-            className="mt-4 text-balance font-bold tracking-tight text-ink"
-            style={{ fontSize: 'clamp(32px, 3vw, 52px)', lineHeight: 1.2 }}
-          >
-            生产级的可靠性
-          </h2>
-          <p className="mx-auto mt-4 max-w-[40em] text-note leading-relaxed text-ink-mid md:text-[16.5px]">
+        {/*
+         * 标题（2026-11-15 改回左对齐）：
+         * 上一版照参考站做成居中眉题 + 居中标题，但这页其余十一屏全是
+         * 「左侧短横线 + 眉标 + 左对齐大标题 + 右侧一句说明」，
+         * 只有这一屏居中，滚到这儿版面突然断一次。现在归队，与全站同一套骨架。
+         */}
+        <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,420px)] md:items-end md:gap-12">
+          <div>
+            <SectionEyebrow>平台能力</SectionEyebrow>
+            <h2
+              className="mt-4 text-balance font-bold tracking-tight text-ink"
+              style={{ fontSize: 'clamp(32px, 3vw, 52px)', lineHeight: 1.2 }}
+            >
+              生产级的可靠性
+            </h2>
+          </div>
+          <p className="text-note leading-relaxed text-ink-mid md:pb-1.5">
             不是玩具项目。从可用性到延迟，从重试机制到账单透明度，每个环节都按生产环境标准设计。
           </p>
         </div>

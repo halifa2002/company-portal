@@ -1,9 +1,10 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { modelPriceText, type ModelView } from '@/lib/pricing';
 import { VendorLogo } from '../vendor-logo';
+import { Arrow } from '@/components/ui/arrow';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { ModelStack } from './model-stack';
 
@@ -134,9 +135,16 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
 
         {/* ---------------- 表格 ---------------- */}
         {/* 桌面端：完整表格（≥ md 显示） */}
-        <div className="hidden overflow-x-auto md:block">
+        <div className="hidden overflow-x-clip md:block">
           <table className="w-full min-w-[560px] border-collapse text-left">
-            <thead className="sticky top-0 z-10 bg-surface-subtle">
+            {/*
+             * 表头（2026-11-14 修）：原来写的是 `sticky top-0`，滚到表格时表头会贴到
+             * 视口最顶，正好被 65px 高的站点头盖住——只看得见下半截，用户反馈「头被截断」。
+             * 站点头是 sticky top-0 且 z-50，所以表头必须停在它下面：top 改成 65px。
+             * 同时给表头补一条底边：吸顶后行与行之间的分隔线会从表头下方滑过，没有这条线
+             * 表头和第一行会粘成一片。
+             */}
+            <thead className="sticky top-[65px] z-10 border-b border-line bg-surface-subtle">
               <tr className="text-meta uppercase tracking-[0.08em] text-ink-muted">
                 <th className="py-3 pr-4 font-medium">模型</th>
                 <th className="hidden py-3 pr-4 font-medium sm:table-cell">厂商</th>
@@ -250,15 +258,10 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
             />
             <Link
               href="/pricing"
-              className="group inline-flex items-center gap-1 whitespace-nowrap text-meta font-medium text-ink transition-colors hover:text-brand-700"
+              className="group inline-flex items-center gap-1.5 whitespace-nowrap text-meta font-medium text-ink transition-colors hover:text-brand-700"
             >
               完整价格表
-              <span
-                aria-hidden
-                className="transition-transform duration-150 group-hover:translate-x-0.5"
-              >
-                →
-              </span>
+              <Arrow />
             </Link>
           </div>
 
@@ -302,4 +305,5 @@ function SectionHead(props: { eyebrow: string; title: string; desc: string }) {
     </div>
   );
 }
+
 

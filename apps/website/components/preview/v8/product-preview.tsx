@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { consoleUrl } from '@/lib/brand';
+import { Arrow } from '@/components/ui/arrow';
 import { buttonStyles } from '@/components/ui/button';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
@@ -37,7 +38,7 @@ const POINTS = [
 
 export function ProductPreview() {
   return (
-    <section className="border-b border-line surface-neutral py-20 md:py-28">
+    <section className="border-b border-line py-20 md:py-28">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:gap-16">
           {/* 左：说明 */}
@@ -62,9 +63,9 @@ export function ProductPreview() {
               ))}
             </ul>
 
-            <Link href={consoleUrl} className={`mt-7 ${buttonStyles('primary')}`}>
+            <Link href={consoleUrl} className={`group mt-7 ${buttonStyles('primary')}`}>
               打开控制台
-              <span aria-hidden>→</span>
+              <Arrow />
             </Link>
           </div>
 
@@ -81,7 +82,7 @@ export function ProductPreview() {
                 <span className="h-3 w-3 rounded-full bg-green-300/60" />
               </div>
               <span className="ml-2 font-mono text-meta text-ink-muted">console · 概览</span>
-              <span className="ml-auto rounded-none border border-neutral-300 bg-neutral-100 px-2.5 py-0.5 text-meta font-medium text-ink-mid">
+              <span className="ml-auto rounded-none border border-line bg-surface-subtle px-2.5 py-0.5 text-meta font-medium text-ink-mid">
                 界面示意 · 数据为示例
               </span>
             </div>

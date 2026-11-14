@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { VendorLogo } from '../vendor-logo';
+import { Arrow } from '@/components/ui/arrow';
 
 /**
  * 模型图标堆叠胶囊（2026-11-14 加）
@@ -38,12 +39,7 @@ export function ModelStack(props: {
       </span>
 
       <span className="whitespace-nowrap text-note font-medium text-ink">{props.label}</span>
-      <span
-        aria-hidden
-        className="text-ink-muted transition-transform duration-300 group-hover:translate-x-0.5"
-      >
-        →
-      </span>
+      <Arrow className="text-ink-muted duration-300" />
     </Link>
   );
 }

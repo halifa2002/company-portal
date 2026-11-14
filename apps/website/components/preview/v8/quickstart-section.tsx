@@ -1,4 +1,5 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
+import { FileText, SquareTerminal } from 'lucide-react';
 import { registerUrl } from '@/lib/brand';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { ProtocolTabs } from './protocol-tabs';
@@ -18,44 +19,6 @@ import { ProtocolTabs } from './protocol-tabs';
  *   这里回答「代码怎么写」，深色那块回答「要按什么顺序做什么」。
  */
 
-function DocIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5V5.5Z" />
-      <path d="M8 7h7M8 11h7" />
-    </svg>
-  );
-}
-
-function ConsoleIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <rect x="3" y="4" width="18" height="16" rx="2" />
-      <path d="m7 10 3 2-3 2M13 14h4" />
-    </svg>
-  );
-}
-
 function EntryCard(props: {
   href: string;
   icon: React.ReactNode;
@@ -67,6 +30,7 @@ function EntryCard(props: {
       href={props.href}
       className="group flex items-start gap-3 rounded-[6px] border border-line bg-white p-4 transition-colors hover:border-ink/25 hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
     >
+      {/* 图标：线性单色（lucide），垫一枚浅底方块；与「能力四条」同一套规格 */}
       <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-surface-subtle text-ink-mid">
         {props.icon}
       </span>
@@ -96,7 +60,7 @@ function EntryCard(props: {
 
 export function QuickStartSection() {
   return (
-    <section id="quickstart" className="border-b border-line surface-neutral">
+    <section id="quickstart" className="border-b border-line">
       <div className="mx-auto w-full max-w-[1280px] px-6 py-16 md:px-10 md:py-20">
         {/* 2026-11-14 第三版：不再居中摆一个小标题，改成与全站其它屏同一套「眉标 + 大标题 + 右侧说明」。
          * 居中标题在这页是异类——其它十二屏都是左对齐大字，只有它居中且字号小一号，扫下来会以为它不是一级栏目。
@@ -127,13 +91,13 @@ export function QuickStartSection() {
             <div className="space-y-3">
               <EntryCard
                 href="/docs/quickstart"
-                icon={<DocIcon />}
+                icon={<FileText size={20} strokeWidth={1.6} />}
                 title="查看 API 文档"
                 desc="协议差异、请求参数、错误码与限流说明"
               />
               <EntryCard
                 href={registerUrl}
-                icon={<ConsoleIcon />}
+                icon={<SquareTerminal size={20} strokeWidth={1.6} />}
                 title="进入控制台创建 Key"
                 desc="注册后即可新建密钥，用量与账单同页查看"
               />
@@ -170,4 +134,6 @@ export function QuickStartSection() {
     </section>
   );
 }
+
+
 

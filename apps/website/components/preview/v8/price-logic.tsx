@@ -39,7 +39,7 @@ const STEPS = [
 
 export function PriceLogic() {
   return (
-    <section className="relative overflow-hidden border-b border-line surface-neutral py-20 md:py-28">
+    <section className="relative overflow-hidden border-b border-line py-20 md:py-28">
       <div className="relative mx-auto w-full max-w-[1280px] px-6">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,420px)] md:items-end md:gap-12">
           <div>

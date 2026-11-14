@@ -1,5 +1,6 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { registerUrl } from '@/lib/brand';
+import { Arrow } from '@/components/ui/arrow';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 /**
@@ -66,10 +67,14 @@ export function TwoPaths() {
             <div
               key={path.title}
               className={[
-                'group relative overflow-hidden rounded-none border p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl',
-                path.variant === 'primary'
-                  ? 'border-neutral-300 bg-white hover:border-ink/30'
-                  : 'border-line bg-gradient-to-br from-surface-subtle to-white hover:border-ink/30',
+                /*
+                 * 边框（2026-11-14 加深一档）：原来用 border-line（#dce8f0），
+                 * 这两张卡是白底白卡，边框几乎看不见，卡像飘在页面上。
+                 * 没有改成纯黑——全站 hairline 都是蓝灰一档，纯黑会让这一屏变表格；
+                 * 也没新增 token，直接用 ink 的透明度（按钮那边本来就这么写）：
+                 * 静止 ink/15（≈ #cfd9e4，看得见但不抢），hover 收到 ink/30。
+                 */
+                'group relative overflow-hidden rounded-none border border-ink/25 bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-ink/45 hover:shadow-[0_18px_40px_-26px_rgba(6,34,63,0.35)]',
               ].join(' ')}
             >
               {/* 装饰光晕 */}
@@ -89,13 +94,13 @@ export function TwoPaths() {
                  * 而**行内样式** width: fit-content 实测能恢复成 100px。所以这里直接写行内样式，
                  * 不用 class 猜。根因（inline-block 在本页为何收缩成 8px）还没查清，先按可用方案兜住。
                  */}
+                {/*
+                 * 标签（2026-11-15 统一）：原来两块分别是品牌蓝实心与深海军蓝实心，
+                 * 同一位置的同级标签出现两种色阶，等于给「开发者」暗中加了一级权重。
+                 * 现在两块都是深海军蓝实心，分级交给下面的按钮（主/次）。
+                 */}
                 <span
-                  className={[
-                    'inline-block whitespace-nowrap rounded-full px-3 py-1 text-meta font-semibold uppercase tracking-wider',
-                    path.variant === 'primary'
-                      ? 'bg-brand-500 text-white'
-                      : 'bg-ink text-white',
-                  ].join(' ')}
+                  className="inline-block whitespace-nowrap rounded-full bg-ink px-3 py-1 text-meta font-semibold uppercase tracking-wider text-white"
                   style={{ width: 'fit-content' }}
                 >
                   {path.tag}
@@ -111,12 +116,7 @@ export function TwoPaths() {
                   {path.points.map((point) => (
                     <li key={point} className="flex items-start gap-3 text-note text-ink-mid">
                       <span
-                        className={[
-                          'mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full',
-                          path.variant === 'primary'
-                            ? 'bg-brand-100 text-brand-700'
-                            : 'bg-surface-subtle text-ink-mid',
-                        ].join(' ')}
+                        className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700"
                       >
                         <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M2 6l3 3 5-6" />
@@ -138,9 +138,7 @@ export function TwoPaths() {
                   ].join(' ')}
                 >
                   {path.cta.label}
-                  <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">
-                    →
-                  </span>
+                  <Arrow />
                 </Link>
               </div>
             </div>
@@ -150,3 +148,4 @@ export function TwoPaths() {
     </section>
   );
 }
+

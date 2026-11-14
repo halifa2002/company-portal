@@ -92,7 +92,7 @@ function CardTexture({ index }: { index: number }) {
     <>
       <div
         aria-hidden='true'
-        className='pointer-events-none absolute inset-0 bg-cover bg-center opacity-90'
+        className='pointer-events-none absolute inset-0 bg-cover bg-center opacity-90 transition-opacity duration-200 group-hover:opacity-100'
         style={{ backgroundImage: `url('${src}')`, transform }}
       />
       {/* 左侧压成实色保白字可读，向右放开让纹理显出来 */}
@@ -116,7 +116,7 @@ export function WhyChoose() {
           {HEADLINERS.map((item, index) => (
             <div
               key={item.title}
-              className='relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 sm:p-10'
+              className='group relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 transition-colors duration-200 hover:bg-brand-900 sm:p-10'
             >
               <CardTexture index={index} />
               <div className='relative'>

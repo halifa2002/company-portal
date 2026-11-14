@@ -107,12 +107,12 @@ function CardTexture({ index }: { index: number }) {
  * 白卡的装饰：四张卡各一张生图图案（2026-11-15 用户否掉手绘 SVG 后改为生图）。
  * 规格统一为「浅蓝玻璃质感 + 纯白底 + 居中留白」，因此直接用 mix-blend-multiply：
  * 卡片底色是纯白 #ffffff，白底相乘后不可见，只留浅蓝图案，无需抠图。
- * 图案语义：层叠 → 稳定性 / 三节点 → 智能 / 边界+核心 → 安全性 / 模块交叠 → 扩展性。
+ * 图案语义与顶部四张主体图标一一对应：层叠 / 三节点 / 盾牌 / 模块交叠。
  */
 const MOTIF_IMAGES = [
   '/textures/why-mark-layer.png',
   '/textures/why-mark-graph.png',
-  '/textures/why-mark-core.png',
+  '/textures/why-mark-shield.png',
   '/textures/why-mark-module.png',
 ];
 

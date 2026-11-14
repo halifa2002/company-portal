@@ -1,4 +1,4 @@
-﻿import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 /**
  * S7：为什么是这个价（2026-11-14 视觉第四版）。
@@ -27,7 +27,7 @@ const STEPS = [
     no: '02',
     label: '平台运营层',
     icon: <ArcIcon />,
-    points: ['采购价基础上收取固定平台服务费', '用于网关、计费、对账与技术支持'],
+    points: ['页面价即最终价，调用时不加收任何费用', '网关、计费、对账与技术支持，全部含在这一层'],
   },
   {
     no: '03',
@@ -52,7 +52,7 @@ export function PriceLogic() {
             </h2>
           </div>
           <p className="text-note leading-relaxed text-ink-mid md:pb-1.5">
-            一个账户，一张账单。价格从采购价往下算，平台只收中间一层。
+            一个账户，一张账单。钱花在哪一层，摊开给你看。
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export function PriceLogic() {
           {STEPS.map((step, index) => (
             <li
               key={step.label}
-              className="group relative flex flex-col items-center rounded-none border border-line bg-white px-6 pb-8 pt-10 text-center transition-colors duration-300 hover:border-brand-300"
+              className="group relative flex flex-col items-center rounded-none border border-ink/20 bg-white px-6 pb-8 pt-10 text-center transition-colors duration-300 hover:border-brand-300"
             >
               <span className="text-brand-500 transition-transform duration-300 group-hover:-translate-y-1 motion-reduce:transition-none">
                 {step.icon}
@@ -87,12 +87,28 @@ export function PriceLogic() {
               </ul>
 
               {index < STEPS.length - 1 && (
+                /*
+                 * 步骤连接符（2026-11-14 第二次优化）：第一版 16px 箭头在 24px 的列间距里
+                 * 仍然"浮"着——四周都是空白，读不出它连着两张卡。
+                 * 现在做成**铺满整个间距**的连接线：宽 24px、right -24px，两端正好顶到两张卡的
+                 * 边框，读作"从这张卡流向下一张卡"。颜色 brand-500，和卡里的小圆点同色。
+                 */
                 <span
                   aria-hidden
-                  className="absolute -right-[18px] top-1/2 hidden -translate-y-1/2 text-brand-300 md:block"
+                  className="absolute top-1/2 hidden -translate-y-1/2 text-brand-500 md:block"
+                  style={{ right: '-24px' }}
                 >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M2 8h10M9 5l4 3-4 3" />
+                  <svg
+                    width="24"
+                    height="16"
+                    viewBox="0 0 24 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M1 8h18M15 4l4 4-4 4" />
                   </svg>
                 </span>
               )}

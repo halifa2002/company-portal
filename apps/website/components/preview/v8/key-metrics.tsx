@@ -114,7 +114,7 @@ export function KeyMetrics() {
           {METRICS.map((metric) => (
             <div
               key={metric.label}
-              className="group relative overflow-hidden rounded-none border border-line bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_18px_40px_-26px_rgba(6,34,63,0.35)] md:p-7"
+              className="group relative overflow-hidden rounded-none border border-ink/20 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_18px_40px_-26px_rgba(6,34,63,0.35)] md:p-7"
             >
               {/* 卡内两层"质感"（2026-11-14 加，照参考站那种卡片底纹）：
                * ① 细网点：6px 一格的均匀点，透明度压得很淡，只在卡内做纸感；

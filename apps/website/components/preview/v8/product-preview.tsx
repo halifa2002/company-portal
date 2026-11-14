@@ -70,7 +70,7 @@ export function ProductPreview() {
           </div>
 
           {/* 右：界面示意 */}
-          <div className="group relative rounded-none border border-line bg-white p-4 shadow-[0_18px_50px_-40px_rgba(6,34,63,0.5)] transition-all duration-300 hover:shadow-[0_24px_60px_-40px_rgba(6,34,63,0.6)]">
+          <div className="group relative rounded-none border border-ink/20 bg-white p-4 shadow-[0_18px_50px_-40px_rgba(6,34,63,0.5)] transition-all duration-300 hover:shadow-[0_24px_60px_-40px_rgba(6,34,63,0.6)]">
             {/* 装饰渐变边框 */}
             <div className="pointer-events-none absolute inset-0 rounded-none bg-gradient-to-br from-brand-200/20 via-transparent to-brand-300/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             

@@ -2,10 +2,13 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { Check, ChevronDown } from 'lucide-react';
 import { modelPriceText, type ModelView } from '@/lib/pricing';
+import { registerUrl } from '@/lib/brand';
 import { VendorLogo } from '../vendor-logo';
 import { Arrow } from '@/components/ui/arrow';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import { STATIC_STATS } from './tokens';
 import { ModelStack } from './model-stack';
 
 /**
@@ -26,12 +29,30 @@ import { ModelStack } from './model-stack';
  *
  * 后端不通时整表换成降级说明，不显示假数字。
  */
-const SHOW_LIMIT = 20;
+/**
+ * 行数（2026-11-14 领导口径：这一屏还是太长 → 默认只显示 10 个，
+ * 给一个展开/收起的开关：收起 10 行、展开 20 行，再多引到价格总览与模型广场）。
+ */
+/**
+ * 数据条下面的五条卖点（领导口径：便宜 / 不跑路 / 稳定 / 不翻墙；用户：卖点要明显）。
+ * 每条都写成**可核对的事实**，不写「绝不跑路」「低至 X 折」这类越强调越可疑的说法。
+ */
+const SELLING_POINTS = [
+  '不用翻墙',
+  '不囤额度',
+  '无隐藏收费',
+  '对公签约与发票',
+  '调价提前公示',
+] as const;
+
+const COLLAPSED_ROWS = 10;
+const EXPANDED_ROWS = 20;
 
 export function PricingTable(props: { models: ModelView[]; pricingAvailable: boolean }) {
   const [vendor, setVendor] = useState<string>('全部');
   const [category, setCategory] = useState<string>('全部');
   const [keyword, setKeyword] = useState('');
+  const [expanded, setExpanded] = useState(false);
 
   const vendors = useMemo(
     () => ['全部', ...Array.from(new Set(props.models.map((m) => m.vendorName)))],
@@ -52,8 +73,22 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
     });
   }, [props.models, vendor, category, keyword]);
 
-  // 首页只铺 SHOW_LIMIT 行；差额交给底部的两个出口，不在这里做「展开」
-  const shown = visible.slice(0, SHOW_LIMIT);
+  // 首页只铺 COLLAPSED_ROWS 行，点「展开」到 EXPANDED_ROWS 行；差额交给底部的两个出口
+  const shown = visible.slice(0, expanded ? EXPANDED_ROWS : COLLAPSED_ROWS);
+  const canExpand = visible.length > COLLAPSED_ROWS;
+
+  // 广告栏用的「最低输入价」：从当前模型数据现算，不写死数字（接新模型会自动跟着变）
+  const minInputPrice = useMemo(() => {
+    const values = props.models
+      .flatMap((model) => {
+        const price = model.price;
+        if (price.mode === 'flat') return [price.inputPerM];
+        if (price.mode === 'tiered') return price.tiers.map((tier) => tier.inputPerM);
+        return [];
+      })
+      .filter((value) => Number.isFinite(value) && value > 0);
+    return values.length ? Math.min(...values) : null;
+  }, [props.models]);
 
   if (!props.pricingAvailable) {
     return (
@@ -78,8 +113,68 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
           desc="单价直接读后台计费配置生成，与下单结算一致；后台调价或上下架，这里跟着变。"
         />
 
+        {/*
+         * 价格数据带（2026-11-14 第三版，按 openrouter / stripe 的做法重做）。
+         *
+         * 看了 openrouter 首页与几篇 pricing 页规范，学到三件事：
+         *   ① **数字不装在盒子里**：OpenRouter 的「800T+ / 10M+ / 600+」是纯文字排的，
+         *      大号数字 + 小号标签，靠字号对比撑层次 —— 比「卡片 + 图标小方块」高级得多，
+         *      这也是第二版显得堆砌的原因：装饰多、字号差小。
+         *   ② **承诺写成一行 meta**（· 分隔），不逐条配图标：图标一多就成"卖点墙"。
+         *   ③ **一条带上只留一个彩色**：这里是价格（brand-700），其余全墨色。
+         * 所以这一版去掉浅底盒子、去掉图标方块，改成上下两条细线的「数据条」，
+         * 承诺与按钮收在右下。数字仍然全部来自真实数据（模型数、最低价、协议数）。
+         */}
+        <div className="mt-8 border-y border-brand-200 bg-brand-50/60 px-5 py-6 lg:px-7 lg:py-7">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
+            <dl className="flex flex-wrap items-end gap-x-10 gap-y-5">
+              <div>
+                <dd className="font-mono text-[38px] font-bold leading-none tracking-tight text-ink">
+                  {props.models.length}
+                </dd>
+                <dt className="mt-2 text-meta text-ink-muted">个模型，一个 Key 全都能调</dt>
+              </div>
+              <div>
+                <dd className="font-mono text-[38px] font-bold leading-none tracking-tight text-brand-700">
+                  {minInputPrice === null ? '—' : `¥${minInputPrice.toFixed(2)}`}
+                </dd>
+                <dt className="mt-2 text-meta text-ink-muted">最低价 / 百万 tokens</dt>
+              </div>
+              <div>
+                <dd className="font-mono text-[38px] font-bold leading-none tracking-tight text-ink">
+                  {STATIC_STATS.protocols.value}
+                </dd>
+                <dt className="mt-2 text-meta text-ink-muted">种协议，共用一套地址</dt>
+              </div>
+            </dl>
+            <Link
+              href={registerUrl}
+              className="group inline-flex h-11 shrink-0 items-center gap-1.5 rounded-none bg-ink px-5 text-note font-medium text-white transition-colors hover:bg-ink/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+            >
+              免费注册拿 Key
+              <Arrow />
+            </Link>
+          </div>
+
+          {/*
+           * 卖点行（2026-11-14 第三版后补：用户「卖点要明显啊」）。
+           * 上一版把五条承诺压成一行 12px 灰字，等于藏起来了。现在：
+           *   - 字号 12 → 14（text-note）、颜色 ink-mid → ink，字重 medium；
+           *   - 每条前面加一枚品牌蓝勾（lucide Check，16px），勾比"·"更能读成"承诺"；
+           *   - 单独一行铺在数据下面，用一条 hairline 与数据分开，跨度足够，不再挤在右下角。
+           */}
+          <ul className="mt-5 flex flex-wrap items-center gap-x-7 gap-y-2.5 border-t border-line pt-5">
+            {SELLING_POINTS.map((point) => (
+              <li key={point} className="flex items-center gap-1.5 text-note font-medium text-ink">
+                <Check size={16} strokeWidth={2.6} aria-hidden className="shrink-0 text-brand-700" />
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* ---------------- 筛选条 ---------------- */}
-        <div className="mt-10 flex flex-col gap-4 border-y border-line py-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mt-8 flex flex-col gap-4 border-y border-line py-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-x-1.5 gap-y-2">
             {vendors.map((item) => (
               <button
@@ -239,6 +334,30 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
             </li>
           )}
         </ul>
+
+        {/* 展开 / 收起（2026-11-14 领导：这一屏还是太长，默认 10 个 + 一个开关到 20 个）。
+         *   - 只在筛完还有超过 10 条时才出现，否则这个按钮没有意义；
+         *   - 文案只承诺"更多"，**不写"全部"**：展开是 20 条，而模型总数可能 27 条，
+         *     写"全部"就是假话（用户当场指出）。收起态「展开更多」，展开态「收起」；
+         *   - 表尾那句广告语与两个出口**保持不动**，开关只负责行数。 */}
+        {canExpand && (
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              aria-expanded={expanded}
+              className="group inline-flex items-center gap-1.5 rounded-none border border-ink/20 px-4 py-2 text-meta font-medium text-ink transition-colors hover:border-ink/45 hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+            >
+              {expanded ? '收起' : '展开更多'}
+              <ChevronDown
+                size={14}
+                strokeWidth={1.8}
+                aria-hidden
+                className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+              />
+            </button>
+          </div>
+        )}
 
         {/* 底部收口（2026-11-14 第四版，按用户意见）：
          *   1. 整块居中——原来「左文案 / 右按钮」的左右分栏取消，一句话 + 一个胶囊居中收；

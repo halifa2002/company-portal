@@ -103,31 +103,6 @@ function CardTexture({ index }: { index: number }) {
     </>
   );
 }
-/**
- * 白卡的装饰：右下角一簇细线电路（2026-11-15 生图版，参照硅基流动那套 PCB 语言）。
- * 纯白底 + 单一浅蓝线（#7ccbff）、圆角直角走线、嵌套方框与焊盘阵列，整体微微倾斜。
- * 卡片底是纯白 #ffffff，白底用 mix-blend-multiply 直接消失，不用抠图。
- * 四张各一种构图：阶梯走线 / 芯片群 / 互锁方框 / 长带延伸。
- */
-const MOTIF_IMAGES = [
-  '/textures/why-sq-1.png',
-  '/textures/why-sq-2.png',
-  '/textures/why-sq-3.png',
-  '/textures/why-sq-4.png',
-];
-
-function CardMotif({ variant }: { variant: number }) {
-  return (
-    <img
-      src={MOTIF_IMAGES[variant % MOTIF_IMAGES.length]}
-      alt=''
-      aria-hidden='true'
-      width={210}
-      height={210}
-      className='pointer-events-none absolute -right-5 -bottom-7 size-[138px] opacity-75 mix-blend-multiply select-none'
-    />
-  );
-}
 export function WhyChoose() {
   return (
     <section id='why-choose' className='border-b border-line py-16 md:py-24'>
@@ -175,7 +150,6 @@ export function WhyChoose() {
               key={pillar.title}
               className='relative overflow-hidden border border-ink bg-surface p-6 sm:p-7'
             >
-              <CardMotif variant={index} />
               <div className='relative flex justify-center'>
                 <img
                   src={pillar.icon}
@@ -209,7 +183,6 @@ export function WhyChoose() {
     </section>
   );
 }
-
 
 
 

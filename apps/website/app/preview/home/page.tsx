@@ -1,24 +1,24 @@
 import { MODEL_CATALOG } from '@portal/types';
 import { loadModelList } from '@/lib/pricing';
 import { SiteHeader } from '@/components/site-chrome';
-import { V8Footer } from '@/components/preview/v8/shell';
-import { V8Hero } from '@/components/preview/v8/hero';
-import { AnnouncementBar } from '@/components/preview/v8/announcement-bar';
-import { QuickStartSection } from '@/components/preview/v8/quickstart-section';
-import { WhyChoose } from '@/components/preview/v8/why-choose';
-import { RequestFlow, Capabilities } from '@/components/preview/v8/capabilities';
-import { TwoPaths } from '@/components/preview/v8/two-paths';
-import { ProductPreview } from '@/components/preview/v8/product-preview';
-import { KeyMetrics } from '@/components/preview/v8/key-metrics';
-import { PricingTable } from '@/components/preview/v8/pricing-table';
-import { QuickStart } from '@/components/preview/v8/quick-start';
-import { PriceLogic } from '@/components/preview/v8/price-logic';
-import { Faq } from '@/components/preview/v8/faq';
-import { ClosingCta } from '@/components/preview/v8/closing';
-import { Reveal } from '@/components/preview/v8/motion';
+import { V8Footer } from '@/components/preview/v9/shell';
+import { V8Hero } from '@/components/preview/v9/hero';
+import { AnnouncementBar } from '@/components/preview/v9/announcement-bar';
+import { QuickStartSection } from '@/components/preview/v9/quickstart-section';
+import { WhyChoose } from '@/components/preview/v9/why-choose';
+import { RequestFlow, Capabilities } from '@/components/preview/v9/capabilities';
+import { TwoPaths } from '@/components/preview/v9/two-paths';
+import { ProductPreview } from '@/components/preview/v9/product-preview';
+import { KeyMetrics } from '@/components/preview/v9/key-metrics';
+import { PricingTable } from '@/components/preview/v9/pricing-table';
+import { QuickStart } from '@/components/preview/v9/quick-start';
+import { PriceLogic } from '@/components/preview/v9/price-logic';
+import { Faq } from '@/components/preview/v9/faq';
+import { ClosingCta } from '@/components/preview/v9/closing';
+import { Reveal } from '@/components/preview/v9/motion';
 
 /**
- * 官网首页「预览版 v8」—— 与正式版完全独立的一份重写。
+ * 官网首页「预览版 v9」—— 与正式版完全独立的一份重写。
  *
  * 地址：http://127.0.0.1:4101/preview/home
  *
@@ -47,7 +47,7 @@ import { Reveal } from '@/components/preview/v8/motion';
  * 定稿后：把 v8 的改动搬回正式版 components/，再删掉 /preview 整个目录。
  */
 export const metadata = {
-  title: '预览版 v8 · 首页',
+  title: '预览版 v9 · 首页',
   robots: { index: false, follow: false },
 };
 
@@ -139,7 +139,7 @@ export default async function PreviewHomePageV8() {
 
       {/* 左下角预览标记：截图发人、隔一会儿再看，能一眼分清试验还是线上 */}
       <div className="pointer-events-none fixed bottom-4 left-4 z-[60] rounded-full border border-line bg-white px-3 py-1.5 text-meta font-medium tracking-wide text-ink-muted shadow-[0_2px_10px_rgba(6,34,63,0.06)]">
-        预览版 v8 · 改这里不影响正式站
+        预览版 v9 · 改这里不影响正式站
       </div>
     </div>
   );

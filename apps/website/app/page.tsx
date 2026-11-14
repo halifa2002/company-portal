@@ -1,29 +1,29 @@
 import { MODEL_CATALOG } from '@portal/types';
 import { loadModelList } from '@/lib/pricing';
 import { SiteHeader } from '@/components/site-chrome';
-import { V8Footer } from '@/components/preview/v8/shell';
-import { V8Hero } from '@/components/preview/v8/hero';
-import { AnnouncementBar } from '@/components/preview/v8/announcement-bar';
-import { QuickStartSection } from '@/components/preview/v8/quickstart-section';
-import { WhyChoose } from '@/components/preview/v8/why-choose';
-import { RequestFlow, Capabilities } from '@/components/preview/v8/capabilities';
-import { TwoPaths } from '@/components/preview/v8/two-paths';
-import { ProductPreview } from '@/components/preview/v8/product-preview';
-import { KeyMetrics } from '@/components/preview/v8/key-metrics';
-import { PricingTable } from '@/components/preview/v8/pricing-table';
-import { QuickStart } from '@/components/preview/v8/quick-start';
-import { PriceLogic } from '@/components/preview/v8/price-logic';
-import { Faq } from '@/components/preview/v8/faq';
-import { ClosingCta } from '@/components/preview/v8/closing';
-import { Reveal } from '@/components/preview/v8/motion';
+import { V8Footer } from '@/components/preview/v9/shell';
+import { V8Hero } from '@/components/preview/v9/hero';
+import { AnnouncementBar } from '@/components/preview/v9/announcement-bar';
+import { QuickStartSection } from '@/components/preview/v9/quickstart-section';
+import { WhyChoose } from '@/components/preview/v9/why-choose';
+import { RequestFlow, Capabilities } from '@/components/preview/v9/capabilities';
+import { TwoPaths } from '@/components/preview/v9/two-paths';
+import { ProductPreview } from '@/components/preview/v9/product-preview';
+import { KeyMetrics } from '@/components/preview/v9/key-metrics';
+import { PricingTable } from '@/components/preview/v9/pricing-table';
+import { QuickStart } from '@/components/preview/v9/quick-start';
+import { PriceLogic } from '@/components/preview/v9/price-logic';
+import { Faq } from '@/components/preview/v9/faq';
+import { ClosingCta } from '@/components/preview/v9/closing';
+import { Reveal } from '@/components/preview/v9/motion';
 
 /**
- * 官网首页（正式版）—— 2026-11-15 由 v8 预览版提升而来。
+ * 官网首页（正式版）—— 2026-11-15 由预览版 v8 提升而来（同日预览页升为 v9）。
  *
  * 与 /preview/home 的关系：**两份独立的页面代码，互不影响。**
  *   - 页面结构、屏序、文案在本文件（正式版）与 app/preview/home/page.tsx（预览版）
  *     各存一份，改动其中一份不会波及另一份；
- *   - 底层展示组件共用 components/preview/v8/*（与仓库既有约定一致：
+ *   - 底层展示组件共用 components/preview/v9/*（与仓库既有约定一致：
  *     home-page-body 与 home-preview-body 也是「独立副本」而不是同一个文件）；
  *   - 因此「在预览页改完 → 搬到这里」才是发布动作，预览页保持为试验田。
  *

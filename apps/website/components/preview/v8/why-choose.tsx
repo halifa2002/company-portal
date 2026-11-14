@@ -70,6 +70,57 @@ const PILLARS = [
   },
 ];
 
+/**
+ * 深色卡右下角的装饰：电路走线纹样（蓝 + 绿细线，圆角折弯 + 方块节点）。
+ * 纯装饰 —— aria-hidden + pointer-events-none，不参与读屏与点击。
+ */
+function CircuitMotif() {
+  return (
+    <svg
+      aria-hidden='true'
+      className='pointer-events-none absolute -right-2 bottom-0 h-44 w-44 opacity-45'
+      viewBox='0 0 176 176'
+      fill='none'
+    >
+      <g stroke='#38b1ff' strokeWidth='1.4' strokeLinecap='round'>
+        <path d='M176 36 H118 a10 10 0 0 1 -10 -10 V0' />
+        <path d='M176 84 H88 a10 10 0 0 1 -10 -10 V46 a10 10 0 0 0 -10 -10 H44' />
+        <path d='M176 132 H104 a10 10 0 0 1 -10 -10 v-6 a10 10 0 0 0 -10 -10 H58' />
+      </g>
+      <g stroke='#10b981' strokeWidth='1.4' strokeLinecap='round'>
+        <path d='M132 176 v-14 a10 10 0 0 1 10 -10 h34' />
+        <path d='M96 176 v-30 a10 10 0 0 1 10 -10 h14' />
+      </g>
+      <g stroke='#38b1ff' strokeWidth='1.4'>
+        <rect x='16' y='14' width='26' height='26' rx='6' />
+      </g>
+      <g stroke='#10b981' strokeWidth='1.4'>
+        <rect x='132' y='120' width='18' height='18' rx='5' />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * 白卡右上角的装饰：两个错位的方框（品牌浅蓝细线）。
+ * 同样纯装饰。
+ */
+function BlockMotif() {
+  return (
+    <svg
+      aria-hidden='true'
+      className='pointer-events-none absolute -top-3 -right-3 h-28 w-28 text-brand-100'
+      viewBox='0 0 112 112'
+      fill='none'
+    >
+      <g stroke='currentColor' strokeWidth='1.6'>
+        <rect x='34' y='8' width='66' height='66' />
+        <rect x='8' y='38' width='66' height='66' />
+      </g>
+    </svg>
+  );
+}
+
 export function WhyChoose() {
   return (
     <section id='why-choose' className='border-b border-line py-16 md:py-24'>
@@ -78,14 +129,15 @@ export function WhyChoose() {
           为什么选择虫洞 AI
         </h2>
 
-        {/* 上方两张浅底大卡：标题 / 说明 / 按钮 */}
+        {/* 上方两张深色大卡：标题 / 说明 / 按钮 + 右下角电路纹装饰 */}
         <div className='mt-12 grid gap-4 md:grid-cols-2'>
           {HEADLINERS.map((item) => (
             <div
               key={item.title}
-              className='flex flex-col justify-between bg-brand-950 p-8 sm:p-10'
+              className='relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 sm:p-10'
             >
-              <div>
+              <CircuitMotif />
+              <div className='relative'>
                 <h3 className='text-[30px] leading-snug font-semibold tracking-tight text-white sm:text-[36px]'>
                   {item.title}
                 </h3>
@@ -95,7 +147,7 @@ export function WhyChoose() {
               </div>
               <Link
                 href={item.href}
-                className='group mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-white px-5 text-note font-medium text-ink transition-colors hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300'
+                className='group relative mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-white px-5 text-note font-medium text-ink transition-colors hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300'
               >
                 {item.cta}
                 <ArrowRight
@@ -112,8 +164,12 @@ export function WhyChoose() {
         {/* 下方四张卡：生图图标 + 大标题 + 要点（外框黑色细线，按用户 2026-11-15 要求） */}
         <div className='mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
           {PILLARS.map((pillar) => (
-            <div key={pillar.title} className='border border-ink bg-surface p-6 sm:p-7'>
-              <div className='flex justify-center'>
+            <div
+              key={pillar.title}
+              className='relative overflow-hidden border border-ink bg-surface p-6 sm:p-7'
+            >
+              <BlockMotif />
+              <div className='relative flex justify-center'>
                 <img
                   src={pillar.icon}
                   alt=''
@@ -122,10 +178,10 @@ export function WhyChoose() {
                   className='size-[104px] object-contain'
                 />
               </div>
-              <h3 className='mt-4 text-center text-[26px] font-semibold tracking-tight text-ink'>
+              <h3 className='relative mt-4 text-center text-[26px] font-semibold tracking-tight text-ink'>
                 {pillar.title}
               </h3>
-              <ul className='mt-4 space-y-2'>
+              <ul className='relative mt-4 space-y-2'>
                 {pillar.points.map((point) => (
                   <li
                     key={point}

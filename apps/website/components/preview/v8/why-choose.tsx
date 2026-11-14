@@ -92,7 +92,7 @@ function CardTexture({ index }: { index: number }) {
     <>
       <div
         aria-hidden='true'
-        className='pointer-events-none absolute inset-0 bg-cover bg-center opacity-90 transition-opacity duration-200 group-hover:opacity-100'
+        className='pointer-events-none absolute inset-0 bg-cover bg-center opacity-90 transition-opacity duration-200 group-hover/card:opacity-100'
         style={{ backgroundImage: `url('${src}')`, transform }}
       />
       {/* 左侧压成实色保白字可读，向右放开让纹理显出来 */}
@@ -116,7 +116,7 @@ export function WhyChoose() {
           {HEADLINERS.map((item, index) => (
             <div
               key={item.title}
-              className='group relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 transition-colors duration-200 hover:bg-brand-900 sm:p-10'
+              className='group/card relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 transition-colors duration-200 hover:bg-brand-900 sm:p-10'
             >
               <CardTexture index={index} />
               <div className='relative'>
@@ -129,14 +129,14 @@ export function WhyChoose() {
               </div>
               <Link
                 href={item.href}
-                className='group relative mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-white px-5 text-note font-medium text-ink transition-colors hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300'
+                className='relative mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-white px-5 text-note font-medium text-ink transition-colors duration-200 group-hover/card:bg-brand-500 group-hover/card:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300'
               >
                 {item.cta}
                 <ArrowRight
                   size={16}
                   strokeWidth={1.8}
                   aria-hidden='true'
-                  className='transition-transform group-hover:translate-x-0.5'
+                  className='transition-transform group-hover/card:translate-x-0.5'
                 />
               </Link>
             </div>

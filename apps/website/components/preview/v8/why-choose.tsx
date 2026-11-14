@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 「为什么选择虫洞 AI」——插在「模型与价格」广告栏之前的一屏。
  *
  * 2026-11-14 用户口径演变：
@@ -76,84 +76,56 @@ const PILLARS = [
  * 第二张卡传 flip，整体镜像到左下角，避免两张卡长得一样。
  */
 /**
- * 深色卡的背景纹理：用生图做的一张电路走线底图（public/textures/why-circuit.jpg），
- * 铺满 + 左侧压深渐变，保证白字可读；第二张卡水平镜像，避免两张一模一样。
+ * 深色卡的背景纹理：每张卡各用一张生图底图，语言刻意不同 ——
+ * ① 电路直角折线（why-circuit.jpg）：主 / 两条虚线
+ * ② 点链同心波纹（why-ripple.jpg）：按量计费 / 流水感
+ * 铺满 + 左侧压深渐变保证白字可读。两张卡不再共用一张图，避免镜像后仍显重复。
  */
-function CardTexture({ flip = false }: { flip?: boolean }) {
+const CARD_TEXTURES = ['/textures/why-circuit.jpg', '/textures/why-ripple.jpg'];
+
+function CardTexture({ index }: { index: number }) {
+  const src = CARD_TEXTURES[index % CARD_TEXTURES.length];
+  // 深卡纹理不斜置（2026-11-15 用户澄清：斜着放是指下面四个符号，不是这两张卡）。
+  // 第二张垂直翻转：一张纹理的密处落在右上、另一张落在右下，避免两张构图雷同。
+  const transform = index === 1 ? 'scaleY(-1)' : undefined;
   return (
     <>
       <div
         aria-hidden='true'
-        className={`pointer-events-none absolute inset-0 bg-cover bg-center opacity-80 ${
-          flip ? 'scale-x-[-1]' : ''
-        }`}
-        style={{ backgroundImage: "url('/textures/why-circuit.jpg')" }}
+        className='pointer-events-none absolute inset-0 bg-cover bg-center opacity-90'
+        style={{ backgroundImage: `url('${src}')`, transform }}
       />
+      {/* 左侧压成实色保白字可读，向右放开让纹理显出来 */}
       <div
         aria-hidden='true'
-        className='pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/85 to-brand-950/45'
+        className='pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/70 to-brand-950/10'
       />
     </>
   );
 }
 /**
- * 白卡的装饰：四张卡各一种纹样（不同形状，避免同图案重复出现）。
- * 统一规格：右下角、96px、品牌浅蓝细线、纯装饰（aria-hidden + pointer-events-none）。
+ * 白卡的装饰：四张卡各一张生图图案（2026-11-15 用户否掉手绘 SVG 后改为生图）。
+ * 规格统一为「浅蓝玻璃质感 + 纯白底 + 居中留白」，因此直接用 mix-blend-multiply：
+ * 卡片底色是纯白 #ffffff，白底相乘后不可见，只留浅蓝图案，无需抠图。
+ * 图案语义：层叠 → 稳定性 / 三节点 → 智能 / 边界+核心 → 安全性 / 模块交叠 → 扩展性。
  */
-/**
- * 白卡的装饰：四张卡各一种**实心浅色块**（不是细线，细线在小尺寸下像划痕）。
- * 统一规格：右下角出血、152px、品牌浅蓝 #e3f3ff、纯装饰。
- */
-function CardMotif({ variant }: { variant: number }) {
-  const cls =
-    'pointer-events-none absolute -right-6 -bottom-8 h-[152px] w-[152px] text-brand-100';
+const MOTIF_IMAGES = [
+  '/textures/why-mark-layer.png',
+  '/textures/why-mark-graph.png',
+  '/textures/why-mark-core.png',
+  '/textures/why-mark-module.png',
+];
 
-  if (variant === 0) {
-    // 三层横条 —— 对应「稳定性」
-    return (
-      <svg aria-hidden='true' className={cls} viewBox='0 0 152 152' fill='currentColor'>
-        <rect x='18' y='34' width='116' height='18' rx='6' opacity='0.9' />
-        <rect x='18' y='64' width='116' height='18' rx='6' opacity='0.65' />
-        <rect x='18' y='94' width='116' height='18' rx='6' opacity='0.4' />
-      </svg>
-    );
-  }
-  if (variant === 1) {
-    // 三个圆点 + 粗连线 —— 对应「智能」
-    return (
-      <svg aria-hidden='true' className={cls} viewBox='0 0 152 152' fill='currentColor'>
-        <path
-          d='M40 110 L76 62 L112 110'
-          stroke='currentColor'
-          strokeWidth='10'
-          fill='none'
-          strokeLinecap='round'
-          opacity='0.45'
-        />
-        <circle cx='40' cy='110' r='14' opacity='0.9' />
-        <circle cx='76' cy='62' r='14' opacity='0.9' />
-        <circle cx='112' cy='110' r='14' opacity='0.9' />
-      </svg>
-    );
-  }
-  if (variant === 2) {
-    // 方中挖方 —— 对应「安全性」
-    return (
-      <svg aria-hidden='true' className={cls} viewBox='0 0 152 152' fill='currentColor'>
-        <path
-          fillRule='evenodd'
-          d='M28 28h96v96H28V28zm28 28v40h40V56H56z'
-          opacity='0.75'
-        />
-      </svg>
-    );
-  }
-  // 两个叠加方块 —— 对应「扩展性」
+function CardMotif({ variant }: { variant: number }) {
   return (
-    <svg aria-hidden='true' className={cls} viewBox='0 0 152 152' fill='currentColor'>
-      <rect x='54' y='22' width='76' height='76' rx='10' opacity='0.45' />
-      <rect x='22' y='54' width='76' height='76' rx='10' opacity='0.85' />
-    </svg>
+    <img
+      src={MOTIF_IMAGES[variant % MOTIF_IMAGES.length]}
+      alt=''
+      aria-hidden='true'
+      width={148}
+      height={148}
+      className='pointer-events-none absolute -right-6 -bottom-8 size-[148px] opacity-65 mix-blend-multiply select-none'
+    />
   );
 }
 export function WhyChoose() {
@@ -171,7 +143,7 @@ export function WhyChoose() {
               key={item.title}
               className='relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 sm:p-10'
             >
-              <CardTexture flip={index === 1} />
+              <CardTexture index={index} />
               <div className='relative'>
                 <h3 className='text-[30px] leading-snug font-semibold tracking-tight text-white sm:text-[36px]'>
                   {item.title}
@@ -237,7 +209,6 @@ export function WhyChoose() {
     </section>
   );
 }
-
 
 
 

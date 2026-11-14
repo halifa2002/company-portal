@@ -163,17 +163,13 @@ export function WhyChoose() {
           {PILLARS.map((pillar, index) => (
             <div
               key={pillar.title}
-              className='group relative overflow-hidden border border-ink bg-surface p-6 transition-[transform,background-color,border-color] duration-300 ease-out hover:-translate-y-2 hover:scale-[1.012] hover:border-brand-200 hover:bg-surface-subtle sm:p-7'
+              className='group relative overflow-hidden border border-ink bg-surface p-6 transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-2 hover:scale-[1.015] hover:shadow-[0_22px_58px_rgba(30,41,59,0.12)] sm:p-7'
             >
-              {/* 悬停高光：与深卡同一套做法（实测硅基流动 = 上浮 + 渐变层淡入），
-                  浅色卡上用品牌蓝而不是白色，白卡上白光看不出来。 */}
+              {/* 悬停高光（实测 siliconflow 能力卡）：卡片上浮 + 投影出现 + 顶部径向渐变淡入，
+                  边框完全不动。渐变只铺到 42%，所以光落在卡片上半部。 */}
               <div
                 aria-hidden='true'
-                className='pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100'
-                style={{
-                  background:
-                    'radial-gradient(circle at 50% -10%, rgba(24,141,249,0.12), transparent 58%)',
-                }}
+                className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(24,141,249,0.12),transparent_42%)] opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100'
               />
               <div className='relative flex justify-center'>
                 <img
@@ -208,7 +204,6 @@ export function WhyChoose() {
     </section>
   );
 }
-
 
 
 

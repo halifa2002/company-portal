@@ -12,6 +12,7 @@
  */
 
 import Link from 'next/link';
+import { useId } from 'react';
 import { ArrowRight } from 'lucide-react';
 
 /** 上方两张主卡：标题 + 说明 + 按钮（对应硅基流动那两张大卡的写法） */
@@ -71,34 +72,61 @@ const PILLARS = [
 ];
 
 /**
- * 深色卡的装饰：电路走线纹样（蓝 + 绿细线，圆角折弯 + 方块节点）。
+ * 深色卡的装饰：电路纹样（主干分叉 + 成组嵌套圆角矩形 + 渐隐遮罩）。
  * 纯装饰 —— aria-hidden + pointer-events-none，不参与读屏与点击。
- * 第二张卡传 flip，纹样镜像到左下角，避免两张卡长得一模一样。
+ * 第二张卡传 flip，整体镜像到左下角，避免两张卡长得一样。
  */
 function CircuitMotif({ flip = false }: { flip?: boolean }) {
+  const uid = useId().replace(/:/g, '');
+  const fadeId = `circuit-fade-${uid}`;
+  const maskId = `circuit-mask-${uid}`;
+
   return (
     <svg
       aria-hidden='true'
-      className={`pointer-events-none absolute bottom-0 h-44 w-44 opacity-45 ${
-        flip ? '-left-2 scale-x-[-1]' : '-right-2'
+      className={`pointer-events-none absolute bottom-0 h-56 w-56 ${
+        flip ? '-left-4 scale-x-[-1]' : '-right-4'
       }`}
-      viewBox='0 0 176 176'
+      viewBox='0 0 220 220'
       fill='none'
     >
-      <g stroke='#38b1ff' strokeWidth='1.4' strokeLinecap='round'>
-        <path d='M176 36 H118 a10 10 0 0 1 -10 -10 V0' />
-        <path d='M176 84 H88 a10 10 0 0 1 -10 -10 V46 a10 10 0 0 0 -10 -10 H44' />
-        <path d='M176 132 H104 a10 10 0 0 1 -10 -10 v-6 a10 10 0 0 0 -10 -10 H58' />
-      </g>
-      <g stroke='#10b981' strokeWidth='1.4' strokeLinecap='round'>
-        <path d='M132 176 v-14 a10 10 0 0 1 10 -10 h34' />
-        <path d='M96 176 v-30 a10 10 0 0 1 10 -10 h14' />
-      </g>
-      <g stroke='#38b1ff' strokeWidth='1.4'>
-        <rect x='16' y='14' width='26' height='26' rx='6' />
-      </g>
-      <g stroke='#10b981' strokeWidth='1.4'>
-        <rect x='132' y='120' width='18' height='18' rx='5' />
+      <defs>
+        <linearGradient
+          id={fadeId}
+          x1='220'
+          y1='220'
+          x2='30'
+          y2='30'
+          gradientUnits='userSpaceOnUse'
+        >
+          <stop offset='0%' stopColor='#fff' stopOpacity='1' />
+          <stop offset='55%' stopColor='#fff' stopOpacity='0.5' />
+          <stop offset='100%' stopColor='#fff' stopOpacity='0' />
+        </linearGradient>
+        <mask id={maskId}>
+          <rect width='220' height='220' fill={`url(#${fadeId})`} />
+        </mask>
+      </defs>
+
+      <g mask={`url(#${maskId})`} strokeWidth='1.3' strokeLinecap='round'>
+        <g stroke='#38b1ff'>
+          {/* 右侧主干 */}
+          <path d='M204 20 V204' />
+          {/* 主干向左的分叉 */}
+          <path d='M204 58 H158 a12 12 0 0 1 -12 -12 V22' />
+          <path d='M204 100 H140 a12 12 0 0 1 -12 -12 V74' />
+          <path d='M204 146 H170 a12 12 0 0 1 -12 -12 v-6 a12 12 0 0 0 -12 -12 h-12' />
+          {/* 成组的嵌套矩形（硅基流动那种「模块」感） */}
+          <rect x='104' y='96' width='60' height='48' rx='10' />
+          <rect x='80' y='152' width='82' height='48' rx='10' />
+          <rect x='44' y='40' width='76' height='48' rx='10' />
+        </g>
+        <g stroke='#10b981'>
+          {/* 绿色支线，底部收口 */}
+          <path d='M204 182 H126 a12 12 0 0 1 -12 -12 v-10' />
+          <path d='M124 64 V26' />
+          <rect x='148' y='58' width='28' height='24' rx='6' />
+        </g>
       </g>
     </svg>
   );
@@ -245,6 +273,7 @@ export function WhyChoose() {
     </section>
   );
 }
+
 
 
 

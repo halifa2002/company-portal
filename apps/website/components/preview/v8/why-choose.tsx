@@ -110,10 +110,10 @@ function CardTexture({ index }: { index: number }) {
  * 四张各一种构图：阶梯走线 / 芯片群 / 互锁方框 / 长带延伸。
  */
 const MOTIF_IMAGES = [
-  '/textures/why-line-1.png',
-  '/textures/why-line-2.png',
-  '/textures/why-line-3.png',
-  '/textures/why-line-4.png',
+  '/textures/why-sq-1.png',
+  '/textures/why-sq-2.png',
+  '/textures/why-sq-3.png',
+  '/textures/why-sq-4.png',
 ];
 
 function CardMotif({ variant }: { variant: number }) {

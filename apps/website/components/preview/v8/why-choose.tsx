@@ -12,7 +12,6 @@
  */
 
 import Link from 'next/link';
-import { useId } from 'react';
 import { ArrowRight } from 'lucide-react';
 
 /** 上方两张主卡：标题 + 说明 + 按钮（对应硅基流动那两张大卡的写法） */
@@ -76,62 +75,27 @@ const PILLARS = [
  * 纯装饰 —— aria-hidden + pointer-events-none，不参与读屏与点击。
  * 第二张卡传 flip，整体镜像到左下角，避免两张卡长得一样。
  */
-function CircuitMotif({ flip = false }: { flip?: boolean }) {
-  const uid = useId().replace(/:/g, '');
-  const fadeId = `circuit-fade-${uid}`;
-  const maskId = `circuit-mask-${uid}`;
-
+/**
+ * 深色卡的背景纹理：用生图做的一张电路走线底图（public/textures/why-circuit.jpg），
+ * 铺满 + 左侧压深渐变，保证白字可读；第二张卡水平镜像，避免两张一模一样。
+ */
+function CardTexture({ flip = false }: { flip?: boolean }) {
   return (
-    <svg
-      aria-hidden='true'
-      className={`pointer-events-none absolute bottom-0 h-56 w-56 ${
-        flip ? '-left-4 scale-x-[-1]' : '-right-4'
-      }`}
-      viewBox='0 0 220 220'
-      fill='none'
-    >
-      <defs>
-        <linearGradient
-          id={fadeId}
-          x1='220'
-          y1='220'
-          x2='30'
-          y2='30'
-          gradientUnits='userSpaceOnUse'
-        >
-          <stop offset='0%' stopColor='#fff' stopOpacity='1' />
-          <stop offset='55%' stopColor='#fff' stopOpacity='0.5' />
-          <stop offset='100%' stopColor='#fff' stopOpacity='0' />
-        </linearGradient>
-        <mask id={maskId}>
-          <rect width='220' height='220' fill={`url(#${fadeId})`} />
-        </mask>
-      </defs>
-
-      <g mask={`url(#${maskId})`} strokeWidth='1.3' strokeLinecap='round'>
-        <g stroke='#38b1ff'>
-          {/* 右侧主干 */}
-          <path d='M204 20 V204' />
-          {/* 主干向左的分叉 */}
-          <path d='M204 58 H158 a12 12 0 0 1 -12 -12 V22' />
-          <path d='M204 100 H140 a12 12 0 0 1 -12 -12 V74' />
-          <path d='M204 146 H170 a12 12 0 0 1 -12 -12 v-6 a12 12 0 0 0 -12 -12 h-12' />
-          {/* 成组的嵌套矩形（硅基流动那种「模块」感） */}
-          <rect x='104' y='96' width='60' height='48' rx='10' />
-          <rect x='80' y='152' width='82' height='48' rx='10' />
-          <rect x='44' y='40' width='76' height='48' rx='10' />
-        </g>
-        <g stroke='#10b981'>
-          {/* 绿色支线，底部收口 */}
-          <path d='M204 182 H126 a12 12 0 0 1 -12 -12 v-10' />
-          <path d='M124 64 V26' />
-          <rect x='148' y='58' width='28' height='24' rx='6' />
-        </g>
-      </g>
-    </svg>
+    <>
+      <div
+        aria-hidden='true'
+        className={`pointer-events-none absolute inset-0 bg-cover bg-center opacity-80 ${
+          flip ? 'scale-x-[-1]' : ''
+        }`}
+        style={{ backgroundImage: "url('/textures/why-circuit.jpg')" }}
+      />
+      <div
+        aria-hidden='true'
+        className='pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/85 to-brand-950/45'
+      />
+    </>
   );
 }
-
 /**
  * 白卡的装饰：四张卡各一种纹样（不同形状，避免同图案重复出现）。
  * 统一规格：右下角、96px、品牌浅蓝细线、纯装饰（aria-hidden + pointer-events-none）。
@@ -207,7 +171,7 @@ export function WhyChoose() {
               key={item.title}
               className='relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 sm:p-10'
             >
-              <CircuitMotif flip={index === 1} />
+              <CardTexture flip={index === 1} />
               <div className='relative'>
                 <h3 className='text-[30px] leading-snug font-semibold tracking-tight text-white sm:text-[36px]'>
                   {item.title}
@@ -273,6 +237,7 @@ export function WhyChoose() {
     </section>
   );
 }
+
 
 
 

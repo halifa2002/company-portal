@@ -92,13 +92,23 @@ function CardTexture({ index }: { index: number }) {
     <>
       <div
         aria-hidden='true'
-        className='pointer-events-none absolute inset-0 scale-100 bg-cover bg-center opacity-90 transition-[opacity,transform] duration-500 ease-out group-hover/card:scale-[1.045] group-hover/card:opacity-100'
+        className='pointer-events-none absolute inset-0 bg-cover bg-center opacity-90 transition-opacity duration-500 ease-out group-hover/card:opacity-100'
         style={{ backgroundImage: `url('${src}')`, transform }}
       />
       {/* 左侧压成实色保白字可读，向右放开让纹理显出来 */}
       <div
         aria-hidden='true'
         className='pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/70 to-brand-950/10'
+      />
+      {/* 悬停时右下角亮起一层辉光：只让「光」出现，不动底图。
+          整图缩放会把所有线条一起推近，看起来是图片在放大而不是光照上来。 */}
+      <div
+        aria-hidden='true'
+        className='pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 ease-out group-hover/card:opacity-100'
+        style={{
+          background:
+            'radial-gradient(62% 78% at 88% 82%, rgba(56,177,255,0.28) 0%, rgba(56,177,255,0.10) 42%, transparent 72%)',
+        }}
       />
     </>
   );

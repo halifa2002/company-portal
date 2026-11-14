@@ -104,7 +104,8 @@ export const text = {
   strong: '#101828',
   soft: '#344054',
   mid: '#5C6675',
-  muted: '#667085',
+  /* 2026-11-14：与 theme.css 的 --neutral-text-muted 对齐，并满足 4.5:1 正文对比度 */
+  muted: '#5F7586',
   inverse: '#FFFFFF',
 } as const;
 

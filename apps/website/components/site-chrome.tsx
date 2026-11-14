@@ -59,11 +59,26 @@ function GuestEntry() {
   );
 }
 
-/** 顶部导航：品牌区 + 导航项 + 登录入口 */
-export function SiteHeader() {
+/**
+ * 顶部导航：品牌区 + 导航项 + 登录入口
+ *
+ * 三段用 justify-between 分布：品牌贴左、登录贴右、导航落在中间——
+ * 所以导航天然是「页面水平居中」的，两侧留白随窗口等宽变化。
+ *
+ * maxWidth（2026-11-14）：官方页整页 1600 宽，预览页正文是 1280，
+ * 所以留一个容器宽度入参，让预览页复用同一个页头时能与自己的正文对齐；
+ * 不传就是正式站的 1600，其他调用点一行都不用改。
+ */
+export function SiteHeader({
+  maxWidth = 'max-w-[1600px]',
+  activePath,
+}: { maxWidth?: string; activePath?: string } = {}) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const signedIn = useSessionHint();
+
+  // 预览页这类「地址不在导航表里」的页面，用 activePath 指定该点亮哪一项
+  const currentPath = activePath ?? pathname;
 
   // 切换页面时收起手机端菜单
   useEffect(() => {
@@ -72,7 +87,9 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 2xl:h-[72px] 2xl:px-10">
+      <div
+        className={`mx-auto flex h-16 items-center justify-between px-6 2xl:h-[72px] 2xl:px-10 ${maxWidth}`}
+      >
         {/* 品牌区：图形 logo + 中英双行 */}
         <Link href="/" className="group flex items-center gap-2.5">
           <LogoMark glow />
@@ -91,7 +108,7 @@ export function SiteHeader() {
           {nav.map((item) => {
             const active =
               !item.external &&
-              (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href));
+              (item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href));
 
             const linkClass = `group relative py-1 text-title transition-colors ${
               active ? 'font-medium text-brand' : 'text-ink-soft hover:text-ink'
@@ -166,11 +183,11 @@ export function SiteHeader() {
       {/* 手机端下拉菜单：md 以下才出现 */}
       {menuOpen && (
         <div id="mobile-nav" className="border-t border-line bg-white md:hidden">
-          <nav className="mx-auto flex max-w-[1600px] flex-col px-6 py-3">
+          <nav className={`mx-auto flex flex-col px-6 py-3 ${maxWidth}`}>
             {nav.map((item) => {
               const active =
                 !item.external &&
-                (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href));
+                (item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href));
 
               const itemClass = `rounded-control px-2 py-3 text-body transition-colors ${
                 active ? 'font-medium text-brand' : 'text-ink-soft hover:bg-surface-tint'

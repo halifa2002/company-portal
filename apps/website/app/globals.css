@@ -51,6 +51,8 @@
   --color-brand-700: var(--brand-700);
   --color-brand-900: var(--brand-900);
   --color-brand-950: var(--brand-950);
+  /* 靛蓝：只给插画/图标做第二色，见 theme.css 同名注释（C-V-03 允许蓝或靛蓝） */
+  --color-brand-indigo: var(--brand-indigo);
 
   /* 文字四档（禁止再写 text-ink/60 这类透明度） */
   --color-ink: var(--neutral-text);
@@ -66,6 +68,7 @@
   --color-surface-tint-soft: var(--surface-tint-soft);
   --color-surface-tint-muted: var(--surface-tint-muted);
   --color-footer: var(--footer-surface);
+  --color-code: var(--code-surface);
 
   /* 语义色：实色 / 深字 / 浅底 三件套 */
   --color-ok: var(--semantic-success);
@@ -317,3 +320,125 @@ textarea:focus-visible,
     color: var(--brand-600);
   }
 }
+
+/* ==========================================================================
+ * 首屏画布（预览页 v9，2026-11-14）
+ *
+ * 约束对齐：
+ *   C-V-03「全站强调色只有一个色相」→ 背景**只用蓝族**，层次全靠明度、位置与颗粒，
+ *           不再用暖色（上一版的暖橙属于第二色相，已撤）；
+ *   C-S-02「业务代码零裸 hex」→ 色值只写在本文件，组件只引用 .hero-canvas /
+ *           .hero-grain 两个类名。
+ *
+ * 为什么背景要这么多层：对标 teamorouter / fireworks 实测（1920 宽、文字之外的区域），
+ *   他们的「大色块级差」是本页旧版的 1.8–2.5 倍（8×6 网格色块标准差 20.5 / 28.7 vs 11.3），
+ *   原因不是网点不够细，而是背景有 4–5 个**不同中心**的色块，旧版只有一条竖直渐变。
+ *   所以这里拆成 5 层，顺序不可调换：
+ *     ① 底色斜向渐变（给整幅画面一个方向）
+ *     ② 四个偏心的径向色雾（顶部主光 / 左上淡雾 / 右上第二团 / 底部下沉色）
+ *     ③ 网点大点（只在下半屏，随高度渐显）
+ *     ④ 网点小点（只在上半屏，与③同网格 → 合起来像点随高度长大）
+ *     ⑤ 颗粒噪点（不规则微噪，放在最上，给「印刷/胶片」的质感）
+ */
+
+.hero-canvas {
+  /* 底图由 scripts/gen-hero-bg.py 生成（蓝族多中心色团，逐像素钳制最低明度，
+   * 保证上身文字区 ≥0.845  luminance → ink-mid 过 4.5:1）。2400×1400、约 38KB。
+   * 仍在同一蓝族里，没有第二色相（C-V-03）。 */
+  background-color: #eef6ff;
+  background-image: url('/hero/canvas-ai.webp');
+  background-size: cover;
+  background-position: 50% 0;
+  background-repeat: no-repeat;
+}
+
+/* 网点：同一个 16px 网格两遍。
+ * 元素本体负责下半屏的大点，::before 负责上半屏的小点；两块 mask 反向，
+ * 过渡带两层同时存在，观感就是「点随高度长大」——单层定径铺满一屏会像平壁纸。 */
+/* 颗粒：SVG fractalNoise 平铺，multiply 混合。不透明度别超过 0.07，
+ * 超过就不是质感而是脏；它只负责让大色块之间的过渡不出现「塑料感台阶」。 */
+.hero-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.085;
+}
+
+/* 路由图连线：同一个蓝族的三档透明度（C-V-03 单一色相，不用橙/绿做区分） */
+:root {
+  --hero-wire-strong: rgba(24, 141, 249, 0.34);
+  --hero-wire-mid: rgba(24, 141, 249, 0.24);
+  --hero-wire-soft: rgba(24, 141, 249, 0.16);
+}
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================================================================
+ * 收尾 CTA 画布（2026-11-14）
+ *
+ * 版式学参考站（居中大标语 + 高亮词 + 一个主按钮 + 一行事实），
+ * 但**配色守 C-V-03**：参考站那块是暖橙到珊瑚、高亮词用橙；我们整块保持蓝族，
+ * 暖只作为极淡的底雾（warm share < 10%），高亮词用 brand-700。
+ *
+ * 底图由 AI 生成的 hero 云图二次加工而来（翻转 + 取下半段 + 提亮到 0.905），
+ * 好处是零新增体积（与首屏同一张的变体），风格天然连贯。
+ *
+ * 网点特意做成**均匀定径**：上一版首屏试过"正弦调径"的网点，平铺后是斜向条带（已淘汰）；
+ * 这里 6px 一格、0.5px 半径、透明度 0.05，只在放大看时出现印刷网点的质感，不会成条纹。
+ */
+.closing-canvas {
+  background-color: #eef6ff;
+  background-image: url('/hero/closing-canvas.webp');
+  background-size: cover;
+  background-position: 50% 40%;
+  background-repeat: no-repeat;
+}
+
+.closing-dots {
+  background-image: radial-gradient(rgba(24, 106, 190, 0.5) 0.5px, transparent 0.5px);
+  background-size: 6px 6px;
+  opacity: 0.28;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.8) 45%, rgba(0, 0, 0, 0.35) 100%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.8) 45%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+/* ==========================================================================
+ * 沙粒/像素质感（2026-11-14，指标卡内层用）
+ *
+ * 参考站那几张指标卡，放大看是一层**很密的细格子 + 砂纸颗粒**：像印刷网点，也像
+ * 手机屏幕像素。之前用 6px 一格的圆点，太稀，放大就是"撒了几颗芝麻"。
+ *
+ * 这里三层叠：
+ *   ① 3px 间距的 1px 横线 + 1px 竖线 → 织成极淡的网格，观感就是"像素"
+ *   ② SVG fractalNoise 颗粒（乘上去），负责砂纸的糙
+ *   ③ 不透明度压在 0.9 以内，让它在 1x 屏上勉强可见、在 2x 屏上明确可见
+ * 只用于指标卡内部，别整页铺（会变成脏）。
+ */
+.card-texture {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='0.35'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg, rgba(6, 34, 63, 0.035) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(6, 34, 63, 0.035) 0 1px, transparent 1px 3px);
+  background-size: 160px 160px, auto, auto;
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+
+
+/* 预览页中性底（2026-11-14）：替代带蓝调的 surface-subtle——浅蓝底 在大面积时显廉价 */
+.surface-neutral {
+  /* 2026-11-14 调：纯 #f7f7f8 铺整屏会"发灰发蒙"（用户反馈）。改成偏暖的纸色 + 极淡颗粒，
+     这样它不是一块平灰，而是有材质的底。颗粒用 fractalNoise，透明度很低，只在浅底上可见。 */
+  background-color: #f8f7f5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)' opacity='0.045'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+

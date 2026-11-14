@@ -14,7 +14,8 @@
     "build:website": "bun --cwd apps/website build",
     "build:console": "bun --cwd apps/console build",
     "build": "bun run build:website && bun run build:console",
-    "typecheck": "bun --cwd apps/website typecheck && bun --cwd apps/console typecheck"
+    "typecheck": "bun --cwd apps/website typecheck && bun --cwd apps/console typecheck",
+    "audit": "bun scripts/audit.mjs"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

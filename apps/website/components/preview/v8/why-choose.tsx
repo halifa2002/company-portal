@@ -92,7 +92,7 @@ function CardTexture({ index }: { index: number }) {
     <>
       <div
         aria-hidden='true'
-        className='pointer-events-none absolute inset-0 bg-cover bg-center opacity-90'
+        className='pointer-events-none absolute inset-0 bg-cover bg-center opacity-90 transition-opacity duration-200 group-hover:opacity-100'
         style={{ backgroundImage: `url('${src}')`, transform }}
       />
       {/* 左侧压成实色保白字可读，向右放开让纹理显出来 */}
@@ -114,9 +114,10 @@ export function WhyChoose() {
         {/* 上方两张深色大卡：标题 / 说明 / 按钮 + 右下角电路纹装饰 */}
         <div className='mt-12 grid gap-4 md:grid-cols-2'>
           {HEADLINERS.map((item, index) => (
-            <div
+            <Link
               key={item.title}
-              className='relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 sm:p-10'
+              href={item.href}
+              className='group relative flex flex-col justify-between overflow-hidden bg-brand-950 p-8 transition-colors duration-200 hover:bg-brand-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300 sm:p-10'
             >
               <CardTexture index={index} />
               <div className='relative'>
@@ -127,10 +128,8 @@ export function WhyChoose() {
                   {item.desc}
                 </p>
               </div>
-              <Link
-                href={item.href}
-                className='group relative mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-white px-5 text-note font-medium text-ink transition-colors hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300'
-              >
+              {/* 按钮只是视觉 CTA：整卡已经是链接，里面不能再套 <a> */}
+              <span className='relative mt-8 inline-flex h-11 w-fit items-center gap-1.5 bg-white px-5 text-note font-medium text-ink transition-colors group-hover:bg-white/90'>
                 {item.cta}
                 <ArrowRight
                   size={16}
@@ -138,8 +137,8 @@ export function WhyChoose() {
                   aria-hidden='true'
                   className='transition-transform group-hover:translate-x-0.5'
                 />
-              </Link>
-            </div>
+              </span>
+            </Link>
           ))}
         </div>
 
@@ -183,7 +182,6 @@ export function WhyChoose() {
     </section>
   );
 }
-
 
 
 

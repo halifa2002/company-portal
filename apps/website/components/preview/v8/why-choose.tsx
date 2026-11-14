@@ -117,12 +117,12 @@ export function WhyChoose() {
                 <img
                   src={pillar.icon}
                   alt=''
-                  width={64}
-                  height={64}
-                  className='size-16 object-contain'
+                  width={104}
+                  height={104}
+                  className='size-[104px] object-contain'
                 />
               </div>
-              <h3 className='mt-5 text-center text-[22px] font-semibold tracking-tight text-ink'>
+              <h3 className='mt-4 text-center text-[22px] font-semibold tracking-tight text-ink'>
                 {pillar.title}
               </h3>
               <ul className='mt-5 space-y-3'>
@@ -146,6 +146,7 @@ export function WhyChoose() {
     </section>
   );
 }
+
 
 
 

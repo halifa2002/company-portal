@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -109,7 +109,7 @@ export function PricingTable(props: { models: ModelView[]; pricingAvailable: boo
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <SectionHead
           eyebrow="模型与价格"
-          title={`${props.models.length} 个模型，一个 Key 全都能调`}
+          title="一个 Key，全部模型都能调"
           desc="单价直接读后台计费配置生成，与下单结算一致；后台调价或上下架，这里跟着变。"
         />
 

@@ -2,13 +2,13 @@ import { SiteFooter, SiteHeader } from '@/components/site-chrome';
 import { brand } from '@/lib/brand';
 
 /**
- * 服务协议页。
+ * 服务条款页。
  *
  * 只写平台确实在做的事（统一接口转发、预充值按量计费、账号与 Key 自持），
  * 分成比例、退款细则这类要商务与法务定的条款不往里写，定了再补。
- * 页脚「服务协议」原先指向 404，这个页面就是给那条链接用的。
+ * 页脚「服务条款」原先指向 404，这个页面就是给那条链接用的。
  */
-export const metadata = { title: '服务协议' };
+export const metadata = { title: '服务条款' };
 
 const SECTIONS = [
   {
@@ -91,10 +91,10 @@ export default function TermsPage() {
         >
           <div className="mx-auto max-w-4xl px-6 py-16 md:py-20">
             <span className="text-meta font-medium tracking-[0.08em] text-brand">
-              LEGAL · 服务协议
+              LEGAL · 服务条款
             </span>
             <h1 className="mt-4 text-display font-bold tracking-tight text-ink md:text-section">
-              服务协议
+              服务条款
             </h1>
             <p className="mt-3 text-note text-ink-mid">更新日期：2026 年 11 月 11 日</p>
           </div>

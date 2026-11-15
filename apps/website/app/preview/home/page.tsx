@@ -1,50 +1,40 @@
 import { MODEL_CATALOG } from '@portal/types';
 import { loadModelList } from '@/lib/pricing';
+// 预览页专用样式：只有本页加载，类名一律 .lab- 开头，不覆盖公共类。
+// 规则见 app/preview/lab.css 顶部注释。
+import '../lab.css';
 import { SiteHeader } from '@/components/site-chrome';
-import { V8Footer } from '@/components/preview/v9/shell';
-import { V8Hero } from '@/components/preview/v9/hero';
-import { AnnouncementBar } from '@/components/preview/v9/announcement-bar';
-import { QuickStartSection } from '@/components/preview/v9/quickstart-section';
-import { WhyChoose } from '@/components/preview/v9/why-choose';
-import { RequestFlow, Capabilities } from '@/components/preview/v9/capabilities';
-import { TwoPaths } from '@/components/preview/v9/two-paths';
-import { ProductPreview } from '@/components/preview/v9/product-preview';
-import { KeyMetrics } from '@/components/preview/v9/key-metrics';
-import { PricingTable } from '@/components/preview/v9/pricing-table';
-import { QuickStart } from '@/components/preview/v9/quick-start';
-import { PriceLogic } from '@/components/preview/v9/price-logic';
-import { Faq } from '@/components/preview/v9/faq';
-import { ClosingCta } from '@/components/preview/v9/closing';
-import { Reveal } from '@/components/preview/v9/motion';
+import { V8Footer } from '@/components/preview/lab/shell';
+import { V8Hero } from '@/components/preview/lab/hero';
+import { AnnouncementBar } from '@/components/preview/lab/announcement-bar';
+import { QuickStartSection } from '@/components/preview/lab/quickstart-section';
+import { WhyChoose } from '@/components/preview/lab/why-choose';
+import { RequestFlow, Capabilities } from '@/components/preview/lab/capabilities';
+import { TwoPaths } from '@/components/preview/lab/two-paths';
+import { ProductPreview } from '@/components/preview/lab/product-preview';
+import { KeyMetrics } from '@/components/preview/lab/key-metrics';
+import { PricingTable } from '@/components/preview/lab/pricing-table';
+import { QuickStart } from '@/components/preview/lab/quick-start';
+import { PriceLogic } from '@/components/preview/lab/price-logic';
+import { Faq } from '@/components/preview/lab/faq';
+import { ClosingCta } from '@/components/preview/lab/closing';
+import { Reveal } from '@/components/preview/lab/motion';
 
 /**
- * 官网首页「预览版 v9」—— 与正式版完全独立的一份重写。
+ * 官网首页「预览版 v9」—— 与正式版完全独立的一份副本。
  *
  * 地址：http://127.0.0.1:4101/preview/home
  *
- * 2026-11-14 当前结构（实际屏序，与最初计划有合并/新增）：
- *   页头              → **复用正式站 components/site-chrome 的 SiteHeader**（传 maxWidth=1280）
- *   Hero（v9）        → hero.tsx（居中大标题 + 一对按钮 + 一行地址条 + 路由图 + 能力胶囊；
- *                       暖色渐变 + 变径网点背景。内部件：hero-headline / address-bar /
- *                       routing-diagram / trust-strip）
- *   协议路径区        → 本文件内联 section + protocol-tabs.tsx（variant="paths"）
- *   Capabilities      → capabilities.tsx（6 条能力，装饰序号 + 图标容器 + hover 效果）
- *   TwoPaths          → two-paths.tsx（开发者 vs 企业，参考 agtcloud）
- *   ProductPreview    → product-preview.tsx（控制台界面示意，渐变边框 + 精致数据卡）
- *   KeyMetrics        → key-metrics.tsx（4 个关键指标大数字）
- *   PricingTable      → pricing-table.tsx（完整价格表，sticky 表头 + 行 hover）
- *   QuickStart        → quick-start.tsx（深色 IDE 风格代码区，全页唯一深色）
- *   PriceLogic        → price-logic.tsx（三步价格口径，图标 + 连接箭头）
- *   Faq               → faq.tsx（编号折叠问答，圆角卡片 + hover）
- *   ClosingCta        → closing.tsx（渐变收尾区，大标题 + 双按钮）
- *   页脚              → shell.tsx（V8Footer：深色 + 渐变装饰 + 光晕）
+ * 独立性（2026-11-15 重新拆开，之前是共用组件、名不副实）：
+ *   - 正式版组件在 `components/home/`（本轮从 `components/preview/v9/` 改名而来）；
+ *   - 预览版组件是本目录对应的一份**独立副本** `components/preview/lab/`；
+ *   - 两份文件互不引用，改这里不会影响 `/`，改 `/` 也不会影响这里。
+ *     验证方式：改 lab 里任一文案 → 只看 /preview/home 变化 → `/` 不变。
+ *   - 发布动作为「把 lab 的改动搬进 components/home/」，搬完两边再对齐。
+ *   - 唯一有意共用的是页头 `components/site-chrome` 的 SiteHeader（传 maxWidth=1280，
+ *     让页头与正文左右边对齐）。
  *
- * 独立性：除页头（有意复用正式站 SiteHeader，见上方说明）外，其余组件全部在
- * components/preview/ 下，正式页不共用；样式只走 Tailwind 主题变量
- * （brand/ink/line/surface/code）。唯一例外是首屏的暖色层——设计 token 里还没有
- * 暖色梯级，暂用裸值写在 hero.tsx 内，风格定稿后收进 packages/design-tokens。
- *
- * 定稿后：把 v8 的改动搬回正式版 components/，再删掉 /preview 整个目录。
+ * 页内结构见下方屏序注释；组件职责与各文件说明在 `components/preview/lab/` 内。
  */
 export const metadata = {
   title: '预览版 v9 · 首页',

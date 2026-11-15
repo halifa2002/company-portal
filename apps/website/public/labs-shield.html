@@ -1,0 +1,55 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#fff;font-family:"Microsoft YaHei",sans-serif}
+  .row{display:flex;align-items:flex-start}
+  .cell{width:190px;height:190px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+  .cell span{font-size:11px;color:#5b6b7f}
+  svg{display:block;flex:none}
+  img{display:block;flex:none}
+</style></head>
+<body>
+<div class="row">
+  <!-- A 盾（Lucide 路径）+ 镂空锁孔 -->
+  <div class="cell">
+    <svg width="104" height="104" viewBox="0 0 24 24">
+      <defs><mask id="mA" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" fill="#fff"/>
+        <circle cx="12" cy="10" r="1.9" fill="#000"/>
+        <path d="M11 10.9h2l.6 3.4h-3.2Z" fill="#000"/>
+      </mask></defs>
+      <rect width="24" height="24" fill="#188df9" mask="url(#mA)"/>
+    </svg>
+    <span>A 盾 + 镂空锁孔</span>
+  </div>
+
+  <!-- B 盾 + 对勾 -->
+  <div class="cell">
+    <svg width="104" height="104" viewBox="0 0 24 24">
+      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" fill="#188df9"/>
+      <path d="M8.8 11.6 11 13.9l4.4-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>B 盾 + 对勾</span>
+  </div>
+
+  <!-- C 纯锁 + 镂空锁孔（Lucide lock 形态） -->
+  <div class="cell">
+    <svg width="104" height="104" viewBox="0 0 24 24">
+      <defs><mask id="mC" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        <rect x="5" y="11" width="14" height="10" rx="2" fill="#fff"/>
+        <circle cx="12" cy="15" r="1.5" fill="#000"/>
+        <path d="M11.3 15.8h1.4l.4 2.4h-2.2Z" fill="#000"/>
+      </mask></defs>
+      <rect width="24" height="24" fill="#188df9" mask="url(#mC)"/>
+    </svg>
+    <span>C 纯锁 + 镂空锁孔</span>
+  </div>
+
+  <!-- D 现版 -->
+  <div class="cell">
+    <img src="/icons/lab/why-security.png" width="104" height="104" alt="" />
+    <span>D 现版（盾+白锁+靛蓝孔）</span>
+  </div>
+</div>
+</body></html>

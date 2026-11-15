@@ -242,6 +242,107 @@ textarea:focus-visible,
   animation-delay: var(--d, 0ms), 0ms;
 }
 
+/* ---------- 首屏标题整行入场（v9.2，2026-11-15） ----------
+ *
+ * 换掉「两句话轮换」的那套。依据是扒 teamorouter.com 现行代码 + 运行时实测
+ * （2026-11-15 CDP 每 200ms 采样）：他们**仍然轮换**，节奏约 4.2 秒一轮，
+ * 但 DOM 里是**整行切换**（h1 只有 3 个 span，没有逐字的 .hero-ch 节点），
+ * 出场是一次轻淡出、不重演逐字入场。我们正式版选择静态（不打扰），
+ * 轮换只在预览页 experiments 里保留。
+ * 整行入场的参数照抄他们：600ms、位移 12px、blur 3px、
+ * 行间 90ms、缓动 cubic-bezier(.22, 1, .36, 1)。
+ *
+ * 为什么按行不按字：中文方块字拆成单字 inline-block 后，每字各自 blur/translate，
+ * 字形边缘被反复重采样，观感是"字在抖"；整行动画只有一个绘制层，干净且省性能。
+ * 首屏标题不许循环：每一轮重演都会把注意力从按钮上拽走。
+ */
+@keyframes hero-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.hero-line {
+  display: block;
+  animation: hero-line-in 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 90ms);
+  will-change: transform, opacity, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-line {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* ---------- 首屏高亮词的蓝色渐变（v9.2，2026-11-15 补回） ----------
+ *
+ * v9 把高亮词退化成实色 brand-700，观感偏平；这里把渐变补回来。
+ * 浅色端**不能随便挑**：首屏底色 #eef6ff，brand-600(#188df9) 压上去已经只有 3.1:1，
+ * 再浅（brand-400 #38b1ff 是 2.2:1、brand-300 #7ccbff 更低）连大字号 AA(3:1) 都过不了。
+ * 所以色阶只在 brand-900 → brand-700 → brand-600 之间走，最浅一档仍有 3.1:1。
+ *
+ * 动效：把背景拉到 220% 高，靠 background-position 竖向 8s 缓慢往返，
+ * 字面在「深藏青 → 品牌蓝」之间呼吸。不做横向扫光——中文方块字横向扫过时
+ * 笔画末端会有「被擦掉」的错觉。
+ */
+@keyframes hero-grad-drift {
+  from {
+    background-position: 50% 0%;
+  }
+  to {
+    background-position: 50% 100%;
+  }
+}
+
+.hero-grad-brand {
+  /* 180deg = 自上而下：上端深藏青、下端品牌蓝，和参考站那种「上深下亮」一致。
+   * 注意别写 165deg —— CSS 里 0deg 朝上、90deg 朝右，165deg 已经接近水平，
+   * 出来是「左深右亮」，跟竖向渐变观感完全不同（2026-11-15 第一版就写成 165deg）。 */
+  background-image: linear-gradient(
+    180deg,
+    var(--brand-900) 0%,
+    var(--brand-700) 50%,
+    var(--brand-600) 100%
+  );
+  background-size: 100% 120%;
+  background-position: 50% 0%;
+  background-repeat: no-repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  /* 撑大绘制盒再负 margin 收回：行高收得紧时，渐变只裁到字形盒内，避免边缘被削 */
+  padding: 0.04em 0.02em 0.12em;
+  margin: -0.04em -0.02em -0.12em;
+  animation: hero-grad-drift 8s ease-in-out infinite alternate;
+}
+
+/* 老浏览器不支持 background-clip:text 时，退回实色，绝不让字消失 */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero-grad-brand {
+    background-image: none;
+    color: var(--brand-700);
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-grad-brand {
+    animation: none;
+  }
+}
+
 /* ---------- 厂牌跑马灯 ---------- */
 
 @keyframes marquee-slide {
@@ -503,4 +604,85 @@ textarea:focus-visible,
     rgba(11, 58, 104, 0.93) 55%,
     rgba(16, 78, 128, 0.87) 100%
   );
+}
+/* ==========================================================================
+ * 首页 · 顶部通告条 + 首屏标题换句（2026-11-15 从 lab 实验版转正）
+ *
+ * 这两块原先在 app/preview/lab.css 里以 `.lab-` 前缀试用；验证通过后按那边的
+ * 规矩去掉前缀并入这里，正式版与预览版共用同一份实现。
+ * 对应组件：components/home/announcement-bar.tsx、hero-headline.tsx
+ * ========================================================================== */
+
+/* ---- 顶部通告条：暖黑底 + 星点 ------------------------------------------
+ * 对标 teamorouter 的 .launch-banner 实测参数：底色 #14110f（暖黑，不是纯黑）、
+ * 字色 #fffefb（暖白）、条高 44px、正文 14px/20px、间距 7px、强调色 #fb8841。
+ * 星点用 CSS 多层 radial-gradient 画，零 JS、零额外请求。
+ */
+.ann {
+  background-color: #14110f;
+  color: #fffefb;
+  animation: ann-in 0.52s cubic-bezier(0.2, 0, 0, 1) 80ms both;
+}
+
+.ann-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.65;
+  background-image:
+    radial-gradient(1.4px 1.4px at 6% 32%, rgba(255, 255, 255, 0.9), transparent 60%),
+    radial-gradient(1px 1px at 13% 72%, rgba(255, 255, 255, 0.55), transparent 60%),
+    radial-gradient(1.8px 1.8px at 21% 22%, rgba(255, 255, 255, 0.75), transparent 60%),
+    radial-gradient(1px 1px at 28% 60%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(1.2px 1.2px at 36% 84%, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(1px 1px at 44% 18%, rgba(255, 255, 255, 0.4), transparent 60%),
+    radial-gradient(1.6px 1.6px at 52% 66%, rgba(255, 255, 255, 0.7), transparent 60%),
+    radial-gradient(1px 1px at 61% 36%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(1.3px 1.3px at 68% 80%, rgba(255, 255, 255, 0.62), transparent 60%),
+    radial-gradient(1px 1px at 76% 26%, rgba(255, 255, 255, 0.4), transparent 60%),
+    radial-gradient(1.7px 1.7px at 84% 58%, rgba(255, 255, 255, 0.75), transparent 60%),
+    radial-gradient(1px 1px at 91% 30%, rgba(255, 255, 255, 0.5), transparent 60%),
+    radial-gradient(1.2px 1.2px at 96% 74%, rgba(255, 255, 255, 0.55), transparent 60%);
+  background-repeat: no-repeat;
+}
+
+@keyframes ann-in {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ann {
+    animation: none;
+  }
+}
+
+/* ---- 首屏标题换句出场 ----------------------------------------------------
+ * 「只出场、不重演入场」：加 .is-leaving 时整块淡出并轻微上移，换完文本去掉
+ * 这个类，靠同一组 transition 淡回原位 —— 没有逐字阶梯，也不 remount。
+ */
+.hero-fade {
+  transition:
+    opacity 240ms ease-out,
+    transform 240ms ease-out,
+    filter 240ms ease-out;
+  will-change: opacity, transform, filter;
+}
+
+.hero-fade.is-leaving {
+  opacity: 0;
+  transform: translateY(-0.24em);
+  filter: blur(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fade {
+    transition: none;
+  }
 }

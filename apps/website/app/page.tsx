@@ -1,33 +1,34 @@
 import { MODEL_CATALOG } from '@portal/types';
 import { loadModelList } from '@/lib/pricing';
 import { SiteHeader } from '@/components/site-chrome';
-import { V8Footer } from '@/components/preview/v9/shell';
-import { V8Hero } from '@/components/preview/v9/hero';
-import { AnnouncementBar } from '@/components/preview/v9/announcement-bar';
-import { QuickStartSection } from '@/components/preview/v9/quickstart-section';
-import { WhyChoose } from '@/components/preview/v9/why-choose';
-import { RequestFlow, Capabilities } from '@/components/preview/v9/capabilities';
-import { TwoPaths } from '@/components/preview/v9/two-paths';
-import { ProductPreview } from '@/components/preview/v9/product-preview';
-import { KeyMetrics } from '@/components/preview/v9/key-metrics';
-import { PricingTable } from '@/components/preview/v9/pricing-table';
-import { QuickStart } from '@/components/preview/v9/quick-start';
-import { PriceLogic } from '@/components/preview/v9/price-logic';
-import { Faq } from '@/components/preview/v9/faq';
-import { ClosingCta } from '@/components/preview/v9/closing';
-import { Reveal } from '@/components/preview/v9/motion';
+import { V8Footer } from '@/components/home/shell';
+import { V8Hero } from '@/components/home/hero';
+import { AnnouncementBar } from '@/components/home/announcement-bar';
+import { QuickStartSection } from '@/components/home/quickstart-section';
+import { WhyChoose } from '@/components/home/why-choose';
+import { RequestFlow, Capabilities } from '@/components/home/capabilities';
+import { TwoPaths } from '@/components/home/two-paths';
+import { ProductPreview } from '@/components/home/product-preview';
+import { KeyMetrics } from '@/components/home/key-metrics';
+import { PricingTable } from '@/components/home/pricing-table';
+import { QuickStart } from '@/components/home/quick-start';
+import { PriceLogic } from '@/components/home/price-logic';
+import { Faq } from '@/components/home/faq';
+import { ClosingCta } from '@/components/home/closing';
+import { Reveal } from '@/components/home/motion';
 
 /**
  * 官网首页（正式版）—— 2026-11-15 由预览版 v8 提升而来（同日预览页升为 v9）。
  *
- * 与 /preview/home 的关系：**两份独立的页面代码，互不影响。**
- *   - 页面结构、屏序、文案在本文件（正式版）与 app/preview/home/page.tsx（预览版）
- *     各存一份，改动其中一份不会波及另一份；
- *   - 底层展示组件共用 components/preview/v9/*（与仓库既有约定一致：
- *     home-page-body 与 home-preview-body 也是「独立副本」而不是同一个文件）；
- *   - 因此「在预览页改完 → 搬到这里」才是发布动作，预览页保持为试验田。
+ * 与 /preview/home 的关系：**两份独立的拷贝，互不影响。**
+ *   - 页面结构、屏序、文案在本文件与 app/preview/home/page.tsx 各存一份；
+ *   - 展示组件：正式版用 `components/home/`（2026-11-15 从
+ *     `components/preview/v9/` 改名而来，名字不再带 preview），
+ *     预览版用 `components/preview/lab/`（同一份的独立副本）；
+ *   - 所以改 `components/home/` 只影响 `/`，改 `components/preview/lab/` 只影响
+ *     `/preview/home`。预览页改完满意了，再把改动搬进 `components/home/`。
  *
- * 与预览版的三处差异：无左下角「预览版 v8」浮标、无 noindex、
+ * 与预览版的三处差异：无左下角「预览版 v9」浮标、无 noindex、
  * metadata 走根 layout 的正式标题（不写本文件的 metadata 即继承默认）。
  *
  * 旧首页 components/home-page-body.tsx（308 行，含 hero-next 首屏）已不再被引用，

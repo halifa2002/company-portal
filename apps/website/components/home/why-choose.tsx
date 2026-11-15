@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 「为什么选择虫洞 AI」——插在「模型与价格」广告栏之前的一屏。
  *
  * 2026-11-14 用户口径演变：
@@ -33,7 +33,7 @@ const HEADLINERS = [
 /** 下方四张卡：图标 + 大标题 + 要点（对应硅基流动「高稳定性 / 高智能 …」那排） */
 const PILLARS = [
   {
-    icon: '/icons/why-stability.png',
+    icon: '/icons/lab/why-stability.png',
     title: '高稳定性',
     points: [
       '多线路自动切换重试',
@@ -42,7 +42,7 @@ const PILLARS = [
     ],
   },
   {
-    icon: '/icons/why-intelligence.png',
+    icon: '/icons/lab/why-intelligence.png',
     title: '高智能',
     points: [
       '对话推理编程统一接入',
@@ -51,7 +51,7 @@ const PILLARS = [
     ],
   },
   {
-    icon: '/icons/why-security.png',
+    icon: '/icons/lab/why-security.png',
     title: '高安全性',
     points: [
       '可部署在自有服务器',
@@ -60,7 +60,7 @@ const PILLARS = [
     ],
   },
   {
-    icon: '/icons/why-extensibility.png',
+    icon: '/icons/lab/why-extensibility.png',
     title: '高扩展性',
     points: [
       '加模型只改后台配置',

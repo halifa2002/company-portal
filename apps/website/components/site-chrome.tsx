@@ -331,7 +331,7 @@ export function SiteFooter() {
               links={[
                 { label: '关于我们', href: '/about' },
                 { label: '生态合作', href: '/partner' },
-                { label: '服务协议', href: '/terms' },
+                { label: '服务条款', href: '/terms' },
                 { label: '隐私政策', href: '/privacy' },
               ]}
             />

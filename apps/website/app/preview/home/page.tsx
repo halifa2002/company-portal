@@ -9,6 +9,7 @@ import { V8Hero } from '@/components/preview/lab/hero';
 import { AnnouncementBar } from '@/components/preview/lab/announcement-bar';
 import { QuickStartSection } from '@/components/preview/lab/quickstart-section';
 import { WhyChoose } from '@/components/preview/lab/why-choose';
+import { ProblemSection } from '@/components/preview/lab/problem-section';
 import { RequestFlow, Capabilities } from '@/components/preview/lab/capabilities';
 import { TwoPaths } from '@/components/preview/lab/two-paths';
 import { ProductPreview } from '@/components/preview/lab/product-preview';
@@ -59,6 +60,13 @@ export default async function PreviewHomePageV8() {
 
             <main>
         <V8Hero modelCount={models.length} vendors={vendors} />
+
+        {/*
+         * 痛点屏 2026-11-15：插在首屏与「为什么选择虫洞 AI」之间。
+         * 首屏讲「我们是什么」，这里换成读者的口气讲「你现在多烦」，下一屏才是我们的答案——
+         * 问题 → 答案连成一对，比两张连续的自夸屏更容易读下去。
+         */}
+        <Reveal><ProblemSection /></Reveal>
 
         {/*
          * 屏序 2026-11-14 按 teamorouter 重排：价格区从第 10 屏提到第 4 屏。

@@ -6,6 +6,7 @@ import { V8Hero } from '@/components/home/hero';
 import { AnnouncementBar } from '@/components/home/announcement-bar';
 import { QuickStartSection } from '@/components/home/quickstart-section';
 import { WhyChoose } from '@/components/home/why-choose';
+import { ProblemSection } from '@/components/home/problem-section';
 import { RequestFlow, Capabilities } from '@/components/home/capabilities';
 import { TwoPaths } from '@/components/home/two-paths';
 import { ProductPreview } from '@/components/home/product-preview';
@@ -37,7 +38,7 @@ import { Reveal } from '@/components/home/motion';
 
 /**
  * 屏序（与预览版同步，2026-11-15）：
- *   通告条 → 首屏 v9 → 为什么选择 → 价格表 → 价格口径 → 转化带（深）
+ *   通告条 → 首屏 v9 → 痛点屏 → 为什么选择 → 价格表 → 价格口径 → 转化带（深）
  *   → 能力 / 快速开始 / 调用链路 / 关键指标（浅蓝章）
  *   → 两种接入 → 控制台预览 → FAQ → 收尾 CTA → 页脚
  */
@@ -54,6 +55,15 @@ export default async function HomePage() {
 
       <main>
         <V8Hero modelCount={models.length} vendors={vendors} />
+
+        {/*
+         * 痛点屏 2026-11-15（与预览页同步）：首屏之后先讲「你现在多烦」，下一屏再给答案。
+         * 用户明确要保留「为什么选择虫洞 AI」那屏居中大标题的震撼观感，所以这里单独成屏而非替换标题。
+         * 代价已知：价格表从第 3 屏挪到第 4 屏。
+         */}
+        <Reveal>
+          <ProblemSection />
+        </Reveal>
 
         <WhyChoose />
 

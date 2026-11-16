@@ -9,7 +9,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { brand, consoleUrl, loginUrl, nav, registerUrl } from '@/lib/brand';
+import { brand, consoleUrl, loginUrl, nav, registerUrl, sourceRepo } from '@/lib/brand';
 import { UserMenu } from './user-menu';
 
 /** 后端登录成功时会写一个可读标记 cookie（SSR 读不到，只在水合后判断） */
@@ -358,9 +358,17 @@ export function SiteFooter() {
           <span>
             © {new Date().getFullYear()} {brand.company} · 保留所有权利
           </span>
-          {/* ⚠️ AGPL 要求：对外提供服务需提供源码获取入口，仓库转为公开后这里换成链接 */}
+          {/* AGPL-3.0 第 13 条：以网络方式提供服务，必须给出源码获取入口，仓库须保持公开 */}
           <span className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <span>基于开源项目构建</span>
+            <a
+              href={sourceRepo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-white/80"
+            >
+              源代码
+            </a>
           </span>
         </div>
       </div>

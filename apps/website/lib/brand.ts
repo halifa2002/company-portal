@@ -49,6 +49,14 @@ export const consoleBase =
 export const apiBase =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.tokenflow365.com';
 
+/**
+ * 后端仓库地址
+ *
+ * AGPL-3.0 第 13 条：通过网络提供服务时，必须让用户能拿到「对应源码」。
+ * 页脚的「源代码」链接指向这里，所以这个仓库必须保持公开。
+ */
+export const sourceRepo = 'https://github.com/halifa2002/new-api';
+
 /** 登录入口 */
 export const loginUrl = `${consoleBase}/login`;
 /** 注册入口：后端 register_enabled = true，用户可自助注册 */

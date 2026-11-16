@@ -1,4 +1,3 @@
-import { LogoMark } from '@portal/ui';
 import { RouteMark } from './route-marks';
 
 /**
@@ -18,7 +17,7 @@ import { RouteMark } from './route-marks';
  *   - 动效：卡片依次淡入（它用 rdIn 620ms、延迟 620+85*i，这里同节奏），连线跑流光，中枢呼吸波纹。
  *
  * 两处有意不同（用户允许的例外）：
- *   ① 中枢圆里用自家 LogoMark；
+ *   ① 中枢圆里放官方标志图形（/brand/tokenflow-icon-512.png）；
  *   ② 底色不搬——用户 2026-11-16 明确「背景你别管」，图仍落在本站蓝色云底上。
  *      代价是连线不能像参考站那样用浅色，只能用各自品牌色的深色 + 亮段流光。
  */
@@ -241,7 +240,14 @@ export function RoutingDiagram() {
             WebkitBackdropFilter: 'blur(13px) saturate(1.25)',
           }}
         >
-          <LogoMark size="sm" />
+          {/* 2026-11-16：中枢图标换成品牌新图形（蓝底方块 + 白色折线），与网站图标同一份素材 */}
+          <img
+            src="/brand/tf-icon-black-512.png"
+            alt=""
+            width={40}
+            height={40}
+            className="h-10 w-10"
+          />
         </div>
         <span className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[12.5px] text-white/75" style={{ top: 'calc(50% + 56px)' }}>
           <i

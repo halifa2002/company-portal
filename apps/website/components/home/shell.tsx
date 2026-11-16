@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { LogoMark } from '@portal/ui';
 import { brand, registerUrl } from '@/lib/brand';
 import { Arrow } from '@/components/ui/arrow';
 
@@ -58,9 +57,15 @@ export function V8Footer() {
       <div className="relative mx-auto w-full max-w-[1280px] px-6 py-14 md:px-10 md:py-16">
         <div className="grid gap-10 md:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))]">
           <div>
-            <div className="flex items-center gap-2.5">
-              <LogoMark size="xs" />
-              <span className="text-note font-semibold tracking-tight text-white">{brand.name}</span>
+            <div className="flex items-center">
+              {/* 2026-11-16：换成领导交付的 TokenFlow 字标（页脚深底用白版） */}
+              <img
+                src="/brand/tokenflow-logo-white.png"
+                alt={brand.name}
+                width={259}
+                height={30}
+                className="h-[30px] w-auto"
+              />
             </div>
             <p className="mt-4 max-w-[280px] text-[13px] leading-relaxed text-white/60">
               {brand.description}

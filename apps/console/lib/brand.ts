@@ -7,8 +7,8 @@
  * 这里只放展示用的名字，不放域名与接口地址（那些走环境变量）。
  */
 export const brand = {
-  /** 平台名 */
-  name: '虫洞 AI',
+  /** 平台名（2026-11-16 定名 TokenFlow） */
+  name: 'TokenFlow',
   /**
    * 方形标记里显示的首字。
    *
@@ -16,7 +16,7 @@ export const brand = {
    * 两个图形，用户看着是两个产品。品牌图形现在统一走 `@portal/ui` 的 LogoMark，
    * 这个字段只在没有图形组件的纯文本场合（例如邮件、标题）才用。
    */
-  initial: '虫',
+  initial: 'T',
 } as const;
 
 /**

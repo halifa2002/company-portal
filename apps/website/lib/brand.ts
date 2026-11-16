@@ -5,10 +5,10 @@
  */
 
 export const brand = {
-  /** 平台名（待定） */
-  name: '虫洞 AI',
-  /** 英文名/短标识（待定），显示在中文名下方 */
-  shortName: 'CHONGDONG AI',
+  /** 平台名（2026-11-16 定名 TokenFlow，品牌只用英文） */
+  name: 'TokenFlow',
+  /** 短标识：品牌只用英文名，此处留空；填值才渲染第二行 */
+  shortName: '',
   /** 一句话定位（待定） */
   tagline: '统一接口，接入主流 AI 模型',
   /** 副标题说明 */

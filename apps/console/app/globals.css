@@ -27,6 +27,9 @@
   --color-brand-soft: var(--brand-primary-soft);
   --color-brand-accent: var(--brand-accent);
 
+  /* 品牌图形方块底（2026-11-16）：bg-logo-tile，对应 theme.css 的 --logo-tile */
+  --color-logo-tile: var(--logo-tile);
+
   /* 文字四档（禁止再写 text-ink/60 这类透明度） */
   --color-ink: var(--neutral-text);
   --color-ink-soft: var(--neutral-text-soft);

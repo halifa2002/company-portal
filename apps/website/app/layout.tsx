@@ -23,7 +23,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body className="antialiased">{children}</body>
+      {/*
+        flex + min-h-svh：内容不足一屏时把页脚顶到视口底部。
+        否则页脚下方会露出 body 的白底，像页面没写完（2026-11-16 /docs 发现）。
+      */}
+      <body className="flex min-h-svh flex-col antialiased">{children}</body>
     </html>
   );
 }

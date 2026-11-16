@@ -55,15 +55,7 @@ export function UserMenu() {
         className="flex h-9 w-9 items-center justify-center rounded-full text-white ring-1 ring-black/5 transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 2xl:h-10 2xl:w-10"
         style={{ background: 'var(--gradient-primary)' }}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path
-            d="M6 7h12L6 17h12"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <img src="/brand/tokenflow-mark-white.png" alt="" width={23} height={13} draggable={false} />
       </button>
 
       {open && (
@@ -79,15 +71,13 @@ export function UserMenu() {
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
               style={{ background: 'var(--gradient-primary)' }}
             >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M6 7h12L6 17h12"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <img
+                src="/brand/tokenflow-mark-white.png"
+                alt=""
+                width={24}
+                height={14}
+                draggable={false}
+              />
             </span>
             <span className="min-w-0">
               <span className="block text-body font-semibold leading-tight text-ink">

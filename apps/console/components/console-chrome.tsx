@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { authApi, setAccessToken } from '@portal/api-client';
-import { LogoMark } from '@portal/ui';
 import type { SelfUser } from '@portal/types';
 import { brand, docsUrl, pricingUrl, siteUrl } from '@/lib/brand';
 import { ensureMoneySettings, moneyUnit, quotaToAmount } from '@/lib/format';
@@ -372,11 +371,15 @@ export function ConsoleTopbar({
                 )}
               </svg>
             </button>
-            <a href={siteUrl} className="group flex shrink-0 items-center gap-2.5">
-              <LogoMark size="xs" />
-              <span className="hidden text-title font-bold tracking-tight text-ink sm:inline">
-                {brand.name}
-              </span>
+            <a href={siteUrl} className="group flex shrink-0 items-center" aria-label={brand.name}>
+              {/* 2026-11-16：品牌图形换成领导交付的 TokenFlow 字标（控制台是白底，用深版） */}
+              <img
+                src="/brand/tokenflow-logo-dark.png"
+                alt={brand.name}
+                width={190}
+                height={22}
+                className="h-[22px] w-auto"
+              />
             </a>
           </div>
 

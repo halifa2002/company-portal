@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { LogoMark } from '@portal/ui';
 import { brand, consoleUrl, loginUrl, nav, registerUrl } from '@/lib/brand';
 import { UserMenu } from './user-menu';
 
@@ -96,8 +95,6 @@ export function SiteHeader({
   }, [overlay]);
 
   const onDark = overlay && atTop;
-  const tone = onDark ? 'text-white' : 'text-ink';
-  const muted = onDark ? 'text-white/60' : 'text-ink-muted';
   const soft = onDark ? 'text-white/80' : 'text-ink-soft';
   const softHover = onDark ? 'hover:text-white' : 'hover:text-ink';
 
@@ -118,17 +115,16 @@ export function SiteHeader({
       <div
         className={`mx-auto flex h-16 items-center justify-between px-6 2xl:h-[72px] 2xl:px-10 ${maxWidth}`}
       >
-        {/* 品牌区：图形 logo + 中英双行 */}
-        <Link href="/" className="group flex items-center gap-2.5">
-          <LogoMark glow />
-          <span className="flex flex-col leading-none">
-            <span className={`text-heading font-bold tracking-tight 2xl:text-heading ${tone}`}>
-              {brand.name}
-            </span>
-            <span className={`mt-1 text-meta font-medium uppercase tracking-[0.18em] ${muted}`}>
-              {brand.shortName}
-            </span>
-          </span>
+        {/* 品牌区：直接用领导交付的 TokenFlow 字标（2026-11-16）。
+            透明底，深色画面上用白版、浅色页面用深版——同一张图不能两处通用。 */}
+        <Link href="/" className="group flex items-center" aria-label={brand.name}>
+          <img
+            src={onDark ? '/brand/tokenflow-logo-white.png' : '/brand/tokenflow-logo-dark.png'}
+            alt={brand.name}
+            width={242}
+            height={28}
+            className="h-[22px] w-auto transition-transform duration-300 group-hover:scale-[1.02] sm:h-[28px]"
+          />
         </Link>
 
         {/* 导航项：当前页高亮 + hover 下划线 */}
@@ -278,7 +274,7 @@ export function SiteHeader({
  */
 export function SiteFooter() {
   return (
-    <footer className="relative overflow-hidden border-t border-line bg-footer">
+    <footer className="relative mt-auto overflow-hidden border-t border-line bg-footer">
       <span
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(129,140,248,0.55),transparent)]"
@@ -298,31 +294,16 @@ export function SiteFooter() {
           看着像没对齐的另一个站。改成两端对拉，品牌贴左、链接贴右，与页头一致。
         */}
         <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-x-16 xl:gap-x-24">
-          {/* 品牌区：与页头同一套 logo 与中英双行，避免两块像两个网站 */}
+          {/* 品牌区：与页头同一套 TokenFlow 字标（页脚是深底，固定用白版） */}
           <div className="lg:max-w-[380px]">
-            <Link href="/" className="group flex w-fit items-center gap-3">
-              <span
-                className="flex h-11 w-11 items-center justify-center rounded-card text-white shadow-brand ring-1 ring-white/10 transition-transform duration-300 group-hover:scale-105"
-                style={{ background: 'var(--gradient-brand)' }}
-              >
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <path
-                    d="M6 7h12L6 17h12"
-                    stroke="currentColor"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-              <span className="flex flex-col leading-none">
-                <span className="text-heading font-bold tracking-tight text-white">
-                  {brand.name}
-                </span>
-                <span className="mt-1.5 text-meta font-medium uppercase tracking-[0.2em] text-white/40">
-                  {brand.shortName}
-                </span>
-              </span>
+            <Link href="/" className="group flex w-fit items-center" aria-label={brand.name}>
+              <img
+                src="/brand/tokenflow-logo-white.png"
+                alt={brand.name}
+                width={294}
+                height={34}
+                className="h-[34px] w-auto transition-transform duration-300 group-hover:scale-[1.02]"
+              />
             </Link>
 
             <p className="mt-7 text-body font-medium tracking-tight text-white/85">

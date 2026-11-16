@@ -1,5 +1,5 @@
 ﻿/**
- * 「为什么选择虫洞 AI」——插在「模型与价格」广告栏之前的一屏。
+ * 「为什么选择 TokenFlow」——插在「模型与价格」广告栏之前的一屏。
  *
  * 2026-11-14 用户口径演变：
  *   ① 参照硅基流动同类版块，位置放在价格广告栏之前，字要大；
@@ -123,7 +123,7 @@ export function WhyChoose() {
     <section id='why-choose' className='border-b border-line py-16 md:py-24'>
       <div className='mx-auto max-w-[1280px] px-6'>
         <h2 className='text-center text-[44px] leading-tight font-semibold tracking-tight text-ink sm:text-[68px]'>
-          为什么选择虫洞 AI
+          为什么选择 TokenFlow
         </h2>
 
         {/* 上方两张深色大卡：标题 / 说明 / 按钮 + 右下角电路纹装饰 */}

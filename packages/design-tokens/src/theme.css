@@ -35,6 +35,12 @@
   --accent-lime: #affd1d;
   --brand-hero-from: #f4faff;
   --brand-hero-to: #e3f3ff;
+  /*
+   * 品牌图形方块底（2026-11-16）：官方标志是黑底白折线。
+   * 必须与 public/brand/tf-icon-black-*.png 的黑底同值，否则组件方块和图标会有色差。
+   * 页面写 bg-logo-tile，不许再写 bg-[#0F0F10]（md 7.2）。
+   */
+  --logo-tile: #0f0f10;
 
   /*
    * ============ 品牌色阶（2026-11-13）============

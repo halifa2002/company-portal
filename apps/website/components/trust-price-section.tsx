@@ -170,7 +170,7 @@ export function TrustPriceSection() {
         */}
         <div className="grid gap-14 lg:grid-cols-2 lg:gap-20 xl:gap-28">
           <Column
-            title="为什么用虫洞 AI"
+            title="为什么用 TokenFlow"
             lead="把接哪家、怎么计费收进网关，模型之间的差异对你没有影响。"
             points={trustPoints}
           />

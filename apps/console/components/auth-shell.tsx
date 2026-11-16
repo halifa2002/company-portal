@@ -1,8 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { LogoMark } from '@portal/ui';
-import { siteUrl } from '@/lib/brand';
+import { brand, siteUrl } from '@/lib/brand';
 
 /**
  * 登录 / 注册共用的外框。
@@ -27,7 +26,14 @@ export function AuthShell({
     <div className="flex min-h-screen flex-col items-center justify-center bg-surface-subtle px-6 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center text-center">
-          <LogoMark size="md" />
+          {/* 2026-11-16：换成领导交付的 TokenFlow 字标（浅色底用深版），不再用方块字形 */}
+          <img
+            src="/brand/tokenflow-logo-dark.png"
+            alt={brand.name}
+            width={259}
+            height={30}
+            className="h-[30px] w-auto"
+          />
           <h1 className="mt-4 text-heading font-semibold text-ink">{title}</h1>
           <p className="mt-1.5 text-note leading-normal text-ink-muted">{description}</p>
         </div>

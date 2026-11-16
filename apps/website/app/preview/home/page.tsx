@@ -85,7 +85,7 @@ export default async function PreviewHomePageV8() {
         <V8Hero modelCount={models.length} vendors={vendors} />
 
         {/*
-         * 痛点屏 2026-11-15：插在首屏与「为什么选择虫洞 AI」之间。
+         * 痛点屏 2026-11-15：插在首屏与「为什么选择 TokenFlow」之间。
          * 首屏讲「我们是什么」，这里换成读者的口气讲「你现在多烦」，下一屏才是我们的答案——
          * 问题 → 答案连成一对，比两张连续的自夸屏更容易读下去。
          */}
@@ -103,7 +103,7 @@ export default async function PreviewHomePageV8() {
          * 卡片里每条模型还只能显示输入/输出两个数，信息量比表格少。价格表已含
          * 全部 27 个模型与「看全部模型」入口，概览层不需要单独占一屏。
          */}
-        {/* 2026-11-14 用户要求：在价格广告栏前面加一屏「为什么选择虫洞 AI」（参照硅基流动的同类版块） */}
+        {/* 2026-11-14 用户要求：在价格广告栏前面加一屏「为什么选择 TokenFlow」（参照硅基流动的同类版块） */}
         <WhyChoose />
 
         <Reveal><PricingTable models={models} pricingAvailable={pricingAvailable} /></Reveal>

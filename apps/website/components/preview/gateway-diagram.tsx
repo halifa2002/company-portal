@@ -190,24 +190,21 @@ export function GatewayGraph({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
           style={{ transformOrigin: `${HUB.x}px ${HUB.y}px` }}
         />
         <g>
-          {/*
-            中心图形�?026-11-13 换掉）：原来是一个圆圈加两道横线—�?            读起来像"用户头像"或�?菜单按钮"，跟网关没有任何关系，用户直接说"好土"�?            现在换成品牌自己那个 Z 折线（与页头 logo 同一个路径）�?            这个节点就不再是一个通用符号，而是"我们的网�?�?            路径来自 packages/ui �?LogoMark，改品牌图形时两边要一起改�?          */}
+          {/* 2026-11-16: hub mark is the official TokenFlow chevron image (public/brand/tokenflow-mark-ink.png). The old Z polyline and its LogoMark dependency are gone. */}
           {/*
             居中偏移要按「缩放后的包围盒」算，不能只减半宽：
             Z 路径本身起点�?(6,7) 不是 (0,0)，缩�?1.7 后左边界跑到 10.2�?            正确写法：t = 目标中心 - 缩放后包围盒中心
               x: HUB.x - (6 + 18)/2 * 1.7 = HUB.x - 20.4
               y: (HUB.y - 8) - (7 + 17)/2 * 1.7 = HUB.y - 28.4
             上一版只减了 10.2，图标整体右�?10px，看着就是"歪了"�?          */}
-          <g transform={`translate(${HUB.x - 20.4} ${HUB.y - 31.4}) scale(1.7)`}>
-            <path
-              d="M6 7h12L6 17h12"
-              fill="none"
-              stroke="#14477f"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </g>
+                    {/* 2026-11-16: official TokenFlow mark image replaces the old Z path */}
+          <image
+            href="/brand/tokenflow-mark-dark.png"
+            x={HUB.x - 13}
+            y={HUB.y - 18.5}
+            width={26}
+            height={15}
+          />
           <text
             x={HUB.x}
             y={HUB.y + 22}

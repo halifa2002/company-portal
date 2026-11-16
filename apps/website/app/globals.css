@@ -35,6 +35,9 @@
   --color-accent-warm: var(--accent-warm);
   --color-accent-warm-deep: var(--accent-warm-deep);
 
+  /* 品牌图形方块底（2026-11-16）：bg-logo-tile，对应 theme.css 的 --logo-tile */
+  --color-logo-tile: var(--logo-tile);
+
   /*
    * 品牌色阶 10 档（2026-11-13 补回）：
    * theme.css 里已经有一整条阶梯，但这里不映射，bg-brand-950 这类类名就不存在，

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { authApi, ApiError } from '@portal/api-client';
 import { Button, Field, Input } from '@portal/ui';
 import { AuthAlert, AuthShell } from '@/components/auth-shell';
+import { siteUrl } from '@/lib/brand';
 
 /** 登录页 —— md 第十章 Phase 2 第 1 步 */
 export default function LoginPage() {
@@ -99,6 +100,28 @@ export default function LoginPage() {
         >
           {cooldown > 0 ? `${cooldownLabel}后可再试` : '登录'}
         </Button>
+
+        {/* 登录也挂一句协议提示：后台协议开关打开后，这里是用户看得见的那句话 */}
+        <p className="mt-4 text-center text-meta leading-normal text-ink-muted">
+          登录即表示你同意
+          <a
+            href={`${siteUrl}/terms`}
+            target="_blank"
+            rel="noreferrer"
+            className="mx-1 hover:text-brand hover:underline"
+          >
+            《服务条款》
+          </a>
+          与
+          <a
+            href={`${siteUrl}/privacy`}
+            target="_blank"
+            rel="noreferrer"
+            className="ml-1 hover:text-brand hover:underline"
+          >
+            《隐私政策》
+          </a>
+        </p>
 
         <div className="mt-4 flex items-center justify-between text-note text-ink-muted">
           <Link href="/forgot-password" className="transition-colors hover:text-brand">

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { authApi, ApiError } from '@portal/api-client';
 import { Button, Field, Input } from '@portal/ui';
 import { AuthAlert, AuthShell } from '@/components/auth-shell';
+import { siteUrl } from '@/lib/brand';
 
 /**
  * 注册页 —— md 第十章 Phase 2 第 1 步
@@ -19,6 +20,7 @@ export default function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +38,10 @@ export default function RegisterPage() {
     }
     if (password.length < 8) {
       setError('密码至少 8 位');
+      return;
+    }
+    if (!agreed) {
+      setError('请先阅读并勾选同意服务条款与隐私政策');
       return;
     }
 
@@ -99,6 +105,41 @@ export default function RegisterPage() {
             className="w-full"
           />
         </Field>
+
+        {/*
+          2026-11-16：加协议勾选。此前注册页没有任何协议确认，
+          后台 user_agreement_enabled / privacy_policy_enabled 又都是关的，
+          等于对外服务时既没提示也没依据。勾选框走前端强校验，
+          两个链接指向官网的正式页面（新窗口打开，别把用户带离注册流程）。
+        */}
+        <label className="mt-5 flex cursor-pointer items-start gap-2 text-note leading-normal text-ink-muted">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 h-3.5 w-3.5 shrink-0 accent-[var(--brand-primary)]"
+          />
+          <span>
+            我已阅读并同意
+            <a
+              href={`${siteUrl}/terms`}
+              target="_blank"
+              rel="noreferrer"
+              className="mx-1 text-brand hover:underline"
+            >
+              《服务条款》
+            </a>
+            与
+            <a
+              href={`${siteUrl}/privacy`}
+              target="_blank"
+              rel="noreferrer"
+              className="ml-1 text-brand hover:underline"
+            >
+              《隐私政策》
+            </a>
+          </span>
+        </label>
 
         {error && <AuthAlert>{error}</AuthAlert>}
 

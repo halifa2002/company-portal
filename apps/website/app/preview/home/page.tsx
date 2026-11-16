@@ -3,7 +3,7 @@ import { loadModelList } from '@/lib/pricing';
 // 预览页专用样式：只有本页加载，类名一律 .lab- 开头，不覆盖公共类。
 // 规则见 app/preview/lab.css 顶部注释。
 import '../lab.css';
-import { SiteHeader } from '@/components/site-chrome';
+import { SiteHeader } from '@/components/preview/site-chrome';
 import { V8Footer } from '@/components/preview/lab/shell';
 import { V8Hero } from '@/components/preview/lab/hero';
 import { AnnouncementBar } from '@/components/preview/lab/announcement-bar';
@@ -32,8 +32,9 @@ import { Reveal } from '@/components/preview/lab/motion';
  *   - 两份文件互不引用，改这里不会影响 `/`，改 `/` 也不会影响这里。
  *     验证方式：改 lab 里任一文案 → 只看 /preview/home 变化 → `/` 不变。
  *   - 发布动作为「把 lab 的改动搬进 components/home/」，搬完两边再对齐。
- *   - 唯一有意共用的是页头 `components/site-chrome` 的 SiteHeader（传 maxWidth=1280，
- *     让页头与正文左右边对齐）。
+ *   - 页头同样是独立副本：`components/preview/site-chrome.tsx`（2026-11-16 从正式那份复制，
+ *     外观一致，传 maxWidth=1280 让页头与正文左右边对齐）。至此页面层不再引用 `components/`
+ *     下任何与正式版共用的组件，只剩数据层（`/api/pricing`、`@portal/types`）同源。
  *
  * 页内结构见下方屏序注释；组件职责与各文件说明在 `components/preview/lab/` 内。
  */
@@ -52,9 +53,10 @@ export default async function PreviewHomePageV8() {
       <AnnouncementBar modelCount={models.length} />
 
       {/*
-        2026-11-14：页头不再用预览版自建的 V8Header，直接复用正式站 components/site-chrome 的
-        SiteHeader（用户：「顶部栏目我正式版就不错」）。差异只在容器宽度：正式站整页 1600，
-        预览页正文 1280，所以传 maxWidth 让页头与正文左右边对齐，其余结构/字号/高亮态完全同一份代码。
+        2026-11-16：页头改为引用预览目录里的独立副本 components/preview/site-chrome（从正式那份复制，
+        外观与正式站一致，用户 2026-11-14 说过「顶部栏目我正式版就不错」）。差异只在容器宽度：
+        正式站整页 1600，预览页正文 1280，所以传 maxWidth 让页头与正文左右边对齐。
+        此后改这个页头不会影响 `/`。
       */}
       <SiteHeader maxWidth="max-w-[1280px]" activePath="/" />
 

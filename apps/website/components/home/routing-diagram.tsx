@@ -112,7 +112,57 @@ export function RoutingDiagram() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: MOTION_CSS }} />
-      <div className="relative mx-auto aspect-[1300/340] w-full max-w-[1280px]">
+
+      {/* 2026-11-16 手机/平板版（<1024）：原图是 1300×340 的固定画布，卡片尺寸不随画布缩，
+       * 压到 390 宽时画布只剩 102 高，三张卡按 23.5/50/76.5% 叠在一起、还压住右下说明字；
+       * 768 宽时右列四张卡（间距 39 < 卡高 42）也还叠着。
+       * 所以 1024 以下改成竖排同一套故事（模型 → 中枢 → 客户端），不画连线、不摆两侧标注。
+       * 1024 以上画布有 255 高、右列间距 53 > 42，继续用原图，桌面一处未改。 */}
+      <div className="mx-auto max-w-[420px] lg:hidden">
+        <div className="flex flex-wrap items-center justify-center gap-1.5">
+          {LEFT.map((item) => (
+            <span
+              key={item.label}
+              className="flex items-center gap-1.5 rounded-[4px] border border-white/85 bg-white/[0.72] px-2.5 py-1.5 text-[13px] font-[650] tracking-[-0.1px] text-ink"
+            >
+              <RouteMark name={item.mark} size={16} color={item.tint} />
+              {item.label}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-2 flex flex-col items-center">
+          <span aria-hidden className="h-3 w-px bg-white/30" />
+          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/90 bg-white/85">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/tf-icon-black-512.png" alt="" width={24} height={24} className="h-6 w-6" />
+          </span>
+          <span aria-hidden className="h-3 w-px bg-white/30" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-1.5">
+          {RIGHT.map((item) => (
+            <span
+              key={item.label}
+              className="flex items-center justify-center gap-1.5 rounded-[4px] border border-white/85 bg-white/[0.72] px-2.5 py-1.5 text-[13px] font-[650] text-ink"
+            >
+              {item.mark ? (
+                <RouteMark name={item.mark} size={16} color={item.tint} />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={item.img} alt="" width={16} height={16} className="shrink-0" />
+              )}
+              <span className="min-w-0 truncate">{item.label}</span>
+            </span>
+          ))}
+        </div>
+
+        <p className="mt-2.5 text-center font-mono text-[11px] tracking-[0.04em] text-white/55">
+          已支持 10+ Agent / 客户端
+        </p>
+      </div>
+
+      <div className="relative mx-auto hidden aspect-[1300/340] w-full max-w-[1280px] lg:block">
         <svg
           aria-hidden
           className="pointer-events-none absolute inset-0 h-full w-full"

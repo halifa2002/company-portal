@@ -36,7 +36,7 @@ export default function ApiPage() {
     <DocsShell>
       <h1 className="text-display font-bold tracking-tight text-ink">接口速查</h1>
       <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-mid">
-        网关开放的接口一览。所有路径都拼在 <span className="font-mono text-note text-brand">{apiBase}</span> 后面，
+        网关开放的接口一览。所有路径都拼在 <span className="break-all font-mono text-note text-brand">{apiBase}</span> 后面，
         鉴权统一用 <span className="font-mono text-note">Authorization: Bearer</span>。
       </p>
 

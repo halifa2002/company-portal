@@ -1,4 +1,4 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { FileText, SquareTerminal } from 'lucide-react';
 import { registerUrl } from '@/lib/brand';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
@@ -83,7 +83,7 @@ export function QuickStartSection() {
 
         <div className="mt-9 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,760px)] lg:items-start lg:gap-14">
           {/* 左：这段能干什么 + 两个入口 */}
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             <p className="text-note leading-relaxed text-ink-mid">
               同样的 SDK、同样的请求体：只有地址和密钥换成平台的，模型名换成我们接的任意一个。
               国内直连，不用为每家厂商各写一套适配。
@@ -122,7 +122,9 @@ export function QuickStartSection() {
           </div>
 
           {/* 右：协议 / 语言 / 端点 / 代码 */}
-          <div>
+          {/* min-w-0：代码示例里有 419px 的长行（curl 地址），不加这个会把栅格列顶到 457px，
+           * 整页跟着变宽，手机上右边留白/内容被切。加了之后长行在代码框里自己横滑。 */}
+          <div className="min-w-0">
             <ProtocolTabs variant="paths" />
             {/* 收口一句：和参考站一样，把「动手要改什么」再说一遍，代码区下面不留白 */}
             <p className="mt-3 text-meta leading-relaxed text-ink-muted">

@@ -351,10 +351,10 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {/* 版权条：公司主体未定前不摆「待定」字样，等定案再补真实信息（站点不在大陆，无需备案号） */}
+        {/* 版权条：写公司主体（版权归法律主体，品牌名不构成权利主张）；站点不在大陆，无需备案号 */}
         <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-6 text-note text-white/45 md:flex-row md:items-center md:justify-between">
           <span>
-            © {new Date().getFullYear()} {brand.name} · 保留所有权利
+            © {new Date().getFullYear()} {brand.company} · 保留所有权利
           </span>
           {/* ⚠️ AGPL 要求：对外提供服务需提供源码获取入口，仓库转为公开后这里换成链接 */}
           <span className="flex flex-wrap items-center gap-x-6 gap-y-2">

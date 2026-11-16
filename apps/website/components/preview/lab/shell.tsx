@@ -97,7 +97,7 @@ export function V8Footer() {
 
         <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-[12.5px] text-white/55 sm:flex-row sm:items-center sm:justify-between">
           <span>
-            © {new Date().getFullYear()} {brand.name} · 保留所有权利
+            © {new Date().getFullYear()} {brand.company} · 保留所有权利
           </span>
           <span className="flex flex-wrap items-center gap-x-5 gap-y-1">
             <span>模型与价格数据更新于 {updated}</span>

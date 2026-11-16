@@ -34,9 +34,9 @@ function Spark() {
       />
       <defs>
         <linearGradient id="lab-ann-spark" x1="3" y1="21" x2="21" y2="3" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#7ccbff" />
-          <stop offset="0.55" stopColor="#188df9" />
-          <stop offset="1" stopColor="#4a55e6" />
+          <stop stopColor="var(--brand-300)" />
+          <stop offset="0.55" stopColor="var(--brand-primary)" />
+          <stop offset="1" stopColor="var(--brand-indigo)" />
         </linearGradient>
       </defs>
     </svg>
@@ -59,9 +59,9 @@ export function AnnouncementBar(props: { modelCount: number }) {
         >
           <Spark />
           <span className="font-semibold">{props.modelCount} 个模型</span>
-          <span className="text-[#fffefb]/75">三协议已接入，</span>
-          <em className="font-semibold not-italic text-[#fb8841]">一个地址全通</em>
-          <Arrow className="text-[#fffefb]/70" />
+          <span className="text-announce-text/75">三协议已接入，</span>
+          <em className="font-semibold not-italic text-announce-accent">一个地址全通</em>
+          <Arrow className="text-announce-text/70" />
         </Link>
       </div>
 
@@ -69,7 +69,7 @@ export function AnnouncementBar(props: { modelCount: number }) {
         type="button"
         onClick={() => setClosed(true)}
         aria-label="关闭通告"
-        className="absolute right-3 top-1/2 inline-flex h-[26px] w-[26px] -translate-y-1/2 items-center justify-center rounded-md text-[#fffefb]/55 transition-colors duration-150 hover:bg-white/10 hover:text-[#fffefb] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
+        className="absolute right-3 top-1/2 inline-flex h-[26px] w-[26px] -translate-y-1/2 items-center justify-center rounded-md text-announce-text/55 transition-colors duration-150 hover:bg-white/10 hover:text-announce-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
           <path d="M2 2l8 8M10 2l-8 8" />

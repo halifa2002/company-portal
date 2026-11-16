@@ -32,8 +32,8 @@
   --color-brand-hover: var(--brand-primary-hover);
   --color-brand-soft: var(--brand-primary-soft);
   --color-brand-accent: var(--brand-accent);
-  --color-accent-warm: var(--accent-warm);
-  --color-accent-warm-deep: var(--accent-warm-deep);
+  --color-announce-text: var(--announce-text);
+  --color-announce-accent: var(--announce-accent);
 
   /* 品牌图形方块底（2026-11-16）：bg-logo-tile，对应 theme.css 的 --logo-tile */
   --color-logo-tile: var(--logo-tile);
@@ -228,9 +228,9 @@ textarea:focus-visible,
 .hero-grad {
   background-image: linear-gradient(
     96deg,
-    var(--accent-warm) 0%,
-    var(--accent-warm-deep) 52%,
-    #c2410c 100%
+    var(--brand-accent) 0%,
+    var(--brand-primary) 52%,
+    var(--brand-indigo) 100%
   );
   background-size: 220% 100%;
   background-clip: text;

@@ -24,15 +24,15 @@
   --brand-primary-hover: #0a74e0;
   --brand-primary-soft: #e3f3ff;
   --brand-accent: #38b1ff;
+  /* 顶部公告条专用色（2026-11-16）：条内唯一一处暖橙强调，按 C-S-02 登记成 token，代码里不再写死 hex。橙只限这一条，不外扩到按钮/价格/图表——那些只用蓝族。 */
+  --announce-text: #fffefb;
+  --announce-accent: #fb8841;
   /*
    * 暖色强调（2026-11-13）：整页只有蓝和灰，远处看是一张蓝纸，没人想点。
    * 这个橙只允许出现在三个地方：首屏高亮词、主行动按钮、价格/优惠这类"数字"。
    * 不铺面积，不做背景——它是指示灯，不是墙纸。
    */
-  --accent-warm: #e8a33d;
-  --accent-warm-deep: #c2410c;
   /* 青柠只给深色底用：白底上它的对比度不足 1.5:1，什么都压不住 */
-  --accent-lime: #affd1d;
   --brand-hero-from: #f4faff;
   --brand-hero-to: #e3f3ff;
   /*

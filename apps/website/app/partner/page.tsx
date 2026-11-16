@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { SiteHeader, SiteFooter } from '@/components/site-chrome';
 import { brand } from '@/lib/brand';
+import { MODEL_CATALOG } from '@portal/types';
+import { loadModelList } from '@/lib/pricing';
 
 /**
  * 生态合作页。
@@ -42,7 +44,9 @@ const STEPS = [
   { step: '04', title: '上线与结算', desc: '正式上线，按约定周期结算用量。' },
 ];
 
-export default function PartnerPage() {
+export default async function PartnerPage() {
+  const { models } = await loadModelList(MODEL_CATALOG);
+
   return (
     <>
       <SiteHeader />
@@ -193,7 +197,7 @@ export default function PartnerPage() {
         </section>
       </main>
 
-      <SiteFooter />
+      <SiteFooter modelCount={models.length} />
     </>
   );
 }

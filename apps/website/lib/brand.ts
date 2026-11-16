@@ -10,7 +10,7 @@ export const brand = {
   name: 'TokenFlow',
   /** 短标识：品牌只用英文名，此处留空；填值才渲染第二行 */
   shortName: '',
-  /** 一句话定位（待定） */
+  /** 一句话定位（页脚与分享卡共用） */
   tagline: '统一接口，接入主流 AI 模型',
   /** 副标题说明 */
   description:
@@ -19,7 +19,7 @@ export const brand = {
   company: 'SNAPPER TRAP INVESTMENTS LIMITED',
   /*
    * 2026-11-16：站点不在大陆落地，不需要 ICP 备案号，
-   * 因此原本的 icp 字段已删除（/about 的「备案：待定」也一并撤掉）。
+   * 因此原本的 icp 字段已删除（/about 那条备案行也一并撤掉）。
    * 若将来服务器迁回内地，需要恢复该字段并把备案号显示在页面上。
    */
   /** 客服邮箱 */

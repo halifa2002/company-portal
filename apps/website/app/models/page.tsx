@@ -18,7 +18,7 @@ export default async function ModelsPage() {
     <>
       <SiteHeader />
       <ModelsClient models={models} pricingAvailable={pricingAvailable} />
-      <SiteFooter />
+      <SiteFooter modelCount={models.length} />
     </>
   );
 }

@@ -1,5 +1,7 @@
 import { SiteFooter, SiteHeader } from '@/components/site-chrome';
 import { brand } from '@/lib/brand';
+import { MODEL_CATALOG } from '@portal/types';
+import { loadModelList } from '@/lib/pricing';
 
 /**
  * 隐私政策页。
@@ -84,7 +86,9 @@ const SECTIONS = [
   },
 ];
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const { models } = await loadModelList(MODEL_CATALOG);
+
   return (
     <>
       <SiteHeader />
@@ -134,7 +138,7 @@ export default function PrivacyPage() {
         </section>
       </main>
 
-      <SiteFooter />
+      <SiteFooter modelCount={models.length} />
     </>
   );
 }

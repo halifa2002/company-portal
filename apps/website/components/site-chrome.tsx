@@ -272,7 +272,7 @@ export function SiteHeader({
  * 并进「公司」后三列高度接近，整块不再一边重一边轻。
  * 分组标题用弱化的小字，不用竖线——竖线会让页脚看起来像表格。
  */
-export function SiteFooter() {
+export function SiteFooter({ modelCount }: { modelCount?: number } = {}) {
   return (
     <footer className="relative mt-auto overflow-hidden border-t border-line bg-footer">
       <span
@@ -315,7 +315,9 @@ export function SiteFooter() {
 
             <p className="mt-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3.5 py-1.5 text-meta text-white/65">
               <span className="h-1.5 w-1.5 rounded-full bg-brand-accent" aria-hidden />
-              已接入 DeepSeek，OpenAI 协议兼容
+              {/* 2026-11-16：原来写死「已接入 DeepSeek」。按 C-D-05（口径全站唯一）
+                  改成从后端价格清单取数量；拿不到数据的页面只说「多模型统一接入」，不编数字。 */}
+              {modelCount ? `已接入 ${modelCount} 个模型，OpenAI 协议兼容` : '多模型统一接入，OpenAI 协议兼容'}
             </p>
           </div>
 

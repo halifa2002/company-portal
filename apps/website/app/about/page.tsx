@@ -132,7 +132,7 @@ export default async function AboutPage() {
         </section>
       </main>
 
-      <SiteFooter />
+      <SiteFooter modelCount={models.length} />
     </>
   );
 }

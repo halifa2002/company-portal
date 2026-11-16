@@ -1,5 +1,7 @@
 import { SiteFooter, SiteHeader } from '@/components/site-chrome';
 import { brand } from '@/lib/brand';
+import { MODEL_CATALOG } from '@portal/types';
+import { loadModelList } from '@/lib/pricing';
 
 /**
  * 服务条款页。
@@ -79,7 +81,9 @@ const SECTIONS = [
   },
 ];
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const { models } = await loadModelList(MODEL_CATALOG);
+
   return (
     <>
       <SiteHeader />
@@ -130,7 +134,7 @@ export default function TermsPage() {
         </section>
       </main>
 
-      <SiteFooter />
+      <SiteFooter modelCount={models.length} />
     </>
   );
 }

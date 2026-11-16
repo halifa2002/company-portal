@@ -35,12 +35,14 @@ function SignedInEntry() {
 }
 
 /** 未登录时右上角的两个入口 */
-function GuestEntry() {
+function GuestEntry({ onDark }: { onDark: boolean }) {
   return (
     <>
       <Link
         href={registerUrl}
-        className="hidden rounded-full px-4 py-2 text-body text-ink-soft transition-colors hover:text-brand sm:block"
+        className={`hidden rounded-full px-4 py-2 text-body transition-colors sm:block ${
+          onDark ? 'text-white/80 hover:text-white' : 'text-ink-soft hover:text-brand'
+        }`}
       >
         注册
       </Link>
@@ -50,8 +52,11 @@ function GuestEntry() {
          * 登录按钮（2026-11-13）：圆角胶囊 → 直角实心。
          * 导航栏里放不下「箭头块 + 文字块」的完整拼接，所以只取那个语言的另一半：
          * 直角、实色、不带投影。它跟首屏、收尾两处的大按钮是同一套，只是缩小版。
+         * 2026-11-16：首页首屏是星空，到顶时反过来用白底深字，否则深底上看不见。
          */
-        className="bg-[#06223f] px-5 py-2 text-body font-medium text-white transition-colors duration-200 hover:bg-[#0a3257] 2xl:px-6 2xl:py-2.5"
+        className={`px-5 py-2 text-body font-medium transition-colors duration-200 2xl:px-6 2xl:py-2.5 ${
+          onDark ? 'bg-white text-ink hover:bg-white/90' : 'bg-[#06223f] text-white hover:bg-[#0a3257]'
+        }`}
       >
         登录
       </Link>
@@ -72,10 +77,29 @@ function GuestEntry() {
 export function SiteHeader({
   maxWidth = 'max-w-[1600px]',
   activePath,
-}: { maxWidth?: string; activePath?: string } = {}) {
+  overlay = false,
+}: { maxWidth?: string; activePath?: string; overlay?: boolean } = {}) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const signedIn = useSessionHint();
+
+  /* 2026-11-16：首页首屏改成星空后，页头在这块深色画面上不能留白条。
+   * 只有传 overlay 的页面（目前只有 /）才启用：到顶时透明 + 白字，滚过 24px 恢复白底深字。
+   * 其它页面（/models、/pricing…）首屏是浅色，不能跟着透明。 */
+  const [atTop, setAtTop] = useState(false);
+  useEffect(() => {
+    if (!overlay) return;
+    const onScroll = () => setAtTop(window.scrollY < 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [overlay]);
+
+  const onDark = overlay && atTop;
+  const tone = onDark ? 'text-white' : 'text-ink';
+  const muted = onDark ? 'text-white/60' : 'text-ink-muted';
+  const soft = onDark ? 'text-white/80' : 'text-ink-soft';
+  const softHover = onDark ? 'hover:text-white' : 'hover:text-ink';
 
   // 预览页这类「地址不在导航表里」的页面，用 activePath 指定该点亮哪一项
   const currentPath = activePath ?? pathname;
@@ -86,7 +110,11 @@ export function SiteHeader({
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-white/80 backdrop-blur-md">
+    <header
+      className={`sticky top-0 z-50 border-b transition-colors duration-300 ${
+        onDark ? 'border-transparent bg-transparent' : 'border-line bg-white/80 backdrop-blur-md'
+      }`}
+    >
       <div
         className={`mx-auto flex h-16 items-center justify-between px-6 2xl:h-[72px] 2xl:px-10 ${maxWidth}`}
       >
@@ -94,10 +122,10 @@ export function SiteHeader({
         <Link href="/" className="group flex items-center gap-2.5">
           <LogoMark glow />
           <span className="flex flex-col leading-none">
-            <span className="text-heading font-bold tracking-tight text-ink 2xl:text-heading">
+            <span className={`text-heading font-bold tracking-tight 2xl:text-heading ${tone}`}>
               {brand.name}
             </span>
-            <span className="mt-1 text-meta font-medium uppercase tracking-[0.18em] text-ink-muted">
+            <span className={`mt-1 text-meta font-medium uppercase tracking-[0.18em] ${muted}`}>
               {brand.shortName}
             </span>
           </span>
@@ -111,7 +139,7 @@ export function SiteHeader({
               (item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href));
 
             const linkClass = `group relative py-1 text-title transition-colors ${
-              active ? 'font-medium text-brand' : 'text-ink-soft hover:text-ink'
+              active ? 'font-medium text-brand' : `${soft} ${softHover}`
             }`;
 
             const underline = (
@@ -154,7 +182,7 @@ export function SiteHeader({
           ) : signedIn ? (
             <SignedInEntry />
           ) : (
-            <GuestEntry />
+            <GuestEntry onDark={onDark} />
           )}
           <button
             type="button"
@@ -162,7 +190,11 @@ export function SiteHeader({
             aria-label={menuOpen ? '关闭菜单' : '打开菜单'}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
-            className="ml-1 flex h-9 w-9 items-center justify-center rounded-control border border-line text-ink-soft transition-colors hover:border-brand/30 hover:text-brand md:hidden"
+            className={`ml-1 flex h-9 w-9 items-center justify-center rounded-control border transition-colors md:hidden ${
+              onDark
+                ? 'border-white/25 text-white/80 hover:border-white/50 hover:text-white'
+                : 'border-line text-ink-soft hover:border-brand/30 hover:text-brand'
+            }`}
           >
             <svg
               width="18"

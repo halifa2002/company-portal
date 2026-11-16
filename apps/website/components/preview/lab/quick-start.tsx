@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { consoleUrl } from '@/lib/brand';
 
 /**
@@ -24,8 +24,23 @@ const STEPS = ['注册并拿到 Key', '换地址与密钥', '沿用原代码调�
 export function QuickStart() {
   return (
     <section className="relative overflow-hidden">
-      {/* 底色：深海军蓝 + 云图（见 globals.css 的 .band-canvas） */}
-      <div className="band-canvas pointer-events-none absolute inset-0" aria-hidden />
+      {/* 2026-11-16：领导要求深色区块统一成星空，与首屏同一风格但不复用同一张图。
+          底色是单独生成的深空横幅（public/hero/cta-band-stars.webp：星云压上下边、中间留暗带），
+          再叠一层径向压暗，保证中间那行白字压得住。 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundColor: '#050a1c',
+          backgroundImage: [
+            'radial-gradient(72% 130% at 42% 50%, rgba(4,8,22,0.62) 0%, rgba(4,8,22,0.28) 62%, rgba(4,8,22,0) 100%)',
+            "url('/hero/cta-band-stars.webp')",
+          ].join(','),
+          backgroundSize: 'cover',
+          backgroundPosition: '50% 50%',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
 
       <div className="relative mx-auto w-full max-w-[1280px] px-6 py-10 md:px-10 md:py-12">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-12">

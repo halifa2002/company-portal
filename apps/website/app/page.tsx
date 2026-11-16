@@ -1,4 +1,4 @@
-import { MODEL_CATALOG } from '@portal/types';
+﻿import { MODEL_CATALOG } from '@portal/types';
 import { loadModelList } from '@/lib/pricing';
 import { SiteHeader } from '@/components/site-chrome';
 import { V8Footer } from '@/components/home/shell';
@@ -48,12 +48,29 @@ export default async function HomePage() {
   const vendors = Array.from(new Set(models.map((model) => model.vendorName)));
 
   return (
-    <div className="min-h-screen bg-surface">
-      <AnnouncementBar modelCount={models.length} />
+    <div className="relative min-h-screen bg-surface">
+      {/* 2026-11-16：与预览版同步 —— 星空底图从页面最顶上（通告条之前）铺一整屏 + 200px，
+          通告条、页头、首屏看到的是同一张图；首屏以下的内容自带底色，不会透出来。 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[calc(100svh+200px)]"
+        style={{
+          backgroundColor: '#eef6ff',
+          backgroundImage: [
+            'linear-gradient(180deg, rgba(238,246,255,0) 0%, rgba(238,246,255,0) 86%, rgba(238,246,255,0.9) 95%, #eef6ff 100%)',
+            "url('/hero/starfield-dawn.webp')",
+          ].join(','),
+          backgroundSize: '100% 100%, 100% 100%',
+          backgroundPosition: 'top, top',
+          backgroundRepeat: 'no-repeat, no-repeat',
+        }}
+      />
+      <div className="relative z-10">
+        <AnnouncementBar modelCount={models.length} />
 
-      <SiteHeader maxWidth="max-w-[1280px]" activePath="/" />
+        <SiteHeader maxWidth="max-w-[1280px]" activePath="/" overlay />
 
-      <main>
+        <main>
         <V8Hero modelCount={models.length} vendors={vendors} />
 
         {/*
@@ -109,7 +126,8 @@ export default async function HomePage() {
         </Reveal>
       </main>
 
-      <V8Footer />
+        <V8Footer />
+      </div>
     </div>
   );
 }

@@ -27,7 +27,7 @@ function Check() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
-      className="shrink-0 text-brand-700"
+      className="shrink-0 text-brand-400"
     >
       <path d="M2 6.2 4.8 9 10 3.4" />
     </svg>
@@ -40,7 +40,7 @@ export function TrustStrip() {
       {FEATURES.map((feature) => (
         <li
           key={feature}
-          className="flex items-center gap-1.5 rounded-full border border-ink/10 bg-white/70 px-3 py-1.5 text-[12.5px] text-ink-mid backdrop-blur transition-[translate,background-color] duration-200 ease-out hover:bg-white/90 hover:[translate:0_-2px]"
+          className="flex items-center gap-1.5 rounded-full border border-white/18 bg-white/10 px-3 py-1.5 text-[12.5px] text-white/80 backdrop-blur transition-[translate,background-color] duration-200 ease-out hover:bg-white/18 hover:[translate:0_-2px]"
         >
           <Check />
           {feature}

@@ -77,7 +77,7 @@ const VENDOR_MARKS: Record<string, { color: string; path: string; scale?: number
   ...VENDOR_MARKS_EXT,
 };
 
-export function VendorLogo(props: { vendor: string; size?: number }) {
+export function VendorLogo(props: { vendor: string; size?: number; bare?: boolean }) {
   const size = props.size ?? 18;
 
   if (props.vendor === 'DeepSeek') {
@@ -90,11 +90,11 @@ export function VendorLogo(props: { vendor: string; size?: number }) {
         aria-hidden
         className="shrink-0"
       >
-        <rect width="24" height="24" rx="6" fill="#4D6BFE" />
+        {!props.bare && <rect width="24" height="24" rx="6" fill="#4D6BFE" />}
         <g
           transform={`translate(${OFFSET_X} ${OFFSET_Y}) scale(${SCALE}) translate(${-MARK_BOX.x} ${-MARK_BOX.y})`}
         >
-          <path d={DEEPSEEK_MARK} fill="#fff" />
+          <path d={DEEPSEEK_MARK} fill={props.bare ? '#4D6BFE' : '#fff'} />
         </g>
       </svg>
     );
@@ -113,9 +113,9 @@ export function VendorLogo(props: { vendor: string; size?: number }) {
         aria-hidden
         className="shrink-0"
       >
-        <rect width="24" height="24" rx="6" fill={mark.color} />
+        {!props.bare && <rect width="24" height="24" rx="6" fill={mark.color} />}
         <g transform={`translate(${offset} ${offset}) scale(${scale})`}>
-          <path d={mark.path} fill="#fff" />
+          <path d={mark.path} fill={props.bare ? mark.color : '#fff'} />
         </g>
       </svg>
     );

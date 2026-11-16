@@ -62,12 +62,12 @@ export function V8Footer() {
               <LogoMark size="xs" />
               <span className="text-note font-semibold tracking-tight text-white">{brand.name}</span>
             </div>
-            <p className="mt-4 max-w-[280px] text-meta leading-relaxed text-white/60">
+            <p className="mt-4 max-w-[280px] text-[13px] leading-relaxed text-white/60">
               {brand.description}
             </p>
             <Link
               href={registerUrl}
-              className="group mt-5 inline-flex items-center gap-2 text-meta font-medium text-white/80 transition-colors hover:text-white"
+              className="group mt-5 inline-flex items-center gap-2 text-[13px] font-medium text-white/80 transition-colors hover:text-white"
             >
               创建账号
               <Arrow />
@@ -76,7 +76,7 @@ export function V8Footer() {
 
           {columns.map((column) => (
             <div key={column.title}>
-              <div className="text-meta font-medium uppercase tracking-[0.16em] text-white/50">
+              <div className="text-[12.5px] font-medium uppercase tracking-[0.16em] text-white/50">
                 {column.title}
               </div>
               <ul className="mt-4 space-y-2.5">
@@ -84,7 +84,7 @@ export function V8Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-meta text-white/65 transition-colors hover:text-white"
+                      className="text-[13px] text-white/65 transition-colors hover:text-white"
                     >
                       {link.label}
                     </Link>
@@ -95,7 +95,7 @@ export function V8Footer() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-meta text-white/55 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-[12.5px] text-white/55 sm:flex-row sm:items-center sm:justify-between">
           <span>
             © {new Date().getFullYear()} {brand.name} · 保留所有权利
           </span>

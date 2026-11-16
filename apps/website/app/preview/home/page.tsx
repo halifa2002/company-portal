@@ -1,4 +1,4 @@
-import { MODEL_CATALOG } from '@portal/types';
+﻿import { MODEL_CATALOG } from '@portal/types';
 import { loadModelList } from '@/lib/pricing';
 // 预览页专用样式：只有本页加载，类名一律 .lab- 开头，不覆盖公共类。
 // 规则见 app/preview/lab.css 顶部注释。
@@ -49,18 +49,39 @@ export default async function PreviewHomePageV8() {
   const vendors = Array.from(new Set(models.map((model) => model.vendorName)));
 
   return (
-    <div className="min-h-screen bg-surface">
-      <AnnouncementBar modelCount={models.length} />
-
+    <div className="relative min-h-screen bg-surface">
       {/*
-        2026-11-16：页头改为引用预览目录里的独立副本 components/preview/site-chrome（从正式那份复制，
-        外观与正式站一致，用户 2026-11-14 说过「顶部栏目我正式版就不错」）。差异只在容器宽度：
-        正式站整页 1600，预览页正文 1280，所以传 maxWidth 让页头与正文左右边对齐。
-        此后改这个页头不会影响 `/`。
+        2026-11-16 星空背景层：从页面最顶上（通告条之前）铺一整屏。
+        这样通告条、页头、首屏看到的是同一张图（用户要求「和背景是一张图」），
+        页头滚过之后才变回白底。层放在内容之下（z-0 + 内容 z-10），
+        首屏以下的内容自带底色，不会透出来。
       */}
-      <SiteHeader maxWidth="max-w-[1280px]" activePath="/" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[calc(100svh+200px)]"
+        style={{
+          backgroundColor: '#eef6ff',
+          backgroundImage: [
+            'linear-gradient(180deg, rgba(238,246,255,0) 0%, rgba(238,246,255,0) 86%, rgba(238,246,255,0.9) 95%, #eef6ff 100%)',
+            "url('/hero/starfield-dawn.webp')",
+          ].join(','),
+          backgroundSize: '100% 100%, 100% 100%',
+          backgroundPosition: 'top, top',
+          backgroundRepeat: 'no-repeat, no-repeat',
+        }}
+      />
+      <div className="relative z-10">
+        <AnnouncementBar modelCount={models.length} />
 
-            <main>
+        {/*
+          2026-11-16：页头改为引用预览目录里的独立副本 components/preview/site-chrome（从正式那份复制，
+          外观与正式站一致，用户 2026-11-14 说过「顶部栏目我正式版就不错」）。差异只在容器宽度：
+          正式站整页 1600，预览页正文 1280，所以传 maxWidth 让页头与正文左右边对齐。
+          此后改这个页头不会影响 `/`。
+        */}
+        <SiteHeader maxWidth="max-w-[1280px]" activePath="/" />
+
+        <main>
         <V8Hero modelCount={models.length} vendors={vendors} />
 
         {/*
@@ -135,7 +156,8 @@ export default async function PreviewHomePageV8() {
         <Reveal><ClosingCta /></Reveal>
       </main>
 
-      <V8Footer />
+        <V8Footer />
+      </div>
 
       {/* 左下角预览标记：截图发人、隔一会儿再看，能一眼分清试验还是线上 */}
       <div className="pointer-events-none fixed bottom-4 left-4 z-[60] rounded-full border border-line bg-white px-3 py-1.5 text-meta font-medium tracking-wide text-ink-muted shadow-[0_2px_10px_rgba(6,34,63,0.06)]">

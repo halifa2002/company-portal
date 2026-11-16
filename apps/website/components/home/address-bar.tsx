@@ -32,8 +32,8 @@ export function AddressBar() {
   }
 
   return (
-    <div className="flex h-12 w-full items-stretch overflow-hidden rounded-none border border-ink/12 bg-white/85 shadow-[0_1px_2px_rgba(6,34,63,0.05)] backdrop-blur">
-      <div className="relative flex shrink-0 items-center border-r border-line">
+    <div className="flex h-12 w-full items-stretch overflow-hidden rounded-none border border-white/20 bg-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.25)] backdrop-blur">
+      <div className="relative flex shrink-0 items-center border-r border-white/15">
         <label htmlFor="hero-protocol" className="sr-only">
           协议
         </label>
@@ -41,10 +41,10 @@ export function AddressBar() {
           id="hero-protocol"
           value={protocol}
           onChange={(event) => setProtocol(event.target.value as ProtocolId)}
-          className="h-full cursor-pointer appearance-none bg-transparent pl-3.5 pr-8 text-[13px] font-medium text-ink outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="h-full cursor-pointer appearance-none bg-transparent pl-3.5 pr-8 text-[13px] font-medium text-white outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
         >
           {PROTOCOLS.map((item) => (
-            <option key={item.id} value={item.id}>
+            <option key={item.id} value={item.id} className="text-ink">
               {item.tab}
             </option>
           ))}
@@ -58,20 +58,20 @@ export function AddressBar() {
           strokeWidth="1.5"
           strokeLinecap="round"
           aria-hidden
-          className="pointer-events-none absolute right-3 text-ink-muted"
+          className="pointer-events-none absolute right-3 text-white/60"
         >
           <path d="M2 3.5 5 6.5 8 3.5" />
         </svg>
       </div>
 
-      <code className="flex min-w-0 flex-1 items-center truncate px-3.5 font-mono text-[13px] text-ink">
+      <code className="flex min-w-0 flex-1 items-center truncate px-3.5 font-mono text-[13px] text-white">
         {baseUrl}
       </code>
 
       <button
         type="button"
         onClick={copy}
-        className="flex shrink-0 items-center gap-1.5 border-l border-line px-3.5 text-[13px] font-medium text-ink-mid transition-colors hover:bg-surface-subtle hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+        className="flex shrink-0 items-center gap-1.5 border-l border-white/15 px-3.5 text-[13px] font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
       >
         <svg
           width="13"

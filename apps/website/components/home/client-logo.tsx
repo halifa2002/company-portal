@@ -29,9 +29,11 @@ const BADGES: Record<string, { text: string; color: string }> = {
   'Cherry Studio': { text: 'C', color: '#FF5A5F' },
   Chatbox: { text: 'C', color: '#0E9F9F' },
   Dify: { text: 'D', color: '#1C64F2' },
+  'CC Switch': { text: 'C', color: '#F5A623' },
+  OpenClaw: { text: 'O', color: '#D64545' },
 };
 
-export function ClientLogo(props: { name: string; size?: number }) {
+export function ClientLogo(props: { name: string; size?: number; bare?: boolean }) {
   const size = props.size ?? 18;
   const mark = MARKS[props.name];
 
@@ -46,15 +48,26 @@ export function ClientLogo(props: { name: string; size?: number }) {
         aria-hidden
         className="shrink-0"
       >
-        <rect width="24" height="24" rx="6" fill={mark.color} />
+        {!props.bare && <rect width="24" height="24" rx="6" fill={mark.color} />}
         <g transform={`translate(${offset} ${offset}) scale(${mark.scale})`}>
-          <path d={mark.path} fill="#fff" />
+          <path d={mark.path} fill={props.bare ? mark.color : '#fff'} />
         </g>
       </svg>
     );
   }
 
   const badge = BADGES[props.name] ?? { text: props.name.slice(0, 1), color: '#94A3B8' };
+  if (props.bare) {
+    return (
+      <span
+        className="flex shrink-0 items-center justify-center font-bold"
+        style={{ width: size, height: size, color: badge.color, fontSize: Math.round(size * 0.86), lineHeight: 1 }}
+        aria-hidden
+      >
+        {badge.text}
+      </span>
+    );
+  }
   return (
     <span
       className="flex shrink-0 items-center justify-center rounded-[6px] font-semibold text-white"

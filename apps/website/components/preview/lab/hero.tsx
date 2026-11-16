@@ -34,26 +34,20 @@ import { KeyRound } from 'lucide-react';
  */
 export function V8Hero(props: { modelCount: number; vendors: string[] }) {
   return (
-    <section className="relative overflow-hidden overflow-x-clip border-b border-line">
-      {/* ---------- 背景层（两层）----------
-       * ① .hero-canvas  湍流云底图（scripts/gen-hero-canvas.py 生成：两级域扭曲 + fbm，
-       *    形状是翻卷的烟云，不是同心圆；明度下限按文字区钳制，保证 4.5:1）
-       * ② .hero-grain   极细颗粒（fractalNoise，multiply），补高频，防止大色块接缝发塑料
-       *
-       * 2026-11-14 淘汰了中间那层「波涛网点」：用正弦调制点径做的贴图，平铺后是**斜向条带**，
-       * 远看像纱窗/摩尔纹，压在卡片上也干扰阅读——要肌理，宁可把噪点烘进底图，不要铺一层有方向的图案。
+    <section className="relative flex min-h-[calc(100svh-117px)] flex-col overflow-hidden overflow-x-clip">
+      {/* 2026-11-16：底部原来有一条 border-b 分割线，星空改深底后那条线在渐变带上很扎眼，去掉 */}
+      {/* ---------- 背景 ----------
+       * 2026-11-16：星空底图移到页面层（app/preview/home/page.tsx），
+       * 从通告条上方一直铺到一屏底，页头与首屏看到的是同一张图。
+       * 这里不再画任何底色，section 保持透明。
        */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="hero-canvas absolute inset-0" />
-        <div className="hero-grain absolute inset-0" />
-      </div>
 
-      <div className="relative mx-auto w-full max-w-[1280px] px-6 md:px-10">
+      <div className="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col justify-between px-6 pb-9 pt-10 md:pb-12 md:pt-14">
         {/* ---------------- 上：居中三块 ---------------- */}
-        <div className="pb-10 pt-14 text-center md:pb-12 md:pt-20">
+        <div className="text-center">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/70 px-3.5 py-1.5 text-[12.5px] text-ink-mid backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-[12.5px] text-white/85 backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden />
               {props.modelCount} 个模型 · 三协议 · 一个地址
             </span>
           </Reveal>
@@ -61,9 +55,9 @@ export function V8Hero(props: { modelCount: number; vendors: string[] }) {
           <V8HeroHeadline modelCount={props.modelCount} />
 
           <Reveal delay={220}>
-            <p className="mx-auto mt-6 max-w-[52em] text-[16.5px] leading-[1.75] text-ink-mid md:text-[17.5px]">
+            <p className="mx-auto mt-6 max-w-[52em] text-[16.5px] leading-[1.75] text-white/72 md:text-[17.5px]">
               把接入、计费、用量收进一个网关。换模型只改
-              <code className="mx-1 font-mono text-ink">model</code>
+              <code className="mx-1 font-mono text-white">model</code>
               字段，SDK 与鉴权都不用动。
             </p>
           </Reveal>
@@ -76,16 +70,16 @@ export function V8Hero(props: { modelCount: number; vendors: string[] }) {
                   left 用 calc 定位到最右：按钮宽 = 内容宽，所以 100% - 图标宽 - 内边距。 */}
               <Link
                 href={registerUrl}
-                className="group relative inline-flex h-12 items-center justify-center rounded-[4px] bg-ink pl-[52px] pr-6 text-[15px] font-medium text-white transition-[background-color,padding] duration-300 ease-out hover:bg-ink/90 hover:pl-6 hover:pr-[52px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                className="group relative inline-flex h-12 items-center justify-center rounded-[4px] bg-white pl-[52px] pr-6 text-[15px] font-medium text-ink transition-[background-color,padding] duration-300 ease-out hover:bg-white/92 hover:pl-6 hover:pr-[52px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
               >
-                <span className="absolute left-1.5 top-1.5 flex h-9 w-9 items-center justify-center rounded-[2px] bg-white/95 text-ink transition-[left] duration-300 ease-out group-hover:left-[calc(100%-2.625rem)]">
+                <span className="absolute left-1.5 top-1.5 flex h-9 w-9 items-center justify-center rounded-[2px] bg-ink text-white transition-[left] duration-300 ease-out group-hover:left-[calc(100%-2.625rem)]">
                   <KeyRound size={16} strokeWidth={1.9} aria-hidden />
                 </span>
                 获取 API Key
               </Link>
               <Link
                 href="/docs/quickstart"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-[4px] border border-ink/15 bg-white/80 px-6 text-[15px] font-medium text-ink backdrop-blur transition-[border-color,background-color,box-shadow] duration-200 ease-out hover:border-ink/45 hover:bg-white hover:shadow-[0_4px_14px_rgba(10,58,95,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-[4px] border border-white/25 bg-white/10 px-6 text-[15px] font-medium text-white backdrop-blur transition-[border-color,background-color] duration-200 ease-out hover:border-white/55 hover:bg-white/18 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400"
               >
                 查看接入文档
               </Link>
@@ -101,13 +95,13 @@ export function V8Hero(props: { modelCount: number; vendors: string[] }) {
 
         {/* ---------------- 中：路由图（首屏的画面） ---------------- */}
         <Reveal delay={120}>
-          <div className="pb-10">
-            <RoutingDiagram vendors={props.vendors} />
+          <div className="py-6 md:py-8">
+            <RoutingDiagram />
           </div>
         </Reveal>
 
         {/* ---------------- 下：能力胶囊 ---------------- */}
-        <div className="pb-12 md:pb-16">
+        <div className="pt-3">
           <TrustStrip />
         </div>
       </div>

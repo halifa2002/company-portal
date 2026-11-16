@@ -69,7 +69,11 @@ const PAINS = [
 
 export function ProblemSection() {
   return (
-    <section id="pain-points" className="border-b border-line py-14 md:py-20">
+    <section
+      id="pain-points"
+      className="relative border-b border-line py-14 md:py-20"
+      style={{ backgroundColor: '#eef6ff' }}
+    >
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,420px)] md:items-end md:gap-12">
           <div>

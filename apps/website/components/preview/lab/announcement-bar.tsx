@@ -48,9 +48,10 @@ export function AnnouncementBar(props: { modelCount: number }) {
   if (closed) return null;
 
   return (
-    <div className="ann relative overflow-hidden">
-      <div className="ann-stars" aria-hidden />
-
+    /* 2026-11-16：首屏星空从页面最顶上铺下来，通告条不能再盖一层暖黑底，
+       否则顶部会和下面的星空割成两块。这里把 .ann 的底色改成透明、去掉自带的星点层，
+       整条直接浮在星空上。 */
+    <div className="ann relative z-10 overflow-hidden" style={{ backgroundColor: 'transparent' }}>
       <div className="relative mx-auto flex w-full max-w-[1280px] items-center justify-center px-6 md:px-10">
         <Link
           href="/models"

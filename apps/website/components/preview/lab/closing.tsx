@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { registerUrl } from '@/lib/brand';
 import { Arrow } from '@/components/ui/arrow';
 
@@ -21,10 +21,23 @@ const FACTS = ['按量计费', '无最低消费', '余额随时充', '每笔可�
 export function ClosingCta() {
   return (
     <section className="relative overflow-hidden border-t border-line text-white">
-      {/* 背景：AI 底图压深 + 均匀网点，两层都 pointer-events-none */}
+      {/* 2026-11-16：领导要求深色区块统一成星空。这里用另一张单独生成的深空图
+          （public/hero/closing-stars.webp：银河斜跨、中间留暗），叠一层径向压暗保证白字可读，
+          不再用原来的云图 + 网点两层。 */}
       <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="closing-canvas absolute inset-0" />
-        <div className="closing-dots absolute inset-0" />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundColor: '#050a1c',
+            backgroundImage: [
+              'radial-gradient(64% 120% at 50% 46%, rgba(4,8,22,0.68) 0%, rgba(4,8,22,0.32) 58%, rgba(4,8,22,0.05) 100%)',
+              "url('/hero/closing-stars.webp')",
+            ].join(','),
+            backgroundSize: 'cover',
+            backgroundPosition: '50% 50%',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
       </div>
 
       <div className="relative mx-auto w-full max-w-[1280px] px-6 py-16 text-center md:px-10 md:py-20">

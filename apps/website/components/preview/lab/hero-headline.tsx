@@ -72,14 +72,26 @@ export function V8HeroHeadline({ modelCount }: { modelCount: number }) {
   return (
     <h1
       className={[
-        'hero-fade mx-auto mt-7 max-w-[16em] break-words text-center font-display font-semibold tracking-[-0.02em] text-ink',
+        'hero-fade mx-auto mt-7 max-w-[16em] break-words text-center font-display font-semibold tracking-[-0.02em] text-white',
         leaving ? 'is-leaving' : '',
       ].join(' ')}
       style={{ fontSize: 'clamp(30px, 5.4vw, 72px)', lineHeight: 1.08, minHeight: '2lh' }}
       aria-live="off"
     >
       <span className="hero-line" style={{ '--i': 0 } as React.CSSProperties}>
-        <span className="hero-grad-brand">{frame.accent}</span>，
+        {/* 首屏改成星空后，原来的深蓝渐变压在暗底上发闷；这里换成更亮的蓝紫青渐变
+            （只覆盖预览页这一处，正式页仍走 globals.css 里的 .hero-grad-brand） */}
+        <span
+          style={{
+            backgroundImage: 'linear-gradient(94deg, #9FC2FF 0%, #C8B0FF 46%, #8FE6FF 100%)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+          }}
+        >
+          {frame.accent}
+        </span>
+        ，
       </span>
       {/* 第二行不参与轮换的位移，只跟着整块淡出淡入 */}
       <span className="hero-line" style={{ '--i': 1 } as React.CSSProperties}>

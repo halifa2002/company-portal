@@ -127,8 +127,10 @@ export function SiteHeader({
           />
         </Link>
 
-        {/* 导航项：当前页高亮 + hover 下划线 */}
-        <nav className="hidden items-center gap-9 md:flex 2xl:gap-11">
+        {/* 导航项：当前页高亮 + hover 下划线。2026-11-16：断点从 md(768) 挪到 lg(1024)——
+            768~1023 之间七个链接放不下，会折成一列竖排（每个词断成两行），
+            这段宽度改用汉堡菜单，1024 以上才铺横排。 */}
+        <nav className="hidden items-center gap-9 lg:flex 2xl:gap-11">
           {nav.map((item) => {
             const active =
               !item.external &&
@@ -186,7 +188,7 @@ export function SiteHeader({
             aria-label={menuOpen ? '关闭菜单' : '打开菜单'}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
-            className={`ml-1 flex h-9 w-9 items-center justify-center rounded-control border transition-colors md:hidden ${
+            className={`ml-1 flex h-9 w-9 items-center justify-center rounded-control border transition-colors lg:hidden ${
               onDark
                 ? 'border-white/25 text-white/80 hover:border-white/50 hover:text-white'
                 : 'border-line text-ink-soft hover:border-brand/30 hover:text-brand'
@@ -208,9 +210,9 @@ export function SiteHeader({
         </div>
       </div>
 
-      {/* 手机端下拉菜单：md 以下才出现 */}
+      {/* 窄屏下拉菜单：lg 以下才出现（与汉堡按钮同一断点） */}
       {menuOpen && (
-        <div id="mobile-nav" className="border-t border-line bg-white md:hidden">
+        <div id="mobile-nav" className="border-t border-line bg-white lg:hidden">
           <nav className={`mx-auto flex flex-col px-6 py-3 ${maxWidth}`}>
             {nav.map((item) => {
               const active =

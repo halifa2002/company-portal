@@ -53,15 +53,19 @@ export function AnnouncementBar(props: { modelCount: number }) {
        整条直接浮在星空上。 */
     <div className="ann relative z-10 overflow-hidden" style={{ backgroundColor: 'transparent' }}>
       <div className="relative mx-auto flex w-full max-w-[1280px] items-center justify-center px-6 md:px-10">
+        {/* 2026-11-16 手机适配：整句不许折行（原来 390 宽会断成「19 个模 / 型」三行），
+            窄屏字号收到 12px，实在放不下时由中间的 truncate 出省略号，箭头始终留在行尾。 */}
         <Link
           href="/models"
-          className="group flex min-h-[44px] items-center justify-center gap-[7px] py-3 pr-8 text-center text-[14px] leading-5"
+          className="group flex min-h-[44px] w-full items-center justify-center gap-[7px] py-3 pr-8 text-center text-[12px] leading-5 whitespace-nowrap sm:text-[14px]"
         >
           <Spark />
-          <span className="font-semibold">{props.modelCount} 个模型</span>
-          <span className="text-announce-text/75">三协议已接入，</span>
-          <em className="font-semibold not-italic text-announce-accent">一个地址全通</em>
-          <Arrow className="text-announce-text/70" />
+          <span className="min-w-0 truncate">
+            <span className="font-semibold">{props.modelCount} 个模型</span>
+            <span className="text-announce-text/75"> 三协议已接入，</span>
+            <em className="font-semibold not-italic text-announce-accent">一个地址全通</em>
+          </span>
+          <Arrow className="shrink-0 text-announce-text/70" />
         </Link>
       </div>
 

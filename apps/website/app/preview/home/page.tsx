@@ -1,4 +1,4 @@
-﻿import { MODEL_CATALOG } from '@portal/types';
+import { MODEL_CATALOG } from '@portal/types';
 import { loadModelList } from '@/lib/pricing';
 // 预览页专用样式：只有本页加载，类名一律 .lab- 开头，不覆盖公共类。
 // 规则见 app/preview/lab.css 顶部注释。
@@ -63,7 +63,10 @@ export default async function PreviewHomePageV8() {
           backgroundColor: '#eef6ff',
           backgroundImage: [
             'linear-gradient(180deg, rgba(238,246,255,0) 0%, rgba(238,246,255,0) 86%, rgba(238,246,255,0.9) 95%, #eef6ff 100%)',
-            "url('/hero/starfield-dawn.webp')",
+            // 2026-11-16：换 4K 星空底图（3840×2160，614KB）。原 starfield-dawn.webp 只有
+            // 2048×1152，宽屏/高 DPI 下被放大 1.2~1.9 倍即发虚，领导反馈「背景清晰度低」。
+            // 新文件独立命名，只在本预览页引用——正式页 app/page.tsx 仍用旧图，互不影响。
+            "url('/hero/starfield-dawn-4k.webp')",
           ].join(','),
           backgroundSize: '100% 100%, 100% 100%',
           backgroundPosition: 'top, top',

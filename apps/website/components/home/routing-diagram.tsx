@@ -48,6 +48,11 @@ const LEFT_YS = [80, 170, 260];
 const RIGHT_TOPS = ['18.5%', '39.5%', '60.5%', '81.5%'];
 const RIGHT_YS = [63, 134, 206, 277];
 
+/** 窄版（<1024）卡片中心点的 y（px）：左列三张用 justify-center + gap 2.5 排在 154 高里，
+ *  右列四张用 justify-between 铺满 154，算出来的中心就是这七个数，连线端点照这个画。 */
+const LEFT_CY = [33, 77, 121];
+const RIGHT_CY = [17, 57, 97, 137];
+
 /**
  * 动效层（纯 CSS）：卡片依次淡入、连线流光沿线跑、中枢呼吸波纹。
  * 参考站是 three.js canvas 画的彗星，这里用 stroke-dashoffset 做同一件事，不占主线程。
@@ -116,48 +121,90 @@ export function RoutingDiagram() {
       {/* 2026-11-16 手机/平板版（<1024）：原图是 1300×340 的固定画布，卡片尺寸不随画布缩，
        * 压到 390 宽时画布只剩 102 高，三张卡按 23.5/50/76.5% 叠在一起、还压住右下说明字；
        * 768 宽时右列四张卡（间距 39 < 卡高 42）也还叠着。
-       * 所以 1024 以下改成竖排同一套故事（模型 → 中枢 → 客户端），不画连线、不摆两侧标注。
+       * 所以 1024 以下换成「左模型 / 中枢 / 右客户端」的窄版，连线保留：
+       * 左列 38%、右列 38%、中枢居中 52px；连线画在 100×154 的 viewBox 里，x 用百分比、
+       * y 用像素，两侧卡片靠 justify-center / justify-between 把中心点钉在 33/77/121 与 17/57/97/137，
+       * 所以任意宽度下线条都正好接在卡片边缘（不会像原图那样错位）。
        * 1024 以上画布有 255 高、右列间距 53 > 42，继续用原图，桌面一处未改。 */}
-      <div className="mx-auto max-w-[420px] lg:hidden">
-        <div className="flex flex-wrap items-center justify-center gap-1.5">
-          {LEFT.map((item) => (
-            <span
-              key={item.label}
-              className="flex items-center gap-1.5 rounded-[4px] border border-white/85 bg-white/[0.72] px-2.5 py-1.5 text-[13px] font-[650] tracking-[-0.1px] text-ink"
-            >
-              <RouteMark name={item.mark} size={16} color={item.tint} />
-              {item.label}
-            </span>
-          ))}
-        </div>
+      <div className="mx-auto w-full max-w-[420px] lg:hidden">
+        <div className="relative h-[154px]">
+          <svg
+            aria-hidden
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            viewBox="0 0 100 154"
+            preserveAspectRatio="none"
+          >
+            {LEFT.map((item, i) => {
+              const cy = LEFT_CY[i];
+              return (
+                <path
+                  key={`ml-${item.label}`}
+                  d={`M30 ${cy} C 39 ${cy} 44 77 50 77`}
+                  fill="none"
+                  stroke={item.light}
+                  strokeOpacity={0.55}
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              );
+            })}
+            {RIGHT.map((item, i) => {
+              const cy = RIGHT_CY[i];
+              return (
+                <path
+                  key={`mr-${item.label}`}
+                  d={`M50 77 C 57 77 62 ${cy} 70 ${cy}`}
+                  fill="none"
+                  stroke={item.light}
+                  strokeOpacity={0.55}
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              );
+            })}
+          </svg>
 
-        <div className="mt-2 flex flex-col items-center">
-          <span aria-hidden className="h-3 w-px bg-white/30" />
-          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/90 bg-white/85">
+          {/* 左列：三个模型 */}
+          <div className="absolute left-0 top-0 flex h-[154px] w-[30%] flex-col justify-center gap-2.5">
+            {LEFT.map((item) => (
+              <span
+                key={item.label}
+                className="flex h-[34px] items-center justify-center gap-1.5 rounded-[4px] border border-white/85 bg-white/[0.72] px-1.5 text-[11.5px] font-[650] tracking-[-0.1px] text-ink"
+              >
+                <RouteMark name={item.mark} size={14} color={item.tint} />
+                {item.label}
+              </span>
+            ))}
+          </div>
+
+          {/* 中枢：品牌圆标，压在连线汇聚点上 */}
+          <div className="absolute left-1/2 top-[77px] flex h-[56px] w-[56px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/90 bg-white/85">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/tf-icon-black-512.png" alt="" width={24} height={24} className="h-6 w-6" />
-          </span>
-          <span aria-hidden className="h-3 w-px bg-white/30" />
+          </div>
+
+          {/* 右列：四个 Agent 客户端 */}
+          <div className="absolute right-0 top-0 flex h-[154px] w-[38%] flex-col justify-between">
+            {RIGHT.map((item) => (
+              <span
+                key={item.label}
+                className="flex h-[34px] items-center justify-center gap-1 rounded-[4px] border border-white/85 bg-white/[0.72] px-1.5 text-[11.5px] font-[650] text-ink"
+              >
+                {item.mark ? (
+                  <RouteMark name={item.mark} size={12} color={item.tint} />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={item.img} alt="" width={12} height={12} className="shrink-0" />
+                )}
+                <span className="min-w-0 truncate">{item.label}</span>
+              </span>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-1.5">
-          {RIGHT.map((item) => (
-            <span
-              key={item.label}
-              className="flex items-center justify-center gap-1.5 rounded-[4px] border border-white/85 bg-white/[0.72] px-2.5 py-1.5 text-[13px] font-[650] text-ink"
-            >
-              {item.mark ? (
-                <RouteMark name={item.mark} size={16} color={item.tint} />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.img} alt="" width={16} height={16} className="shrink-0" />
-              )}
-              <span className="min-w-0 truncate">{item.label}</span>
-            </span>
-          ))}
-        </div>
-
-        <p className="mt-2.5 text-center font-mono text-[11px] tracking-[0.04em] text-white/55">
+        <p className="mt-2 text-center font-mono text-[11px] tracking-[0.04em] text-white/55">
           已支持 10+ Agent / 客户端
         </p>
       </div>

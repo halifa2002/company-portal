@@ -3,6 +3,12 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   /**
+   * 独立产物：运行所需的 node 依赖一起打包进 .next/standalone，
+   * 服务器上不用 bun/npm 安装依赖，直接 `node server.js`（或塞进 node 容器）就能跑。
+   * 交付包里的控制台部署依赖这一项。
+   */
+  output: 'standalone',
+  /**
    * 不要在这里加 allowedDevOrigins。
    * 2026-11-12 实测：写成 ['127.0.0.1','localhost']（与官网同款）后，控制台 dev
    * 侧边每加载一页就整页重载一次、连成无限刷新；去掉这一项才恢复。

@@ -351,7 +351,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {/* 版权条：公司主体与备案号未定前不摆「待定」字样，等定案再补真实信息 */}
+        {/* 版权条：公司主体未定前不摆「待定」字样，等定案再补真实信息（站点不在大陆，无需备案号） */}
         <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-6 text-note text-white/45 md:flex-row md:items-center md:justify-between">
           <span>
             © {new Date().getFullYear()} {brand.name} · 保留所有权利

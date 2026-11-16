@@ -127,11 +127,7 @@ export default async function AboutPage() {
                   {brand.email}
                 </a>
               </p>
-              <p>备案：{brand.icp}</p>
             </div>
-            <p className="mt-6 text-meta text-white/40">
-              公司主体、备案号与联系邮箱待公司资料确认后替换。
-            </p>
           </div>
         </section>
       </main>

@@ -22,12 +22,15 @@ export const brand = {
 /**
  * 官网地址
  *
- * 开发时官网跑在独立端口；上线改子域名时只改这一处（或用环境变量覆盖）。
+ * 2026-11-16：正式域名为 tokenflow365.com，官网在根域；本地开发仍回
+ * localhost:4101，否则本地点「返回官网」会跳到线上。也可用 NEXT_PUBLIC_WEBSITE_URL 覆盖。
  * 控制台里指向它的链接一律走**同标签页**跳转：官网上点「控制台」也是同页跳，
  * 两边行为一致；用户要回来按浏览器返回键即可，不会莫名攒出一堆标签页。
  * 真正的站外链接（第三方文档、源码地址）才用新标签页。
  */
-export const siteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL ?? 'http://localhost:4101';
+export const siteUrl =
+  process.env.NEXT_PUBLIC_WEBSITE_URL ??
+  (process.env.NODE_ENV === 'development' ? 'http://localhost:4101' : 'https://tokenflow365.com');
 
 /** 开发者文档 */
 export const docsUrl = `${siteUrl}/docs`;

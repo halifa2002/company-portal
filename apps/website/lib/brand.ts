@@ -1,7 +1,8 @@
 /**
  * 品牌常量
  *
- * ⚠️ 全部为占位值，等公司定名后只改这一个文件。
+ * 品牌名、公司主体、客服邮箱都只在这里维护，页面不各自写死。
+ * 2026-11-16：领导已交付公司主体（SNAPPER TRAP INVESTMENTS LIMITED）与客服邮箱。
  */
 
 export const brand = {
@@ -14,30 +15,39 @@ export const brand = {
   /** 副标题说明 */
   description:
     '一个 Key 调用多家模型，按量计费，用量透明。为企业与开发者提供稳定的 AI 能力接入。',
-  /** 公司主体（待定） */
-  company: '待定公司名称',
-  /** 备案号（待定） */
-  icp: '待定',
-  /** 客服邮箱（待定） */
-  email: 'support@example.com',
+  /** 公司主体（法定注册名，原样大写，不翻译不缩写） */
+  company: 'SNAPPER TRAP INVESTMENTS LIMITED',
+  /*
+   * 2026-11-16：站点不在大陆落地，不需要 ICP 备案号，
+   * 因此原本的 icp 字段已删除（/about 的「备案：待定」也一并撤掉）。
+   * 若将来服务器迁回内地，需要恢复该字段并把备案号显示在页面上。
+   */
+  /** 客服邮箱 */
+  email: 'support@tokenflow365.com',
 } as const;
 
 /**
  * 用户控制台地址
  *
- * 开发时控制台跑在独立端口；上线后应改为同域路径（例如 /console），
- * 改这里一处即可，不用翻页面。
+ * 2026-11-16：正式域名定为 tokenflow365.com，官网在根域，控制台按子域
+ * console.tokenflow365.com 约定。本地开发（next dev）仍指向 localhost:4102，
+ * 否则本地点「控制台」会跳到线上；也可以用 NEXT_PUBLIC_CONSOLE_URL 直接覆盖。
+ * 若上线改成同域路径（tokenflow365.com/console），只改这一处再加一条反代规则。
  */
+const isDev = process.env.NODE_ENV === 'development';
+
 export const consoleBase =
-  process.env.NEXT_PUBLIC_CONSOLE_URL ?? 'http://localhost:4102';
+  process.env.NEXT_PUBLIC_CONSOLE_URL ??
+  (isDev ? 'http://localhost:4102' : 'https://console.tokenflow365.com');
 
 /**
  * API 网关地址（文档与代码示例里展示的地址）
  *
- * 上线换成正式域名后只改这一处。
+ * 2026-11-16 定为 api.tokenflow365.com；页面显示时统一在后面加 /v1。
+ * 换域名只改这一处。
  */
 export const apiBase =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.example.com';
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.tokenflow365.com';
 
 /** 登录入口 */
 export const loginUrl = `${consoleBase}/login`;

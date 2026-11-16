@@ -53,9 +53,23 @@ export const apiBase =
  * 后端仓库地址
  *
  * AGPL-3.0 第 13 条：通过网络提供服务时，必须让用户能拿到「对应源码」。
- * 页脚的「源代码」链接指向这里，所以这个仓库必须保持公开。
+ * 页脚的「源代码」链接指向上线的具体版本（下面 sourceUrl），仓库必须保持公开。
  */
 export const sourceRepo = 'https://github.com/halifa2002/new-api';
+
+/**
+ * 线上运行的版本标签（对应后端仓库的 git tag）。
+ *
+ * 为什么不直接链到仓库首页：仓库默认分支是 main，而开发在 develop，
+ * 两边会拉开距离（2026-11-16 实测差 29 个提交），访客点进去看到的是旧代码，
+ * 等于「给的源码不对版」。链到 tag 就一步到位。
+ *
+ * ⚠️ 每次发版改这一行，和发版记录里的版本号保持一致。
+ */
+export const sourceVersion = 'company-v0.2.0';
+
+/** 页脚「源代码」实际链接：指向该版本目录 */
+export const sourceUrl = `${sourceRepo}/tree/${sourceVersion}`;
 
 /** 登录入口 */
 export const loginUrl = `${consoleBase}/login`;

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { brand, consoleUrl, loginUrl, nav, registerUrl, sourceRepo } from '@/lib/brand';
+import { brand, consoleUrl, loginUrl, nav, registerUrl, sourceUrl } from '@/lib/brand';
 import { UserMenu } from './user-menu';
 
 /** 后端登录成功时会写一个可读标记 cookie（SSR 读不到，只在水合后判断） */
@@ -360,7 +360,7 @@ export function SiteFooter() {
           <span className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <span>基于开源项目构建</span>
             <a
-              href={sourceRepo}
+              href={sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-white/80"

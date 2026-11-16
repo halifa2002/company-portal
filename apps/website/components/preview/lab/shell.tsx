@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { LogoMark } from '@portal/ui';
-import { brand, registerUrl, sourceRepo } from '@/lib/brand';
+import { brand, registerUrl, sourceUrl } from '@/lib/brand';
 import { Arrow } from '@/components/ui/arrow';
 
 /**
@@ -108,7 +108,7 @@ export function V8Footer() {
             <span aria-hidden className="hidden h-3 w-px bg-white/15 sm:block" />
             {/* AGPL-3.0 第 13 条：必须给出源码获取入口 */}
             <a
-              href={sourceRepo}
+              href={sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-white/80"

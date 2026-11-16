@@ -32,7 +32,10 @@ export function AddressBar() {
   }
 
   return (
-    <div className="flex h-12 w-full items-stretch overflow-hidden rounded-none border border-white/20 bg-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.25)] backdrop-blur">
+    /* 2026-11-16：改为墨色实心（与预览版同一套）。首屏其它元素都是半透明玻璃，
+       只有地址这一条实心，正好把「网关地址」这件事实钉住；12% 白边 + 内侧顶部高光 + 内圈暗边，
+       避免看起来像贴上去的一块黑条。 */
+    <div className="flex h-12 w-full items-stretch overflow-hidden rounded-none border border-white/12 bg-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_0_0_1px_rgba(0,0,0,0.25),0_2px_10px_rgba(0,0,0,0.35)]">
       <div className="relative flex shrink-0 items-center border-r border-white/15">
         <label htmlFor="hero-protocol" className="sr-only">
           协议

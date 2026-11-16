@@ -32,7 +32,7 @@ export function AddressBar() {
   }
 
   return (
-    <div className="flex h-12 w-full items-stretch overflow-hidden rounded-none border border-white/20 bg-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.25)] backdrop-blur">
+    <div className="flex h-12 w-full items-stretch overflow-hidden rounded-none border border-white/12 bg-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_0_0_1px_rgba(0,0,0,0.25),0_2px_10px_rgba(0,0,0,0.35)]">
       <div className="relative flex shrink-0 items-center border-r border-white/15">
         <label htmlFor="hero-protocol" className="sr-only">
           协议

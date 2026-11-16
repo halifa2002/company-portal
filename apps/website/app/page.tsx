@@ -1,4 +1,4 @@
-﻿import { MODEL_CATALOG } from '@portal/types';
+import { MODEL_CATALOG } from '@portal/types';
 import { loadModelList } from '@/lib/pricing';
 import { SiteHeader } from '@/components/site-chrome';
 import { V8Footer } from '@/components/home/shell';
@@ -51,14 +51,31 @@ export default async function HomePage() {
     <div className="relative min-h-screen bg-surface">
       {/* 2026-11-16：与预览版同步 —— 星空底图从页面最顶上（通告条之前）铺一整屏 + 200px，
           通告条、页头、首屏看到的是同一张图；首屏以下的内容自带底色，不会透出来。 */}
+      {/* 2026-11-16 分档：≥1280 用 4K（3840×2160 / 600KB），更窄的用 2K（2048×1152 / 148KB）。
+          手机/平板最高也就用到两千像素，再发 4K 是白花 450KB；display:none 那层浏览器不会下载，
+          所以省流是真的省。 */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[calc(100svh+200px)]"
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[calc(100svh+200px)] xl:hidden"
         style={{
           backgroundColor: '#eef6ff',
           backgroundImage: [
             'linear-gradient(180deg, rgba(238,246,255,0) 0%, rgba(238,246,255,0) 86%, rgba(238,246,255,0.9) 95%, #eef6ff 100%)',
             "url('/hero/starfield-dawn.webp')",
+          ].join(','),
+          backgroundSize: '100% 100%, 100% 100%',
+          backgroundPosition: 'top, top',
+          backgroundRepeat: 'no-repeat, no-repeat',
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 hidden h-[calc(100svh+200px)] xl:block"
+        style={{
+          backgroundColor: '#eef6ff',
+          backgroundImage: [
+            'linear-gradient(180deg, rgba(238,246,255,0) 0%, rgba(238,246,255,0) 86%, rgba(238,246,255,0.9) 95%, #eef6ff 100%)',
+            "url('/hero/starfield-dawn-4k.webp')",
           ].join(','),
           backgroundSize: '100% 100%, 100% 100%',
           backgroundPosition: 'top, top',

@@ -5,6 +5,8 @@
  * 我们那套是「品牌色方块 + 白图形」，形态对不上；用户要求照抄，就直接取它的 path。
  * 图形版权归各厂商，此处只作页面演示占位，正式上线前需确认授权或替换为自家素材。
  */
+import { useId } from 'react';
+
 type Mark = { viewBox: string; inner: string };
 
 const MARKS: Record<string, Mark> = {
@@ -18,8 +20,16 @@ const MARKS: Record<string, Mark> = {
 
 export function RouteMark(props: { name: string; size?: number; color?: string }) {
   const m = MARKS[props.name];
+  /* 2026-11-16 修「电脑版图标变成两个眼睛」：原素材把渐变 id 写死（cdxg / lobe-icons-open-claw-*），
+   * 同一页渲染两套（窄版 + 桌面版图，一套 display:none），id 重复 → url(#id) 指到隐藏那一套，
+   * 部分浏览器就不上色：Codex 整个消失、OpenClaw 只剩两个眼珠。这里给每次实例加唯一后缀。 */
+  const raw = useId();
+  const uid = raw.replace(/[^a-zA-Z0-9_-]/g, '');
   if (!m) return null;
   const s = props.size ?? 23;
+  const inner = m.inner
+    .replace(/cdxg/g, `cdxg-${uid}`)
+    .replace(/lobe-icons-open-claw-(\d)-_R_0_/g, `openclaw-$1-${uid}`);
   return (
     <svg
       width={s}
@@ -29,7 +39,7 @@ export function RouteMark(props: { name: string; size?: number; color?: string }
       style={props.color ? { color: props.color } : undefined}
       aria-hidden
       className="shrink-0"
-      dangerouslySetInnerHTML={{ __html: m.inner }}
+      dangerouslySetInnerHTML={{ __html: inner }}
     />
   );
 }
